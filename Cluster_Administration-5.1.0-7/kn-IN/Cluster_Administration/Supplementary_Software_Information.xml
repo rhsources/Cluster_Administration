@@ -1,0 +1,639 @@
+<?xml version='1.0'?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<appendix id="Cluster_Administration-Supplementary_Software_Information">
+	<title>Supplementary Software Information</title>
+	<indexterm>
+		<primary>software information, supplementary</primary>
+	</indexterm>
+	<para>
+		The information in the following sections can assist in the management of the cluster software configuration.
+	</para>
+	<section id="Cluster_Administration-Supplementary_Software_Information-Cluster_Communication_Mechanisms">
+		<title>Cluster Communication Mechanisms</title>
+		<indexterm>
+			<primary>cluster communication mechanisms</primary>
+		</indexterm>
+		<para>
+			A cluster uses several intra-cluster communication mechanisms to ensure data integrity and correct cluster behavior when a failure occurs. The cluster uses these mechanisms to:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Control when a system can become a cluster member
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Determine the state of the cluster systems
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Control the behavior of the cluster when a failure occurs
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			The cluster communication mechanisms are as follows:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Shared (quorum) partitions
+				</para>
+				<para>
+					Periodically, each cluster system writes a time-stamp and system status to the primary and shadow shared partitions, which are raw partitions located on shared storage. Each member reads the system status and time-stamp that were written by the other members and determines if they are up to date. The members attempt to read the information from the primary shared partition. If this partition is corrupted, the members read the information from the shadow shared partition and simultaneously repair the primary partition. Data consistency is maintained through checksums and any inconsistencies between the partitions are automatically corrected.
+				</para>
+				<para>
+					If a member reboots but cannot write to both shared partitions, the system is not allowed to join the cluster. In addition, if an existing member can no longer write to both partitions, it removes itself from the cluster by shutting down.
+				</para>
+				<para>
+					Shared partitions are only used as a communication mechanism in two-member clusters that have network tie-breaker disabled.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Remote power switch monitoring
+				</para>
+				<para>
+					Periodically, each member monitors the health of the remote power switch connection, if any. The member uses this information to help determine the status of the other cluster members. The complete failure of the power switch communication mechanism does not automatically result in a failover. If a power switch fails to power-cycle a hung system, no failover is performed as the cluster infrastructure cannot guarantee the member&#39;s present state.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Ethernet heartbeats
+				</para>
+				<para>
+					The members are connected together by using point-to-point Ethernet lines. Periodically, each member issues heartbeats (pings) across these lines. The cluster uses this information to help determine the status of the members and to ensure correct cluster operation. The complete failure of the heartbeat communication mechanism does not automatically result in a failover.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			If a member determines that a time-stamp from another member is not up-to-date, it checks the heartbeat status. If heartbeats to the member are still operating, the cluster software takes no action. If a member does not update its time-stamp after some period of time, and does not respond to heartbeat pings, it is considered down.
+		</para>
+		<para>
+			The cluster remains operational as long as one cluster system can write to the shared partitions, even if all other communication mechanisms fail.
+		</para>
+		<para>
+			Note that shared partition is only used as a back-up in some two-member configurations. The network membership algorithm is the primary determining factor as to which cluster members are active and which are not. A member that is not updating its time-stamp in this configuration never causes a failover unless <command>clumembd</command> reports that the member is down.
+		</para>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Failover_and_Recovery_Scenarios">
+		<title>Failover and Recovery Scenarios</title>
+		<indexterm>
+			<primary>failover and recover scenarios</primary>
+		</indexterm>
+		<indexterm>
+			<primary>troubleshooting</primary>
+			<secondary>failover and recover scenarios</secondary>
+		</indexterm>
+		<para>
+			Understanding cluster behavior when significant events occur can assist in the proper management of a cluster. Note that cluster behavior depends on whether power switches are employed in the configuration. Power switches enable the cluster to maintain complete data integrity under all failure conditions.
+		</para>
+		<para>
+			The following sections describe how the system responds to various failure and error scenarios.
+		</para>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Common_Cluster_Behaviors_General">
+		<title>Common Cluster Behaviors: General</title>
+		<variablelist>
+			<indexterm>
+				<primary>tables</primary>
+				<secondary>common cluster behaviors</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>common cluster behaviors table</primary>
+			</indexterm>
+			<varlistentry>
+				<term><emphasis>Loss of connectivity to a power switch or failure to fence a member</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Serial power switch disconnected from controlling member. Network power switch disconnected from network.
+					</para>
+					<para>
+						Expected Behavior: Members controlled by the power switch will not be able to be shut down or restarted. In this case, if the member hangs, services will not fail-over from any member controlled by the switch in question.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> to verify that services are still marked as <computeroutput>running</computeroutput> on the member, even though it is <computeroutput>inactive</computeroutput> according to membership.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Dissolution of the cluster quorum</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: A majority of cluster members (for example, 3 of 5 members) go offline
+					</para>
+					<para>
+						Test Case: In a 3 member cluster, stop the cluster software on two members.
+					</para>
+					<para>
+						Expected Behavior: All members which do not have controlling power switches reboot immediately. All services stop immediately and their states are not updated on the shared media (when running <command>clustat</command>, the service status blocks may still display that the service is running). Service managers exit. Cluster locks are lost and become unavailable.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> on one of the remaining active members.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Member loses participatory status in the cluster quorum but is not hung</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Total loss of connectivity to other members.
+					</para>
+					<para>
+						Test Case: Disconnect all network cables from a cluster member.
+					</para>
+					<para>
+						Expected Behavior: If the member has no controlling power switches, it reboots immediately. Otherwise, it attempts to stop services as quickly as possible. If a quorum exists, the set of members comprising the cluster quorum will fence the member.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>clumembd</command> crashes</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>killall -KILL clumembd</command>
+					</para>
+					<para>
+						Expected Behavior: System reboot.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>clumembd</command> hangs, watchdog in use</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>killall -STOP clumembd</command>
+					</para>
+					<para>
+						Expected Behavior: System reboot may occur if <command>clumembd</command> hangs for a time period greater than (failover_time - 1) seconds. Triggered externally by watchdog timer.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>clumembd</command> hangs, no watchdog in use</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>killall -STOP clumembd</command>
+					</para>
+					<para>
+						Expected Behavior: System reboot may occur if <command>clumembd</command> hangs for a time period greater than (failover_time) seconds. Triggered internally by <command>clumembd</command>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>cluquorumd</command> crashes</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>killall -KILL cluquorumd</command>
+					</para>
+					<para>
+						Expected Behavior: System reboot.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>clusvcmgrd</command> crashes</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>killall -KILL clusvcmgrd</command>
+					</para>
+					<para>
+						Expected Behavior: <command>cluquorumd</command> re-spawns <command>clusvcmgrd</command>, which runs the stop phase of all services. Services which are stopped are started.
+					</para>
+					<para>
+						Verification: Consult system logs for a warning message from <command>cluquorumd</command>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>clulockd</command> crashes</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>killall -KILL clulockd</command>
+					</para>
+					<para>
+						Expected Behavior: <command>cluquorumd</command> re-spawns <command>clulockd</command>. Locks may be unavailable (preventing service transitions) for a short period of time.
+					</para>
+					<para>
+						Verification: Consult system logs for a warning message from <command>cluquorumd</command>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Unexpected system reboot without clean shutdown of cluster services</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Any noted scenario which causes a system reboot.
+					</para>
+					<para>
+						Test Case: <command>reboot -fn</command>; pressing the reset switch.
+					</para>
+					<para>
+						Expected Behavior: If a power switch controls the rebooting member in question, the system will also be fenced (generally, power-cycled) if a cluster quorum exists.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Loss of quorum during clean shutdown</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: Stop cluster services (<command>service rgmanager stop</command>) on all members.
+					</para>
+					<para>
+						Expected Behavior: Any remaining services are stopped uncleanly.
+					</para>
+					<para>
+						Verification: Consult the system logs for warning message.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Successful STONITH fencing operation</emphasis></term>
+				<listitem>
+					<para>
+						Expected Behavior: Services on member which was fenced are started elsewhere in the cluster, if possible.
+					</para>
+					<para>
+						Verification: Verify that services are, in fact, started after the member is fenced. This should only take a few seconds.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Unsuccessful fencing operation on cluster member</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Power switch returned error status or is not reachable.
+					</para>
+					<para>
+						Test Case: Disconnect power switch controlling a member and run <command>reboot -fn</command> on the member.
+					</para>
+					<para>
+						Expected Behavior: Services on a member which fails to be fenced are not started elsewhere in the cluster. If the member recovers, services on the cluster are restarted. Because there is no way to accurately determine the member&#39;s state, it is assumed that it is now still running even if heartbeats have stopped. Thus, all services should be reported as running on the down member.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> to verify that services are still marked as running on the member, even though it is inactive according to membership. Messages will be logged stating that the member is now in the <computeroutput>PANIC</computeroutput> state.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Error reading from one of the shared partitions</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: Run <command>dd</command> to write zeros to the shared partition
+					</para>
+<screen><command>dd if=/dev/zero of=/dev/raw/raw1 bs=512 count=1</command></screen>
+<screen><command>shutil -p /cluster/header</command></screen>
+					<para>
+						Expected Behavior: Event is logged. The data from the good shared partition is copied to the partition which returned errors
+					</para>
+					<para>
+						Verification: A second read pass of the same data should not produce a second error message.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Error reading from both of the shared partitions</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Shared media is either unreachable or both partitions have corruption.
+					</para>
+					<para>
+						Test Case: Unplug SCSI or Fibre Channel cable from a member.
+					</para>
+					<para>
+						Expected Behavior: The event is logged. Configured action is taken to address loss of access to shared storage (reboot/halt/stop/ignore). Default action is to reboot
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Common_Behaviors_Two_Member_Cluster_with_Disk_based_Tie_breaker">
+		<title>Common Behaviors: Two Member Cluster with Disk-based Tie-breaker</title>
+		<variablelist>
+			<indexterm>
+				<primary>common cluster behaviors</primary>
+				<secondary>two member disk-based tie-breaker</secondary>
+			</indexterm>
+			<varlistentry>
+				<term><emphasis>Loss of network connectivity to other member, shared media still accessible</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Network connectivity lost.
+					</para>
+					<para>
+						Test Case: Disconnect all network cables from a member.
+					</para>
+					<para>
+						Expected Behavior: No fail-over unless disk updates are also lost. Services will not be able to be relocated in most cases, which is due to the fact that the lock server requires network connectivity.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> to verify that services are still marked as running on the member, even though it is inactive according to membership. Messages are logged stating that the member is now in the <computeroutput>PANIC</computeroutput> state.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Loss of access to shared media</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Shared media loses power, cable connecting a member to the shared media is disconnected.
+					</para>
+					<para>
+						Test Case: Unplug SCSI or Fibre Channel cable from a member.
+					</para>
+					<para>
+						Expected Behavior: No failover occurs unless network is also lost. Configured action is taken to address loss of access to shared storage (reboot/halt/stop/ignore). Default is <command>reboot</command>. The action may subsequently cause a failover.)
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>System hang or crash (panic) on member X</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: Kill the <command>cluquorumd</command> and <command>clumembd</command> daemons.
+					</para>
+<screen><command>killall -STOP cluquorumd clumembd</command></screen>
+					<para>
+						Expected Behavior: Hung cluster member is fenced by other cluster member. Services fail over. Configured watchdog timers may be triggered.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Start of Cluster Services without network connectivity</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Bad switch; one or both members are without network connectivity
+					</para>
+					<para>
+						Test Case: Stop cluster services on all members. Disconnect all network cables from one member. Start cluster services on both members.
+					</para>
+					<para>
+						Verification: Not all services may start, as locks require network connectivity. <emphasis>Because the Cluster Manager requires a fully connected subnet, this case is handled on a best-effort basis, but is technically an inoperable cluster.</emphasis>
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Common_Behaviors_2_4_Member_Cluster_with_IP_based_Tie_Breaker">
+		<title>Common Behaviors: 2-4 Member Cluster with IP-based Tie-Breaker</title>
+		<variablelist>
+			<indexterm>
+				<primary>common cluster behaviors</primary>
+				<secondary>2-4 Member cluster, IP tie-breaker</secondary>
+			</indexterm>
+			<varlistentry>
+				<term><emphasis>Network Partition</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Network switch problem.
+					</para>
+					<para>
+						Test Case: Connect half of the members to switch A. Connect other half to switch B. Connect switch A to switch B using up-link or crossover cable. Connect device acting as tie-breaker IP address to switch A. Start cluster services. Unplug switch A from switch B.
+					</para>
+					<para>
+						Expected Behavior: All cluster partitions which are comprised of exactly half (1/2 or 2/4) members send <command>ping</command> packets to the tie-breaker IP address. If a reply is received, the partition forms a quorum. In the test case, this means the half connected to switch A will form a quorum. <emphasis>Because the Cluster Manager requires a fully connected subnet, the case where an even-split (or <wordasword>split-brain</wordasword>) occurs when both partitions can reach the tie-breaker IP is not handled.</emphasis>
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> on the members plugged in to switch A. There should be a <computeroutput>Cluster Quorum Incarnation</computeroutput> number listed at the top of the output.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Loss of access to shared media</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Shared media loses power; cable connecting a member to the shared media is disconnected.
+					</para>
+					<para>
+						Test Case: Unplug SCSI or Fibre Channel cable from a member.
+					</para>
+					<para>
+						Expected Behavior: Configured action is taken to address loss of access to shared storage (reboot/halt/stop/ignore). Default is <command>reboot</command>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>System hang or crash (panic) on cluster member</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: Kill the <command>cluquorumd</command> and <command>clumembd</command> daemons.
+					</para>
+<screen><command>killall -STOP cluquorumd clumembd</command></screen>
+					<para>
+						Expected Behavior: The cluster member is fenced by another member. Services fail over. If a watchdog is in use, it may be triggered.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Common_Behaviors_3_5_Member_Cluster">
+		<title>Common Behaviors: 3-5 Member Cluster</title>
+		<variablelist>
+			<indexterm>
+				<primary>common cluster behaviors</primary>
+				<secondary>3-5 Member Cluster</secondary>
+			</indexterm>
+			<varlistentry>
+				<term><emphasis>Network Partition</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Network switch problem
+					</para>
+					<para>
+						Test Case: Connect a majority of members to switch A. Connect remaining members to switch B. Connect switch A to switch B using up-link or crossover cable. Start cluster services. Unplug switch A from switch B.
+					</para>
+					<para>
+						Expected Behavior: The partition with a majority of members continues operating, and a new view of the cluster quorum is formed. Members in the minority partition are fenced, and services which were running in the minority partition are started in the majority partition, if possible. In the test case, this means that members connected to switch A will fence members connected to switch B.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> on one of the members connected to switch A. There should be a <computeroutput>Cluster Quorum Incarnation</computeroutput> number listed near the top of the output.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>System hang on cluster member</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: Kill the <command>clumembd</command> daemon.
+					</para>
+<screen><command>killall -STOP clumembd</command></screen>
+					<para>
+						Expected Behavior: The cluster member is fenced by another member. Services fail over. If watchdog timer is configured, it may be triggered.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Loss of access to shared media</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: Shared media loses power, cable connecting a member to the shared media is disconnected.
+					</para>
+					<para>
+						Test Case: Unplug SCSI or Fibre Channel cable from a member.
+					</para>
+					<para>
+						Expected Behavior: Configured action is taken to address loss of access to shared storage (reboot/halt/stop/ignore). Default is <command>reboot</command>.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Common_Behaviors_Cluster_Service_Daemons">
+		<title>Common Behaviors: Cluster Service Daemons</title>
+		<variablelist>
+			<indexterm>
+				<primary>common cluster behaviors</primary>
+				<secondary>service daemons</secondary>
+			</indexterm>
+			<varlistentry>
+				<term><emphasis>Service status check fails</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: User script reports error, <command>clurmtabd</command> not running on NFS service, <command>smbd</command> and <command>nmbd</command> not running for a service with a Samba share.
+					</para>
+					<para>
+						Test Case: Create a service with an init script that returns a <computeroutput>status</computeroutput> output of <computeroutput>1</computeroutput>.
+					</para>
+					<para>
+						Expected Behavior: Service restarts on the current owner.
+					</para>
+					<para>
+						Verification: Consult system logs for a service restart event. The <computeroutput>restarts</computeroutput> field of the service&#39;s status information should be incremented.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>A member fails to start services</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: User script returns error due to file system errors.
+					</para>
+					<para>
+						Test Case: Create a service with a user script which returns 1 for the <command>start</command> phase only on one member. Attempt to enable the service on this member.
+					</para>
+					<para>
+						Expected Behavior: Service is stopped and started on another member, provided the services stops successfully.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Service start fails on all members</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: User script returns error, file system errors.
+					</para>
+					<para>
+						Test Case: Create a service with a user script which returns 1 for the <computeroutput>start</computeroutput> phase on all members.
+					</para>
+					<para>
+						Expected Behavior: Service is placed into the <computeroutput>disabled</computeroutput> state.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> and verify that the service is in the <computeroutput>disabled state</computeroutput>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis>Service stop fails on a member</emphasis></term>
+				<listitem>
+					<para>
+						Common Causes: User script returns error; file system can not be unmounted.
+					</para>
+					<para>
+						Test Case: Create a service script which returns 1 for the <computeroutput>stop</computeroutput> phase.
+					</para>
+					<para>
+						Expected Behavior: Service is placed into the <computeroutput>failed</computeroutput> state. At this point, the administrator must intervene to determine the cause of the failure and the appropriate course of action. The service must then be disabled before it can be enabled.
+					</para>
+					<para>
+						Verification: Run <command>clustat</command> and verify that the service has been placed in to the <computeroutput>failed</computeroutput> state.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-Common_Behaviors_Miscellaneous">
+		<title>Common Behaviors: Miscellaneous</title>
+		<variablelist>
+			<indexterm>
+				<primary>common cluster behaviors</primary>
+				<secondary>miscellaneous</secondary>
+			</indexterm>
+			<varlistentry>
+				<term><emphasis><filename>/etc/cluster/cluster.conf</filename> no longer exists yet cluster is running</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: <command>rm -f cluster.xml</command>
+					</para>
+					<para>
+						Expected Behavior: <command>clusvcmgrd</command> recreates <filename>/etc/cluster/cluster.conf</filename> from its cached version.
+					</para>
+					<para>
+						Verification: Check to see that <filename>/etc/cluster/cluster.conf</filename> is present shortly after testing this action. A log message appears in the system logs.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><emphasis><command>clurmtabd</command> crashes</emphasis></term>
+				<listitem>
+					<para>
+						Test Case: Kill the <command>clurmtabd</command> daemon.
+					</para>
+<screen><command>killall -KILL clurmtabd</command></screen>
+					<para>
+						Expected Behavior: Since <command>clurmtabd</command> is only spawned during the start phase of a service with NFS exports, it is only checked by a service which has a <guilabel>Check Interval</guilabel> and NFS exports configured. If <command>clurmtabd</command> is not present (and it is configured to be), the check phase of the service returns an error and the service is restarted.
+					</para>
+					<para>
+						Verification: Consult system logs for a service restart event. The <computeroutput>restarts</computeroutput> field of the service&#39;s status information should be incremented.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Supplementary_Software_Information-The_cluster.xml_File">
+		<title>The <filename>cluster.xml</filename> File</title>
+		<para>
+			The cluster configuration file, <filename>/etc/cluster/cluster.conf</filename>, contains detailed information about the cluster members and services. <emphasis>Do not</emphasis> manually edit the configuration file. Instead, use the <application>&RHCLUSTERTOOL;</application> to modify the cluster configuration.
+		</para>
+		<para>
+			When you run <application>&RHCLUSTERTOOL;</application>, cluster-specific information is entered in a hierarchical XML format. The following is a description of each area of configuration, from daemon and shared storage to cluster members and services. Note that the back slash (\) represents a continuation of a single line.
+		</para>
+<screen><computeroutput> &lt;?xml version="1.0"?&gt; &lt;cluconfig version="3.0"&gt; &lt;clumembd broadcast="no" interval="500000" loglevel="4" multicast="yes" \ multicast_ipaddress="225.0.0.11" thread="yes" tko_count="20"/&gt; &lt;cluquorumd loglevel="6" pinginterval="" tiebreaker_ip=""/&gt; &lt;clurmtabd loglevel="4" pollinterval="4"/&gt; &lt;clusvcmgrd loglevel="4"/&gt; &lt;clulockd loglevel="4"/&gt; &lt;cluster config_viewnumber="18" key="7a497d303feefeef0f8be9b72697aaed" name="Octane"/&gt; </computeroutput></screen>
+		<para>
+			The above fields contain versioning information and cluster daemon operation parameters such as logging levels, networking addresses, and more. For more information on configuring cluster daemon parameters, refer to <xref linkend="s1-config-daemons" />.
+		</para>
+<screen><computeroutput> &lt;cluster config_viewnumber="18" key="7a497d303feefeef0f8be9b72697aaed" \ name="Test_cluster"/&gt; &lt;sharedstate driver="libsharedraw.so" rawprimary="/dev/raw/raw1" \ rawshadow="/dev/raw/raw2" type="raw"/&gt; </computeroutput></screen>
+		<para>
+			The fields above define the cluster quorum and shared cluster configuration parameters. The driver and raw partition information about the shared primary and backup partitions are also specified in these fields. For more information about configuring the shared partitions, refer to <xref linkend="s1-software-rawdevices" />.
+		</para>
+<screen><computeroutput> &lt;members&gt; &lt;member id="0" name="clu1" watchdog="yes"&gt; &lt;powercontroller id="0" ipaddress="192.168.65.51" password="apc" \ port="1:1" type="apcmaster" user="apc"/&gt; &lt;/member&gt; &lt;member id="1" name="clu2" watchdog="yes"&gt; &lt;powercontroller id="0" ipaddress="192.168.65.52" password="baytech" \ port="1" type="baytech" user="admin"/&gt; &lt;/member&gt; &lt;member id="2" name="clu3" watchdog="yes"&gt; &lt;powercontroller id="0" ipaddress="192.168.65.53" password="baytech" \ port="2" type="baytech" user="admin"/&gt; &lt;/member&gt; &lt;member id="3" name="clu4" watchdog="yes"&gt; &lt;powercontroller id="0" ipaddress="192.168.65.54" password="wti" \ port="blue" type="wti_nps" user=""/&gt; &lt;/member&gt; &lt;/members&gt; </computeroutput></screen>
+		<para>
+			The fields above define the cluster and its individual members. Each member field contains identification and configuration information, including cluster names, addresses, power controllers and types, and authentication details. For more information on configuring cluster members, refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_and_Deleting_Members" />.
+		</para>
+<screen><computeroutput> &lt;services&gt; &lt;service checkinterval="0" failoverdomain="None" id="0" name="test" \ userscript="None"&gt; &lt;service_ipaddresses/&gt; &lt;/service&gt; &lt;service checkinterval="0" failoverdomain="foodomain" id="1" name="test2" \ userscript="None"&gt; &lt;service_ipaddresses/&gt; &lt;/service&gt; &lt;/services&gt; </computeroutput></screen>
+		<para>
+			The fields above define the services controlled by the cluster system, such as NFS, Samba, and HTTP. The parameters in these fields include service names, failover domain names, service status check intervals, and location of service init scripts (if applicable). For more information about configuring clustered services, refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_a_Cluster_Service_to_the_Cluster" />.
+		</para>
+<screen><computeroutput> &lt;failoverdomains&gt; &lt;failoverdomain id="0" name="fonfs" ordered="yes" restricted="yes"&gt; &lt;failoverdomainnode id="0" name="clu2"/&gt; &lt;failoverdomainnode id="1" name="clu3"/&gt; &lt;/failoverdomain&gt; &lt;failoverdomain id="1" name="fosamba" ordered="no" restricted="no"&gt; &lt;failoverdomainnode id="0" name="clu1"/&gt; &lt;failoverdomainnode id="1" name="clu3"/&gt; &lt;/failoverdomain&gt; &lt;/failoverdomains&gt; </computeroutput></screen>
+		<para>
+			The fields above define the failover domains that control the priority and order in which the cluster members queue in the event of failover. Parameters in these fields include failover domain name, restricted and ordered toggling, and node order by member name. For more information about configuring failover domains for cluster systems, refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" />.
+		</para>
+	</section>
+
+</appendix>
+

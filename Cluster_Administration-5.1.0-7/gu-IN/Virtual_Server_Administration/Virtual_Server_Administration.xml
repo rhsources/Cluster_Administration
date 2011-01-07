@@ -1,0 +1,19 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<book>
+	<xi:include href="Book_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Introduction_to_Linux_Virtual_Server.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Linux_Virtual_Server_Overview.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Initial_LVS_Configuration.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Setting_Up_A_LVS_Cluster.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="LVS_Piranha.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include href="Using_RHCM_With_Piranha.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<index></index>
+</book>
+

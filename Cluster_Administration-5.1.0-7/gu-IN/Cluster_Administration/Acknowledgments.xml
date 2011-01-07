@@ -1,0 +1,92 @@
+<?xml version='1.0'?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<preface id="Cluster_Administration-Acknowledgments">
+	<title>Acknowledgments</title>
+	<indexterm>
+		<primary>acknowledgments</primary>
+	</indexterm>
+	<indexterm>
+		<primary>Kimberlite</primary>
+	</indexterm>
+	<indexterm>
+		<primary>Mission Critical Linux, Inc.</primary>
+	</indexterm>
+	<para>
+		The &RHCM; software was originally based on the open source Kimberlite (<ulink url="http://oss.missioncriticallinux.com/kimberlite/">http://oss.missioncriticallinux.com/kimberlite/</ulink>) cluster project, which was developed by Mission Critical Linux, Inc.
+	</para>
+	<para>
+		Subsequent to its inception based on Kimberlite, developers at &RH; have made a large number of enhancements and modifications. The following is a non-comprehensive list highlighting some of these enhancements.
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				Packaging and integration into the &RH; installation paradigm to simplify the end user&#39;s experience.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of support for multiple cluster members.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of support for high availability NFS services.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of support for high availability Samba services.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of the <application>&RHCLUSTERTOOL;</application>, a graphical configuration tool.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of the <application>&RHCLUSTERSTATTOOL;</application>, a graphical monitoring and administration tool.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of support for failover domains.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of support for &RHGFS;, including the <application>&RHGFSTOOL;</application> and the <guilabel>LOCK_GULM</guilabel> fencing driver.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of support for using watchdog timers as a data integrity provision.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Addition of service monitoring which automatically restart a failed application.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Rewrite of the service manager to facilitate additional cluster-wide operations.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				A set of miscellaneous bug fixes.
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		The &RHCM; software incorporates STONITH compliant power switch modules from the Linux-HA project; refer to <ulink url="http://www.linux-ha.org/stonith/">http://www.linux-ha.org/stonith/</ulink>.
+	</para>
+</preface>
+

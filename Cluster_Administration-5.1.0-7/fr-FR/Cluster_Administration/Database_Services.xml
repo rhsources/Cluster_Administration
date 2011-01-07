@@ -1,0 +1,631 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-Database_Services">
+	<title>Database Services</title>
+	<para>
+		This chapter contains instructions for configuring &PROD; to make database services highly available.
+	</para>
+	<note>
+		<title>Note</title>
+		<para>
+			The following descriptions present example database configuration instructions. Be aware that differences may exist in newer versions of each database product. Consequently, this information may not be directly applicable.
+		</para>
+	</note>
+	<section id="Cluster_Administration-Database_Services-Setting_Up_an_Oracle_Service">
+		<title>Setting Up an Oracle Service</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>Oracle service, setting up</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Oracle</primary>
+			<secondary>setting up service</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>databases</primary>
+			<secondary>Oracle</secondary>
+			<tertiary>setting up</tertiary>
+		</indexterm>
+		<para>
+			A database service can serve highly-available data to a database application. The application can then provide network access to database client systems, such as Web servers. If the service fails over, the application accesses the shared database data through the new cluster system. A network-accessible database service is usually assigned an IP address, which is failed over along with the service to maintain transparent access for clients.
+		</para>
+		<para>
+			This section provides an example of setting up a cluster service for an Oracle database. Although the variables used in the service scripts depend on the specific Oracle configuration, the example may aid in setting up a service for individual environments. Refer to <xref linkend="Cluster_Administration-Database_Services-Tuning_Oracle_Service" /> for information about improving service performance.
+		</para>
+		<para>
+			In the example that follows:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					The service includes one IP address for the Oracle clients to use.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The service requires two mounted file systems, one for the Oracle software (<filename>/u01/</filename>) and the other for the Oracle database (<filename>/u02/</filename>), which can be stored in a shared resource such as a GFS filesystem or storage area network (SAN) are set up and exported as a filesystem accessible to the cluster as a resource before the service is added.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					An Oracle administration account with the username <guilabel>oracle</guilabel> is created on every cluster nodes that run the service before the service are actually added. Note that <emphasis>only one</emphasis> node can be running the service at a time, but other nodes must be configured for the database service for proper failover to those nodes.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The administration directory must be accessible to all nodes configured for failover of the database service, and therefore must exist on shared storage, such as a GFS cluster or storage area network (SAN) and mounted locally (for example, <filename>/u01/app/oracle/admin/db1</filename>).
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Create a consistent user/group configuration that can properly access Oracle service for each cluster node. For example:
+		</para>
+<screen><command> mkdir /users groupadd -g 900 dba groupadd -g 901 oinstall useradd -u 901 -g 901 -d /users/oracle -m oracle usermod -G 900 oracle </command></screen>
+		<para>
+			The Oracle service example uses three scripts that must be placed in <filename>/users/oracle</filename> and owned by the Oracle administration account. The <command>oracle</command> script is used to start and stop the Oracle service. You must specify this as a <guilabel>Script</guilabel> resource when you configure the service using the <application>&RHCLUSTERTOOL;</application>. This script calls the other Oracle example scripts. The <command>startdb</command> and <command>stopdb</command> scripts start and stop the database. Note that there are many ways for an application to interact with an Oracle database.
+		</para>
+		<para>
+			The following is an example of the <command>oracle</command> script, which is used to start, stop, and check the status of the Oracle service.
+		</para>
+		<indexterm>
+			<primary>scripts</primary>
+			<secondary><command>oracle</command> script example</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>examples</primary>
+			<secondary><command>oracle</command> script</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Oracle</primary>
+			<secondary><command>oracle</command> script example</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>databases</primary>
+			<secondary>Oracle</secondary>
+			<tertiary><command>oracle</command>script example</tertiary>
+		</indexterm>
+<screen><computeroutput> #!/bin/sh # # Cluster service script to start, stop, and check status of oracle # cd /users/oracle case $1 in start) su - oracle -c ./startdb ;; stop) su - oracle -c ./stopdb ;; status) status oracle ;; esac </computeroutput></screen>
+		<para>
+			The following is an example of the <command>startdb</command> script, which is used to start the Oracle Database Server instance:
+		</para>
+		<indexterm>
+			<primary>scripts</primary>
+			<secondary><command>startdb</command> script example</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>examples</primary>
+			<secondary><command>startdb</command> script</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Oracle</primary>
+			<secondary><command>startdb</command> script example</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>databases</primary>
+			<secondary>Oracle</secondary>
+			<tertiary><command>startdb</command> script example</tertiary>
+		</indexterm>
+<screen><computeroutput> #!/bin/sh # # # Script to start the Oracle Database Server instance. # ######################################################################## # # ORACLE_RELEASE # # Specifies the Oracle product release. # ######################################################################## ORACLE_RELEASE=9.2.0 ######################################################################## # # ORACLE_SID # # Specifies the Oracle system identifier or "sid", which is the name of # the Oracle Server instance. # ######################################################################## export ORACLE_SID=TEST ######################################################################## # # ORACLE_BASE # # Specifies the directory at the top of the Oracle software product and # administrative file structure. # ######################################################################## export ORACLE_BASE=/u01/app/oracle ######################################################################## # # ORACLE_HOME # # Specifies the directory containing the software for a given release. # The Oracle recommended value is $ORACLE_BASE/product/&lt;release&gt; # ######################################################################## export ORACLE_HOME=/u01/app/oracle/product/${ORACLE_RELEASE} ######################################################################## # # LD_LIBRARY_PATH # # Required when using Oracle products that use shared libraries. # ######################################################################## export LD_LIBRARY_PATH=${ORACLE_HOME}/lib:$LD_LIBRARY_PATH ######################################################################## # # PATH # # Verify that the users search path includes $ORACLE_HOME/bin # ######################################################################## export PATH=$PATH:${ORACLE_HOME}/bin ######################################################################## # # This does the actual work. # # Start the Oracle Server instance based on the initSID.ora # initialization parameters file specified. # ######################################################################## /u01/app/oracle/product/9.2.0/bin/sqlplus &lt;&lt; EOF sys as sysdba spool /home/oracle/startdb.log startup pfile = /u01/app/oracle/product/9.2.0/admin/test/scripts/init.ora open; spool off quit; EOF exit </computeroutput></screen>
+		<para>
+			The following is an example of the <command>stopdb</command> script, which is used to stop the Oracle Database Server instance:
+		</para>
+		<indexterm>
+			<primary>scripts</primary>
+			<secondary><command>stopdb</command> script example</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>examples</primary>
+			<secondary><command>stopdb</command> script</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Oracle</primary>
+			<secondary><command>stopdb</command> script example</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>databases</primary>
+			<secondary>Oracle</secondary>
+			<tertiary><command>stopdb</command> script example</tertiary>
+		</indexterm>
+<screen><computeroutput> #!/bin/sh # # # Script to STOP the Oracle Database Server instance. # ###################################################################### # # ORACLE_RELEASE # # Specifies the Oracle product release. # ###################################################################### ORACLE_RELEASE=9.2.0 ###################################################################### # # ORACLE_SID # # Specifies the Oracle system identifier or "sid", which is the name # of the Oracle Server instance. # ###################################################################### export ORACLE_SID=TEST ###################################################################### # # ORACLE_BASE # # Specifies the directory at the top of the Oracle software product # and administrative file structure. # ###################################################################### export ORACLE_BASE=/u01/app/oracle ###################################################################### # # ORACLE_HOME # # Specifies the directory containing the software for a given release. # The Oracle recommended value is $ORACLE_BASE/product/&lt;release&gt; # ###################################################################### export ORACLE_HOME=/u01/app/oracle/product/${ORACLE_RELEASE} ###################################################################### # # LD_LIBRARY_PATH # # Required when using Oracle products that use shared libraries. # ###################################################################### export LD_LIBRARY_PATH=${ORACLE_HOME}/lib:$LD_LIBRARY_PATH ###################################################################### # # PATH # # Verify that the users search path includes $ORACLE_HOME/bin # ###################################################################### export PATH=$PATH:${ORACLE_HOME}/bin ###################################################################### # # This does the actual work. # # STOP the Oracle Server instance in a tidy fashion. # ###################################################################### /u01/app/oracle/product/9.2.0/bin/sqlplus &lt;&lt;EOF sys as sysdba spool /home/oracle/stopdb.log shutdown abort; spool off quit; EOF exit </computeroutput></screen>
+		<section id="Cluster_Administration-Setting_Up_an_Oracle_Service-Oracle_and_the_RHCLUSTERTOOL">
+			<title>Oracle and the <application>&RHCLUSTERTOOL;</application></title>
+			<indexterm>
+				<primary>examples</primary>
+				<secondary>using <application>&RHCLUSTERTOOL;</application> to add an Oracle service</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>Oracle</primary>
+				<secondary>adding an Oracle service</secondary>
+			</indexterm>
+			<indexterm>
+				<primary><application>&RHCLUSTERTOOL;</application></primary>
+				<secondary>and Oracle service</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>databases</primary>
+				<secondary>Oracle</secondary>
+				<tertiary>using <application>&RHCLUSTERTOOL;</application> with</tertiary>
+			</indexterm>
+			<para>
+				To use the <application>&RHCLUSTERTOOL;</application> to configure a failover Oracle service installed on &RHGFS;, perform the following steps:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						Start the <application>&RHCLUSTERTOOL;</application> by typing <command>system-config-cluster</command> at a shell prompt.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Create the Oracle Script resource.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Click the <guilabel>Resources</guilabel> property, then click the <guibutton>Create a Resource</guibutton> button.
+							</para>
+							<figure id="Cluster_Administration-Oracle_and_the_RHCLUSTERTOOL-Adding_the_Oracle_Script_Resource">
+								<title>Adding the Oracle Script Resource</title>
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="images/add-resource.png" />
+									</imageobject>
+									<textobject>
+										<para>
+											Adding the Oracle Script Resource
+										</para>
+									</textobject>
+								</mediaobject>
+							</figure>
+						</listitem>
+						<listitem>
+							<para>
+								Choose the <guilabel>Script</guilabel> resource from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Create a <guilabel>Name</guilabel> for the resource, such as <userinput>oracle-script</userinput>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the name of the <guilabel>File</guilabel> with path for the Script, such as <filename>/users/oracle/oracle</filename>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton> to create the resource.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Add the IP address resource for the Oracle service.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Click the <guilabel>Resources</guilabel> property, then click the <guibutton>Create a Resource</guibutton> button.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Choose the <guilabel>IP Address</guilabel> resource from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the IP address to be used by clients to access the Oracle service. Leave <guilabel>Link Monitor</guilabel> checked.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton> to create the resource.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Add a GFS resource for the Oracle service and administrative files (ORACLE_HOME and ORACLE_BASE).
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Click the <guilabel>Resources</guilabel> property, then click the <guibutton>Create a Resource</guibutton> button.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Choose the <guilabel>GFS</guilabel> resource from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the <guilabel>Name</guilabel> of the GFS resource where the ORACLE_HOME and ORACLE_BASE files are installed (for example, <userinput>oracle-home</userinput>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the path on the local filesystem where the <userinput>oracle_home</userinput> device is mounted in the <guilabel>Mount Point</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the block device upon which the ORACLE_HOME and ORACLE_BASE files are installed in the <guilabel>Device</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter any mount options needed to mount the GFS resource in the <guilabel>Options</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton> to create the resource.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Add a GFS resource for the Oracle data partition.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Click the <guilabel>Resources</guilabel> property, then click the <guibutton>Create a Resource</guibutton> button.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Choose the <guilabel>GFS</guilabel> resource from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the <guilabel>Name</guilabel> of the GFS resource for the oracle data (for example, <userinput>oracle-data</userinput>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the path on the local filesystem where the Oracle data device is mounted in the <guilabel>Mount Point</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the block device upon which the Oracle data partition is installed in the <guilabel>Device</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter any mount options needed to mount the GFS resource in the <guilabel>Options</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton> to create the resource.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Create the Oracle service.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Click <guibutton>Create a Service</guibutton>. Type a <guilabel>Name</guilabel> for the service in the <guilabel>Add a Service</guilabel> dialog.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Service Management</guilabel> dialog, select a <guilabel>Failover Domain</guilabel> from the drop-down menu or leave it as <guilabel>None</guilabel>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click the <guibutton>Add a Shared Resource to this service</guibutton> button. From the available list, choose each resource that you created in the previous steps. Repeat this step until all resources have been added.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Click <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save your configuration.
+					</para>
+				</listitem>
+			</orderedlist>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Database_Services-Tuning_Oracle_Service">
+		<title>Tuning Oracle Service</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>Oracle, tuning</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Oracle</primary>
+			<secondary>tuning service</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>databases</primary>
+			<secondary>Oracle</secondary>
+			<tertiary>tuning</tertiary>
+		</indexterm>
+		<para>
+			The Oracle database recovery time after a failover is directly proportional to the number of outstanding transactions and the size of the database. The following parameters control database recovery time:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<guilabel>LOG_CHECKPOINT_TIMEOUT</guilabel>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>LOG_CHECKPOINT_INTERVAL</guilabel>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>FAST_START_IO_TARGET</guilabel>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>REDO_LOG_FILE_SIZES</guilabel>
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			To minimize recovery time, set the previous parameters to relatively low values. Note that excessively low values adversely impact performance. Try different values to find the optimal value.
+		</para>
+		<para>
+			Oracle provides additional tuning parameters that control the number of database transaction retries and the retry delay time. Be sure that these values are large enough to accommodate the failover time in the cluster environment. This ensures that failover is transparent to database client application programs and does not require programs to reconnect.
+		</para>
+	</section>
+	
+	<section id="Cluster_Administration-Database_Services-Setting_Up_a_MySQL_Service">
+		<title>Setting Up a MySQL Service</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>MySQL service, setting up</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>MySQL</primary>
+			<secondary>setting up service</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>databases</primary>
+			<secondary>MySQL</secondary>
+			<tertiary>setting up service</tertiary>
+		</indexterm>
+		<para>
+			A database service can serve highly-available data to a MySQL database application. The application can then provide network access to database client systems, such as Web servers. If the service fails over, the application accesses the shared database data through the new cluster system. A network-accessible database service is usually assigned one IP address, which is failed over along with the service to maintain transparent access for clients.
+		</para>
+		<para>
+			An example of a MySQL database service configuration is as follows:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					The MySQL server packages are installed on each cluster system that will run the service. The MySQL database files are installed on a shared GFS device. This allows the database data to be accessed by all cluster members. In the example, the file system is mounted as <filename>/var/lib/mysql</filename>, using the block device <filename>/dev/vg01/lvol5</filename>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					An IP address is associated with the MySQL service to accommodate network access by clients of the database service. This IP address is automatically migrated to the working cluster node in the event of failover. In the example below, the IP address is 10.1.16.12.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The script that is used to start and stop the MySQL database is the standard <command>init</command> script <command>mysqld</command>. If general logging of connections and queries is needed, edit the <command>mysqld</command> script to add the option <option>--log=/var/log/mysqld.log</option> as the last option to the <command>safe_mysqld</command> command. The resulting line should appear similar to the following (Note: the back slash (\) denotes the continuation of one line):
+				</para>
+<screen><command> /usr/bin/safe_mysqld --defaults-file=/etc/my.cnf --log=/var/log/mysqld.log \ &gt;/dev/null 2&gt;&amp;1 &amp; </command></screen>
+				<para>
+					If the <option>--log</option> option is added to the <command>mysqld</command> script, the new <command>mysqld</command> script should be copied to the other cluster members that can run the MySQL service, so that they can log connections and queries if the MySQL service fails over to those members.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					by default, a client connection to a MySQL server times out after eight hours of inactivity. This connection limit can be modified by setting the <command>wait_timeout</command> variable in the <filename>/etc/my.cnf</filename> file. For example, to set timeouts to four hours, add the following line to the <command>[mysqld]</command> section of <filename>/etc/my.cnf</filename>:
+				</para>
+<screen><command>set-variable = wait_timeout=14400</command></screen>
+				<para>
+					Restart the MySQL service. Note that after this change is made, the new <filename>/etc/my.cnf</filename> file should be copied to all the other cluster members that can run the MySQL service.
+				</para>
+				<para>
+					To check if a MySQL server has timed out, invoke the <command>mysqladmin</command> command and examine the uptime. If it has timed out, invoke the query again to automatically reconnect to the server.
+				</para>
+				<para>
+					Depending on the Linux distribution, one of the following messages may indicate a MySQL server timeout:
+				</para>
+<screen><computeroutput> CR_SERVER_GONE_ERROR CR_SERVER_LOST </computeroutput></screen>
+			</listitem>
+		</itemizedlist>
+		<section id="Cluster_Administration-Setting_Up_a_MySQL_Service-MySQL_and_the_RHCLUSTERTOOL">
+			<title>MySQL and the <application>&RHCLUSTERTOOL;</application></title>
+			<para>
+				To add a MySQL service using the <application>&RHCLUSTERTOOL;</application>, perform the following:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						Add the init script for the MySQL application service.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Select the <guilabel>Resources</guilabel> property and click <guibutton>Create a Resource</guibutton>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Resource Configuration</guilabel> dialog, select <guilabel>Script</guilabel> from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter a <guilabel>Name</guilabel> to be associated with the MySQL service.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the path to the MySQL init script (such as <filename>/etc/init.d/mysqld</filename> in the <guilabel>File (with path)</guilabel> field.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Add an IP address for the MySQL service.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Select the <guilabel>Resources</guilabel> property and click <guibutton>Create a Resource</guibutton>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Resource Configuration</guilabel> dialog, select <guilabel>IP Address</guilabel> from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter the <guilabel>IP Address</guilabel> to be associated with the MySQL service.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Make sure that the <guilabel>Monitor Link</guilabel> checkbox is left checked.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Add a device for the MySQL service.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Select the <guilabel>Resources</guilabel> property and click <guibutton>Create a Resource</guibutton>.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Select <guilabel>GFS</guilabel> from the drop-down menu.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Resource Configuration</guilabel> dialog, enter the <guilabel>Name</guilabel> for the resource (for example, <userinput>mysql-data</userinput>).
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Mount Point</guilabel> field, enter the path to which the shared GFS device is mounted (<filename>/var/lib/mysql/</filename>).
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Device</guilabel> field, enter the block device associated with the GFS share (<filename>/dev/vg01/lvol5</filename>).
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Enter any mount point <guilabel>Options</guilabel>, (such as <userinput>rw</userinput> for read-write priveleges).
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Click the <guilabel>Services</guilabel> property.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Add the MySQL service.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								Click <guibutton>Create a Service</guibutton>. Type a <guilabel>Name</guilabel> for the service in the <guilabel>Add a Service</guilabel> dialog.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the <guilabel>Service Management</guilabel> dialog, select a <guilabel>Failover Domain</guilabel> from the drop-down menu or leave it as <replaceable>None</replaceable>.
+							</para>
+							<figure id="Cluster_Administration-MySQL_and_the_RHCLUSTERTOOL-MySQL_service_management">
+								<title>MySQL service management</title>
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="images/add-service.png" />
+									</imageobject>
+									<textobject>
+										<para>
+											Adding the MySQL service
+										</para>
+									</textobject>
+								</mediaobject>
+							</figure>
+						</listitem>
+						<listitem>
+							<para>
+								Click the <guibutton>Add a Shared Resource to this service</guibutton> button. From the available list, choose each resource that you created in the previous steps. Repeat this step until all resources have been added.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click <guibutton>OK</guibutton>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the MySQL service configuration.
+					</para>
+				</listitem>
+			</orderedlist>
+		</section>
+
+	</section>
+
+</chapter>
+

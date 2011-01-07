@@ -1,0 +1,2032 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Suite_Overview-RHCS_Overview">
+	<title>&RHCS; Overview</title>
+	<para>
+		Clustered systems provide reliability, scalability, and availability to critical production services. Using &RHCS;, you can create a cluster to suit your needs for performance, high availability, load balancing, scalability, file sharing, and economy. This chapter provides an overview of &RHCS; components and functions, and consists of the following sections:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Cluster_Basics" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-RHCS_Introduction" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Cluster_Infrastructure" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-High_availability_Service_Management" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-RHGFS" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Cluster_Logical_Volume_Manager" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Global_Network_Block_Device" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Linux_Virtual_Server" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Cluster_Administration_Tools" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview-Linux_Virtual_Server_Administration_GUI" />
+			</para>
+		</listitem>
+	</itemizedlist>
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Cluster_Basics">
+		<title>Cluster Basics</title>
+		<para>
+			A cluster is two or more computers (called <firstterm>nodes</firstterm> or <firstterm>members</firstterm>) that work together to perform a task. There are four major types of clusters:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Storage
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					High availability
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Load balancing
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					High performance
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Storage clusters provide a consistent file system image across servers in a cluster, allowing the servers to simultaneously read and write to a single shared file system. A storage cluster simplifies storage administration by limiting the installation and patching of applications to one file system. Also, with a cluster-wide file system, a storage cluster eliminates the need for redundant copies of application data and simplifies backup and disaster recovery. &RHCS; provides storage clustering through &RHGFS;.
+		</para>
+		<para>
+			High-availability clusters provide continuous availability of services by eliminating single points of failure and by failing over services from one cluster node to another in case a node becomes inoperative. Typically, services in a high-availability cluster read and write data (via read-write mounted file systems). Therefore, a high-availability cluster must maintain data integrity as one cluster node takes over control of a service from another cluster node. Node failures in a high-availability cluster are not visible from clients outside the cluster. (High-availability clusters are sometimes referred to as failover clusters.) &RHCS; provides high-availability clustering through its High-availability Service Management component.
+		</para>
+		<para>
+			Load-balancing clusters dispatch network service requests to multiple cluster nodes to balance the request load among the cluster nodes. Load balancing provides cost-effective scalability because you can match the number of nodes according to load requirements. If a node in a load-balancing cluster becomes inoperative, the load-balancing software detects the failure and redirects requests to other cluster nodes. Node failures in a load-balancing cluster are not visible from clients outside the cluster. &RHCS; provides load-balancing through LVS (Linux Virtual Server).
+		</para>
+		<para>
+			High-performance clusters use cluster nodes to perform concurrent calculations. A high-performance cluster allows applications to work in parallel, therefore enhancing the performance of the applications. (High performance clusters are also referred to as computational clusters or grid computing.)
+		</para>
+		<note>
+			<title>Note</title>
+			<para>
+				The cluster types summarized in the preceding text reflect basic configurations; your needs might require a combination of the clusters described.
+			</para>
+		</note>
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-RHCS_Introduction">
+		<title>&RHCS; Introduction</title>
+		<para>
+			&RHCS; (RHCS) is an integrated set of software components that can be deployed in a variety of configurations to suit your needs for performance, high-availability, load balancing, scalability, file sharing, and economy.
+		</para>
+		<para>
+			RHCS consists of the following major components (refer to <xref linkend="Cluster_Suite_Overview-RHCS_Introduction-RHCS_Introduction" />):
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Cluster infrastructure &mdash; Provides fundamental functions for nodes to work together as a cluster: configuration-file management, membership management, lock management, and fencing.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					High-availability Service Management &mdash; Provides failover of services from one cluster node to another in case a node becomes inoperative.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					&RHGFS; (Global File System) &mdash; Provides a cluster file system for use with &RHCS;. GFS allows multiple nodes to share storage at a block level as if the storage were connected locally to each cluster node.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Cluster Logical Volume Manager (CLVM) &mdash; Provides volume management of cluster storage.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Global Network Block Device (GNBD) &mdash; An ancillary component of GFS that exports block-level storage to Ethernet. This is an economical way to make block-level storage available to &RHGFS;.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Cluster administration tools &mdash; Configuration and management tools for setting up, configuring, and managing a &RH; cluster. The tools are for use with the Cluster Infrastructure components, the High-availability and Service Management components, and storage. You can configure and manage other &RHCS; components through tools for those components.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Linux Virtual Server (LVS) &mdash; Routing software that provides IP-Load-balancing. LVS runs in a pair of redundant servers that distributes client requests evenly to real servers that are behind the LVS servers.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			For a lower level summary of &RHCS; components, refer to <xref linkend="Cluster_Suite_Overview-RHCS_Component_Summary" />.
+		</para>
+		<figure id="Cluster_Suite_Overview-RHCS_Introduction-RHCS_Introduction">
+			<title>&RHCS; Introduction</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/9106.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						&RHCS; Introduction
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Cluster_Infrastructure">
+		<title>Cluster Infrastructure</title>
+		<para>
+			The &RHCS; cluster infrastructure provides the basic functions for a group of computers (called <firstterm>nodes</firstterm> or <firstterm>members</firstterm>) to work together as a cluster. Once a cluster is formed using the cluster infrastructure, you can use other &RHCS; components to suit your clustering needs (for example, setting up a cluster for sharing files on a GFS file system or setting up service failover). The cluster infrastructure performs the following functions:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Cluster management
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Lock management
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Fencing
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Cluster configuration management
+				</para>
+			</listitem>
+		</itemizedlist>
+		<section id="Cluster_Suite_Overview-Cluster_Infrastructure-Cluster_Management">
+			<title>Cluster Management</title>
+			<para>
+				Cluster management manages cluster quorum and cluster membership. CMAN (an abbreviation for cluster manager) performs cluster management in &RHCS; for &RHEL; 5. CMAN is a distributed cluster manager and runs in each cluster node; cluster management is distributed across all nodes in the cluster (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Management-CMANDLM_Overview" />).
+			</para>
+			<para>
+				CMAN keeps track of cluster quorum by monitoring the count of cluster nodes. If more than half the nodes are active, the cluster has quorum. If half the nodes (or fewer) are active, the cluster does not have quorum, and all cluster activity is stopped. Cluster quorum prevents the occurrence of a "split-brain" condition &mdash; a condition where two instances of the same cluster are running. A split-brain condition would allow each cluster instance to access cluster resources without knowledge of the other cluster instance, resulting in corrupted cluster integrity.
+			</para>
+			<para>
+				Quorum is determined by communication of messages among cluster nodes via Ethernet. Optionally, quorum can be determined by a combination of communicating messages via Ethernet <emphasis>and</emphasis> through a quorum disk. For quorum via Ethernet, quorum consists of 50 percent of the node votes plus 1. For quorum via quorum disk, quorum consists of user-specified conditions.
+			</para>
+			<note>
+				<title>Note</title>
+				<para>
+					By default, each node has one quorum vote. Optionally, you can configure each node to have more than one vote.
+				</para>
+			</note>
+			<para>
+				CMAN keeps track of membership by monitoring messages from other cluster nodes. When cluster membership changes, the cluster manager notifies the other infrastructure components, which then take appropriate action. For example, if node A joins a cluster and mounts a GFS file system that nodes B and C have already mounted, then an additional journal and lock management is required for node A to use that GFS file system. If a cluster node does not transmit a message within a prescribed amount of time, the cluster manager removes the node from the cluster and communicates to other cluster infrastructure components that the node is not a member. Again, other cluster infrastructure components determine what actions to take upon notification that node is no longer a cluster member. For example, Fencing would fence the node that is no longer a member.
+			</para>
+			<figure id="Cluster_Suite_Overview-Cluster_Management-CMANDLM_Overview">
+				<title>CMAN/DLM Overview</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/DLM_Overview.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							CMAN/DLM Overview
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Cluster_Infrastructure-Lock_Management">
+			<title>Lock Management</title>
+			<para>
+				Lock management is a common cluster-infrastructure service that provides a mechanism for other cluster infrastructure components to synchronize their access to shared resources. In a &RH; cluster, DLM (Distributed Lock Manager) is the lock manager. As implied in its name, DLM is a distributed lock manager and runs in each cluster node; lock management is distributed across all nodes in the cluster (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Management-CMANDLM_Overview" />). GFS and CLVM use locks from the lock manager. GFS uses locks from the lock manager to synchronize access to file system metadata (on shared storage). CLVM uses locks from the lock manager to synchronize updates to LVM volumes and volume groups (also on shared storage).
+			</para>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Cluster_Infrastructure-Fencing">
+			<title>Fencing</title>
+			<para>
+				Fencing is the disconnection of a node from the cluster&#39;s shared storage. Fencing cuts off I/O from shared storage, thus ensuring data integrity. The cluster infrastructure performs fencing through the fence daemon, <command>fenced</command>.
+			</para>
+			<para>
+				When CMAN determines that a node has failed, it communicates to other cluster-infrastructure components that the node has failed. <command>fenced</command>, when notified of the failure, fences the failed node. Other cluster-infrastructure components determine what actions to take &mdash; that is, they perform any recovery that needs to done. For example, DLM and GFS, when notified of a node failure, suspend activity until they detect that <command>fenced</command> has completed fencing the failed node. Upon confirmation that the failed node is fenced, DLM and GFS perform recovery. DLM releases locks of the failed node; GFS recovers the journal of the failed node.
+			</para>
+			<para>
+				The fencing program determines from the cluster configuration file which fencing method to use. Two key elements in the cluster configuration file define a fencing method: fencing agent and fencing device. The fencing program makes a call to a fencing agent specified in the cluster configuration file. The fencing agent, in turn, fences the node via a fencing device. When fencing is complete, the fencing program notifies the cluster manager.
+			</para>
+			<para>
+				&RHCS; provides a variety of fencing methods:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Power fencing &mdash; A fencing method that uses a power controller to power off an inoperable node.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Fibre Channel switch fencing &mdash; A fencing method that disables the Fibre Channel port that connects storage to an inoperable node.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						GNBD fencing &mdash; A fencing method that disables an inoperable node&#39;s access to a GNBD server.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Other fencing &mdash; Several other fencing methods that disable I/O or power of an inoperable node, including IBM Bladecenters, PAP, DRAC/MC, HP ILO, IPMI, IBM RSA II, and others.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-Fencing-Power_Fencing_Example" /> shows an example of power fencing. In the example, the fencing program in node A causes the power controller to power off node D. <xref linkend="Cluster_Suite_Overview-Fencing-Fibre_Channel_Switch_Fencing_Example" /> shows an example of Fibre Channel switch fencing. In the example, the fencing program in node A causes the Fibre Channel switch to disable the port for node D, disconnecting node D from storage.
+			</para>
+			<figure id="Cluster_Suite_Overview-Fencing-Power_Fencing_Example">
+				<title>Power Fencing Example</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fence-example-pwr.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Power Fencing Example
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<figure id="Cluster_Suite_Overview-Fencing-Fibre_Channel_Switch_Fencing_Example">
+				<title>Fibre Channel Switch Fencing Example</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fence-example-fc.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Fibre Channel Switch Fencing Example
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Specifying a fencing method consists of editing a cluster configuration file to assign a fencing-method name, the fencing agent, and the fencing device for each node in the cluster.
+			</para>
+			<para>
+				The way in which a fencing method is specified depends on if a node has either dual power supplies or multiple paths to storage. If a node has dual power supplies, then the fencing method for the node must specify at least two fencing devices &mdash; one fencing device for each power supply (refer to <xref linkend="Cluster_Suite_Overview-Fencing-Fencing_a_Node_with_Dual_Power_Supplies" />). Similarly, if a node has multiple paths to Fibre Channel storage, then the fencing method for the node must specify one fencing device for each path to Fibre Channel storage. For example, if a node has two paths to Fibre Channel storage, the fencing method should specify two fencing devices &mdash; one for each path to Fibre Channel storage (refer to <xref linkend="Cluster_Suite_Overview-Fencing-Fencing_a_Node_with_Dual_Fibre_Channel_Connections" />).
+			</para>
+			<figure id="Cluster_Suite_Overview-Fencing-Fencing_a_Node_with_Dual_Power_Supplies">
+				<title>Fencing a Node with Dual Power Supplies</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fence-example-pwr-dual.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Fencing a Node with Dual Power Supplies
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<figure id="Cluster_Suite_Overview-Fencing-Fencing_a_Node_with_Dual_Fibre_Channel_Connections">
+				<title>Fencing a Node with Dual Fibre Channel Connections</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fence-example-fc-dual.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Fencing a Node with Dual Fibre Channel Connections
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				You can configure a node with one fencing method or multiple fencing methods. When you configure a node for one fencing method, that is the only fencing method available for fencing that node. When you configure a node for multiple fencing methods, the fencing methods are <firstterm>cascaded</firstterm> from one fencing method to another according to the order of the fencing methods specified in the cluster configuration file. If a node fails, it is fenced using the first fencing method specified in the cluster configuration file for that node. If the first fencing method is not successful, the next fencing method specified for that node is used. If none of the fencing methods is successful, then fencing starts again with the first fencing method specified, and continues looping through the fencing methods in the order specified in the cluster configuration file until the node has been fenced.
+			</para>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Cluster_Infrastructure-Cluster_Configuration_System">
+			<title>Cluster Configuration System</title>
+			<para>
+				The Cluster Configuration System (CCS) manages the cluster configuration and provides configuration information to other cluster components in a &RH; cluster. CCS runs in each cluster node and makes sure that the cluster configuration file in each cluster node is up to date. For example, if a cluster system administrator updates the configuration file in Node A, CCS propagates the update from Node A to the other nodes in the cluster (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Configuration_System-CCS_Overview" />).
+			</para>
+			<figure id="Cluster_Suite_Overview-Cluster_Configuration_System-CCS_Overview">
+				<title>CCS Overview</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/ccs-overview.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							CCS Overview
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Other cluster components (for example, CMAN) access configuration information from the configuration file through CCS (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Configuration_System-CCS_Overview" />).
+			</para>
+			<figure id="Cluster_Suite_Overview-Cluster_Configuration_System-Accessing_Configuration____Information">
+				<title>Accessing Configuration Information</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/ccs-access-config.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Accessing Configuration Information
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>) is an XML file that describes the following cluster characteristics:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Cluster name &mdash; Displays the cluster name, cluster configuration file revision level, and basic fence timing properties used when a node joins a cluster or is fenced from the cluster.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Cluster &mdash; Displays each node of the cluster, specifying node name, node ID, number of quorum votes, and fencing method for that node.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Fence Device &mdash; Displays fence devices in the cluster. Parameters vary according to the type of fence device. For example for a power controller used as a fence device, the cluster configuration defines the name of the power controller, its IP address, login, and password.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Managed Resources &mdash; Displays resources required to create cluster services. Managed resources includes the definition of failover domains, resources (for example an IP address), and services. Together the managed resources define cluster services and failover behavior of the cluster services.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-High_availability_Service_Management">
+		<title>High-availability Service Management</title>
+		<para>
+			High-availability service management provides the ability to create and manage high-availability <firstterm>cluster services</firstterm> in a &RH; cluster. The key component for high-availability service management in a &RH; cluster, <command>rgmanager</command>, implements cold failover for off-the-shelf applications. In a &RH; cluster, an application is configured with other cluster resources to form a high-availability cluster service. A high-availability cluster service can fail over from one cluster node to another with no apparent interruption to cluster clients. Cluster-service failover can occur if a cluster node fails or if a cluster system administrator moves the service from one cluster node to another (for example, for a planned outage of a cluster node).
+		</para>
+		<para>
+			To create a high-availability service, you must configure it in the cluster configuration file. A cluster service comprises cluster <firstterm>resources</firstterm>. Cluster resources are building blocks that you create and manage in the cluster configuration file &mdash; for example, an IP address, an application initialization script, or a &RHGFS; shared partition.
+		</para>
+		<para>
+			You can associate a cluster service with a <firstterm>failover domain</firstterm>. A failover domain is a subset of cluster nodes that are eligible to run a particular cluster service (refer to <xref linkend="Cluster_Suite_Overview-High_availability_Service_Management-Failover_Domains" />).
+		</para>
+		<note>
+			<title>Note</title>
+			<para>
+				Failover domains are <emphasis>not</emphasis> required for operation.
+			</para>
+		</note>
+		<para>
+			A cluster service can run on only one cluster node at a time to maintain data integrity. You can specify failover priority in a failover domain. Specifying failover priority consists of assigning a priority level to each node in a failover domain. The priority level determines the failover order &mdash; determining which node that a cluster service should fail over to. If you do not specify failover priority, a cluster service can fail over to any node in its failover domain. Also, you can specify if a cluster service is restricted to run only on nodes of its associated failover domain. (When associated with an unrestricted failover domain, a cluster service can start on any cluster node in the event no member of the failover domain is available.)
+		</para>
+		<para>
+			In <xref linkend="Cluster_Suite_Overview-High_availability_Service_Management-Failover_Domains" />, Failover Domain 1 is configured to restrict failover within that domain; therefore, Cluster Service X can only fail over between Node A and Node B. Failover Domain 2 is also configured to restrict failover with its domain; additionally, it is configured for failover priority. Failover Domain 2 priority is configured with Node C as priority 1, Node B as priority 2, and Node D as priority 3. If Node C fails, Cluster Service Y fails over to Node B next. If it cannot fail over to Node B, it tries failing over to Node D. Failover Domain 3 is configured with no priority and no restrictions. If the node that Cluster Service Z is running on fails, Cluster Service Z tries failing over to one of the nodes in Failover Domain 3. However, if none of those nodes is available, Cluster Service Z can fail over to any node in the cluster.
+		</para>
+		<figure id="Cluster_Suite_Overview-High_availability_Service_Management-Failover_Domains">
+			<title>Failover Domains</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/svc-fo-domain.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						Failover domains
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			<xref linkend="Cluster_Suite_Overview-High_availability_Service_Management-Web_Server_Cluster_Service____Example" /> shows an example of a high-availability cluster service that is a web server named "content-webserver". It is running in cluster node B and is in a failover domain that consists of nodes A, B, and D. In addition, the failover domain is configured with a failover priority to fail over to node D before node A and to restrict failover to nodes only in that failover domain. The cluster service comprises these cluster resources:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					IP address resource &mdash; IP address 10.10.10.201.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					An application resource named "httpd-content" &mdash; a web server application init script <filename>/etc/init.d/httpd</filename> (specifying <command>httpd</command>).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A file system resource &mdash; &RHGFS; named "gfs-content-webserver".
+				</para>
+			</listitem>
+		</itemizedlist>
+		<figure id="Cluster_Suite_Overview-High_availability_Service_Management-Web_Server_Cluster_Service____Example">
+			<title>Web Server Cluster Service Example</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/ha-svc-example-webserver.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						Web Server Cluster Service Example
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			Clients access the cluster service through the IP address 10.10.10.201, enabling interaction with the web server application, httpd-content. The httpd-content application uses the gfs-content-webserver file system. If node B were to fail, the content-webserver cluster service would fail over to node D. If node D were not available or also failed, the service would fail over to node A. Failover would occur with no apparent interruption to the cluster clients. The cluster service would be accessible from another cluster node via the same IP address as it was before failover.
+		</para>
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-RHGFS">
+		<title>&RHGFS;</title>
+		<para>
+			&RHGFS; is a cluster file system that allows a cluster of nodes to simultaneously access a block device that is shared among the nodes. GFS is a native file system that interfaces directly with the VFS layer of the Linux kernel file-system interface. GFS employs distributed metadata and multiple journals for optimal operation in a cluster. To maintain file system integrity, GFS uses a lock manager to coordinate I/O. When one node changes data on a GFS file system, that change is immediately visible to the other cluster nodes using that file system.
+		</para>
+		<para>
+			Using &RHGFS;, you can achieve maximum application uptime through the following benefits:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Simplifying your data infrastructure
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							Install and patch applications once for the entire cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Eliminates the need for redundant copies of application data (duplication).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Enables concurrent read/write access to data by many clients.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Simplifies backup and disaster recovery (only one file system to back up or recover).
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Maximize the use of storage resources; minimize storage administration costs.
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							Manage storage as a whole instead of by partition.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Decrease overall storage needs by eliminating the need for data replications.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Scale the cluster seamlessly by adding servers or storage on the fly.
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							No more partitioning storage through complicated techniques.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Add servers to the cluster on the fly by mounting them to the common file system.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+		</itemizedlist>
+		<para>
+			Nodes that run &RHGFS; are configured and managed with &RHCS; configuration and management tools. Volume management is managed through CLVM (Cluster Logical Volume Manager). &RHGFS; provides data sharing among GFS nodes in a &RH; cluster. GFS provides a single, consistent view of the file-system name space across the GFS nodes in a &RH; cluster. GFS allows applications to install and run without much knowledge of the underlying storage infrastructure. Also, GFS provides features that are typically required in enterprise environments, such as quotas, multiple journals, and multipath support.
+		</para>
+		<para>
+			GFS provides a versatile method of networking storage according to the performance, scalability, and economic needs of your storage environment. This chapter provides some very basic, abbreviated information as background to help you understand GFS.
+		</para>
+		<indexterm>
+			<primary>overview</primary>
+			<secondary>performance</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>overview</primary>
+			<secondary>scalability</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>overview</primary>
+			<secondary>economy</secondary>
+		</indexterm>
+		<para>
+			You can deploy GFS in a variety of configurations to suit your needs for performance, scalability, and economy. For superior performance and scalability, you can deploy GFS in a cluster that is connected directly to a SAN. For more economical needs, you can deploy GFS in a cluster that is connected to a LAN with servers that use <firstterm>GNBD</firstterm> (Global Network Block Device) or to <firstterm>iSCSI</firstterm> (Internet Small Computer System Interface) devices. (For more information about GNBD, refer to <xref linkend="Cluster_Suite_Overview-RHCS_Overview-Global_Network_Block_Device" />.)
+		</para>
+		<para>
+			The following sections provide examples of how GFS can be deployed to suit your needs for performance, scalability, and economy:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-RHGFS-Superior_Performance_and_Scalability" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-RHGFS-Performance_Scalability_Moderate_Price" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-RHGFS-Economy_and_Performance" />
+				</para>
+			</listitem>
+		</itemizedlist>
+		<note>
+			<title>Note</title>
+			<para>
+				The GFS deployment examples reflect basic configurations; your needs might require a combination of configurations shown in the examples.
+			</para>
+		</note>
+		<section id="Cluster_Suite_Overview-RHGFS-Superior_Performance_and_Scalability">
+			<title>Superior Performance and Scalability</title>
+			<para>
+				You can obtain the highest shared-file performance when applications access storage directly. The GFS SAN configuration in <xref linkend="Cluster_Suite_Overview-Superior_Performance_and_Scalability-GFS_with_a_SAN" /> provides superior file performance for shared files and file systems. Linux applications run directly on cluster nodes using GFS. Without file protocols or storage servers to slow data access, performance is similar to individual Linux servers with directly connected storage; yet, each GFS application node has equal access to all data files. GFS supports over 300 GFS nodes.
+			</para>
+			<figure id="Cluster_Suite_Overview-Superior_Performance_and_Scalability-GFS_with_a_SAN">
+				<title>GFS with a SAN</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fig-gfs-with-san.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							GFS with a SAN
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-RHGFS-Performance_Scalability_Moderate_Price">
+			<title>Performance, Scalability, Moderate Price</title>
+			<para>
+				Multiple Linux client applications on a LAN can share the same SAN-based data as shown in <xref linkend="Cluster_Suite_Overview-Performance_Scalability_Moderate_Price-GFS_and_GNBD_with_a_SAN" />. SAN block storage is presented to network clients as block storage devices by GNBD servers. From the perspective of a client application, storage is accessed as if it were directly attached to the server in which the application is running. Stored data is actually on the SAN. Storage devices and data can be equally shared by network client applications. File locking and sharing functions are handled by GFS for each network client.
+			</para>
+			<figure id="Cluster_Suite_Overview-Performance_Scalability_Moderate_Price-GFS_and_GNBD_with_a_SAN">
+				<title>GFS and GNBD with a SAN</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fig-gfs-gnbd-san.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							GFS and GNBD with a SAN
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-RHGFS-Economy_and_Performance">
+			<title>Economy and Performance</title>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-Economy_and_Performance-GFS_and_GNBD_with_Directly_Connected_Storage" /> shows how Linux client applications can take advantage of an existing Ethernet topology to gain shared access to all block storage devices. Client data files and file systems can be shared with GFS on each client. Application failover can be fully automated with &RHCS;.
+			</para>
+			<figure id="Cluster_Suite_Overview-Economy_and_Performance-GFS_and_GNBD_with_Directly_Connected_Storage">
+				<title>GFS and GNBD with Directly Connected Storage</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/fig-gfs-gnbd-storage.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							GFS and GNBD with Direct-Attached Storage
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Cluster_Logical_Volume_Manager">
+		<title>Cluster Logical Volume Manager</title>
+		<para>
+			The Cluster Logical Volume Manager (CLVM) provides a cluster-wide version of LVM2. CLVM provides the same capabilities as LVM2 on a single node, but makes the volumes available to all nodes in a &RH; cluster. The logical volumes created with CLVM make logical volumes available to all nodes in a cluster.
+		</para>
+		<para>
+			The key component in CLVM is <command>clvmd</command>. <command>clvmd</command> is a daemon that provides clustering extensions to the standard LVM2 tool set and allows LVM2 commands to manage shared storage. <command>clvmd</command> runs in each cluster node and distributes LVM metadata updates in a cluster, thereby presenting each cluster node with the same view of the logical volumes (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-CLVM_Overview" />). Logical volumes created with CLVM on shared storage are visible to all nodes that have access to the shared storage. CLVM allows a user to configure logical volumes on shared storage by locking access to physical storage while a logical volume is being configured. CLVM uses the lock-management service provided by the cluster infrastructure (refer to <xref linkend="Cluster_Suite_Overview-RHCS_Overview-Cluster_Infrastructure" />).
+		</para>
+		<note>
+			<title>Note</title>
+			<para>
+				Using CLVM requires minor changes to <filename>/etc/lvm/lvm.conf</filename> for cluster-wide locking.
+			</para>
+		</note>
+		<figure id="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-CLVM_Overview">
+			<title>CLVM Overview</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/clvmoverview.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						CLVM Overview
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			You can configure CLVM using the same commands as LVM2, using the LVM graphical user interface (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-LVM_Graphical_User_Interface" />), or using the storage configuration function of the <application>Conga</application> cluster configuration graphical user interface (refer to <xref linkend="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-Conga_LVM_Graphical_User_Interface" />) . <xref linkend="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-Creating_Logical_Volumes" /> shows the basic concept of creating logical volumes from Linux partitions and shows the commands used to create logical volumes.
+		</para>
+		<figure id="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-LVM_Graphical_User_Interface">
+			<title>LVM Graphical User Interface</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/lvm-gui-overview.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						LVM Graphical User Interface
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<figure id="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-Conga_LVM_Graphical_User_Interface">
+			<title>Conga LVM Graphical User Interface</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/lvm-gui-conga.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						Conga LVM Graphical User Interface
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<figure id="Cluster_Suite_Overview-Cluster_Logical_Volume_Manager-Creating_Logical_Volumes">
+			<title>Creating Logical Volumes</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/logicalvolumes.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						Creating Logical Volumes
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Global_Network_Block_Device">
+		<title>Global Network Block Device</title>
+		<para>
+			Global Network Block Device (GNBD) provides block-device access to &RHGFS; over TCP/IP. GNBD is similar in concept to NBD; however, GNBD is GFS-specific and tuned solely for use with GFS. GNBD is useful when the need for more robust technologies &mdash; Fibre Channel or single-initiator SCSI &mdash; are not necessary or are cost-prohibitive.
+		</para>
+		<para>
+			GNBD consists of two major components: a GNBD client and a GNBD server. A GNBD client runs in a node with GFS and imports a block device exported by a GNBD server. A GNBD server runs in another node and exports block-level storage from its local storage (either directly attached storage or SAN storage). Refer to <xref linkend="Cluster_Suite_Overview-Global_Network_Block_Device-GNBD_Overview" />. Multiple GNBD clients can access a device exported by a GNBD server, thus making a GNBD suitable for use by a group of nodes running GFS.
+		</para>
+		<figure id="Cluster_Suite_Overview-Global_Network_Block_Device-GNBD_Overview">
+			<title>GNBD Overview</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/GNBD-overview.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						CLVM Overview
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Linux_Virtual_Server">
+		<title>Linux Virtual Server</title>
+		<para>
+			Linux Virtual Server (LVS) is a set of integrated software components for balancing the IP load across a set of real servers. LVS runs on a pair of equally configured computers: one that is an active LVS router and one that is a backup LVS router. The active LVS router serves two roles:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					To balance the load across the real servers.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					To check the integrity of the services on each real server.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			The backup LVS router monitors the active LVS router and takes over from it in case the active LVS router fails.
+		</para>
+		<para>
+			<xref linkend="Cluster_Suite_Overview-Linux_Virtual_Server-Components_of_a_Running_LVS_Cluster" /> provides an overview of the LVS components and their interrelationship.
+		</para>
+		<figure id="Cluster_Suite_Overview-Linux_Virtual_Server-Components_of_a_Running_LVS_Cluster">
+			<title>Components of a Running LVS Cluster</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/lvs-components.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						Components of a Running LVS Cluster
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			The <command>pulse</command> daemon runs on both the active and passive LVS routers. On the backup LVS router, <command>pulse</command> sends a <firstterm>heartbeat</firstterm> to the public interface of the active router to make sure the active LVS router is properly functioning. On the active LVS router, <command>pulse</command> starts the <command>lvs</command> daemon and responds to <firstterm>heartbeat</firstterm> queries from the backup LVS router.
+		</para>
+		<para>
+			Once started, the <command>lvs</command> daemon calls the <command>ipvsadm</command> utility to configure and maintain the IPVS (IP Virtual Server) routing table in the kernel and starts a <command>nanny</command> process for each configured virtual server on each real server. Each <command>nanny</command> process checks the state of one configured service on one real server, and tells the <command>lvs</command> daemon if the service on that real server is malfunctioning. If a malfunction is detected, the <command>lvs</command> daemon instructs <command>ipvsadm</command> to remove that real server from the IPVS routing table.
+		</para>
+		<para>
+			If the backup LVS router does not receive a response from the active LVS router, it initiates failover by calling <command>send_arp</command> to reassign all virtual IP addresses to the NIC hardware addresses (<firstterm>MAC</firstterm> address) of the backup LVS router, sends a command to the active LVS router via both the public and private network interfaces to shut down the <command>lvs</command> daemon on the active LVS router, and starts the <command>lvs</command> daemon on the backup LVS router to accept requests for the configured virtual servers.
+		</para>
+		<para>
+			To an outside user accessing a hosted service (such as a website or database application), LVS appears as one server. However, the user is actually accessing real servers behind the LVS routers.
+		</para>
+		<para>
+			Because there is no built-in component in LVS to share the data among real servers, you have have two basic options:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Synchronize the data across the real servers.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Add a third layer to the topology for shared data access.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			The first option is preferred for servers that do not allow large numbers of users to upload or change data on the real servers. If the real servers allow large numbers of users to modify data, such as an e-commerce website, adding a third layer is preferable.
+		</para>
+		<para>
+			There are many ways to synchronize data among real servers. For example, you can use shell scripts to post updated web pages to the real servers simultaneously. Also, you can use programs such as <command>rsync</command> to replicate changed data across all nodes at a set interval. However, in environments where users frequently upload files or issue database transactions, using scripts or the <command>rsync</command> command for data synchronization does not function optimally. Therefore, for real servers with a high amount of uploads, database transactions, or similar traffic, a <firstterm>three-tiered topology</firstterm> is more appropriate for data synchronization.
+		</para>
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server-Two_Tier_LVS_Topology">
+			<title>Two-Tier LVS Topology</title>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-Two_Tier_LVS_Topology-Two_Tier_LVS_Topology" /> shows a simple LVS configuration consisting of two tiers: LVS routers and real servers. The LVS-router tier consists of one active LVS router and one backup LVS router. The real-server tier consists of real servers connected to the private network. Each LVS router has two network interfaces: one connected to a public network (Internet) and one connected to a private network. A network interface connected to each network allows the LVS routers to regulate traffic between clients on the public network and the real servers on the private network. In <xref linkend="Cluster_Suite_Overview-Two_Tier_LVS_Topology-Two_Tier_LVS_Topology" />, the active LVS router uses <firstterm>Network Address Translation</firstterm> (<firstterm>NAT</firstterm>) to direct traffic from the public network to real servers on the private network, which in turn provide services as requested. The real servers pass all public traffic through the active LVS router. From the perspective of clients on the public network, the LVS router appears as one entity.
+			</para>
+			<figure id="Cluster_Suite_Overview-Two_Tier_LVS_Topology-Two_Tier_LVS_Topology">
+				<title>Two-Tier LVS Topology</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/lvs-two-tier.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Two-Tier LVS Topology
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Service requests arriving at an LVS router are addressed to a <firstterm>virtual IP</firstterm> address or VIP. This is a publicly-routable address that the administrator of the site associates with a fully-qualified domain name, such as www.example.com, and which is assigned to one or more <firstterm>virtual servers</firstterm><footnote><para>
+					A virtual server is a service configured to listen on a specific virtual IP.
+				</para>
+				</footnote>. Note that a VIP address migrates from one LVS router to the other during a failover, thus maintaining a presence at that IP address, also known as <emphasis>floating IP addresses</emphasis>.
+			</para>
+			<para>
+				VIP addresses may be aliased to the same device that connects the LVS router to the public network. For instance, if eth0 is connected to the Internet, then multiple virtual servers can be aliased to <filename>eth0:1</filename>. Alternatively, each virtual server can be associated with a separate device per service. For example, HTTP traffic can be handled on <filename>eth0:1</filename>, and FTP traffic can be handled on <filename>eth0:2</filename>.
+			</para>
+			<para>
+				Only one LVS router is active at a time. The role of the active LVS router is to redirect service requests from virtual IP addresses to the real servers. The redirection is based on one of eight load-balancing algorithms:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Round-Robin Scheduling &mdash; Distributes each request sequentially around a pool of real servers. Using this algorithm, all the real servers are treated as equals without regard to capacity or load.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Weighted Round-Robin Scheduling &mdash; Distributes each request sequentially around a pool of real servers but gives more jobs to servers with greater capacity. Capacity is indicated by a user-assigned weight factor, which is then adjusted up or down by dynamic load information. This is a preferred choice if there are significant differences in the capacity of real servers in a server pool. However, if the request load varies dramatically, a more heavily weighted server may answer more than its share of requests.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Least-Connection &mdash; Distributes more requests to real servers with fewer active connections. This is a type of dynamic scheduling algorithm, making it a better choice if there is a high degree of variation in the request load. It is best suited for a real server pool where each server node has roughly the same capacity. If the real servers have varying capabilities, weighted least-connection scheduling is a better choice.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Weighted Least-Connections (default) &mdash; Distributes more requests to servers with fewer active connections relative to their capacities. Capacity is indicated by a user-assigned weight, which is then adjusted up or down by dynamic load information. The addition of weighting makes this algorithm ideal when the real server pool contains hardware of varying capacity.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Locality-Based Least-Connection Scheduling &mdash; Distributes more requests to servers with fewer active connections relative to their destination IPs. This algorithm is for use in a proxy-cache server cluster. It routes the packets for an IP address to the server for that address unless that server is above its capacity and has a server in its half load, in which case it assigns the IP address to the least loaded real server.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Locality-Based Least-Connection Scheduling with Replication Scheduling &mdash; Distributes more requests to servers with fewer active connections relative to their destination IPs. This algorithm is also for use in a proxy-cache server cluster. It differs from Locality-Based Least-Connection Scheduling by mapping the target IP address to a subset of real server nodes. Requests are then routed to the server in this subset with the lowest number of connections. If all the nodes for the destination IP are above capacity, it replicates a new server for that destination IP address by adding the real server with the least connections from the overall pool of real servers to the subset of real servers for that destination IP. The most-loaded node is then dropped from the real server subset to prevent over-replication.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Source Hash Scheduling &mdash; Distributes requests to the pool of real servers by looking up the source IP in a static hash table. This algorithm is for LVS routers with multiple firewalls.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				Also, the active LVS router dynamically monitors the overall health of the specific services on the real servers through simple <firstterm>send/expect scripts</firstterm>. To aid in detecting the health of services that require dynamic data, such as HTTPS or SSL, you can also call external executables. If a service on a real server malfunctions, the active LVS router stops sending jobs to that server until it returns to normal operation.
+			</para>
+			<para>
+				The backup LVS router performs the role of a standby system. Periodically, the LVS routers exchange heartbeat messages through the primary external public interface and, in a failover situation, the private interface. Should the backup LVS router fail to receive a heartbeat message within an expected interval, it initiates a failover and assumes the role of the active LVS router. During failover, the backup LVS router takes over the VIP addresses serviced by the failed router using a technique known as <firstterm>ARP spoofing</firstterm> &mdash; where the backup LVS router announces itself as the destination for IP packets addressed to the failed node. When the failed node returns to active service, the backup LVS router assumes its backup role again.
+			</para>
+			<para>
+				The simple, two-tier configuration in <xref linkend="Cluster_Suite_Overview-Two_Tier_LVS_Topology-Two_Tier_LVS_Topology" /> is suited best for clusters serving data that does not change very frequently &mdash; such as static web pages &mdash; because the individual real servers do not automatically synchronize data among themselves.
+			</para>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server-Three_Tier_LVS_Topology">
+			<title>Three-Tier LVS Topology</title>
+			<indexterm>
+				<primary>LVS</primary>
+				<secondary>three tiered</secondary>
+				<tertiary>high-availability cluster</tertiary>
+			</indexterm>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-Three_Tier_LVS_Topology-Three_Tier_LVS_Topology" /> shows a typical three-tier LVS configuration. In the example, the active LVS router routes the requests from the public network (Internet) to the second tier &mdash; real servers. Each real server then accesses a shared data source of a &RH; cluster in the third tier over the private network.
+			</para>
+			<figure id="Cluster_Suite_Overview-Three_Tier_LVS_Topology-Three_Tier_LVS_Topology">
+				<title>Three-Tier LVS Topology</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/lvs-three-tier.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							Three-Tier LVS Topology
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This topology is suited well for busy FTP servers, where accessible data is stored on a central, highly available server and accessed by each real server via an exported NFS directory or Samba share. This topology is also recommended for websites that access a central, high-availability database for transactions. Additionally, using an active-active configuration with a &RH; cluster, you can configure one high-availability cluster to serve both of these roles simultaneously.
+			</para>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server-Routing_Methods">
+			<title>Routing Methods</title>
+			<indexterm>
+				<primary>LVS</primary>
+				<secondary>routing methods</secondary>
+				<tertiary>NAT</tertiary>
+			</indexterm>
+			<indexterm>
+				<primary>network address translation</primary>
+				<see>NAT</see>
+			</indexterm>
+			<indexterm>
+				<primary>NAT</primary>
+				<secondary>routing methods, LVS</secondary>
+			</indexterm>
+			<para>
+				You can use Network Address Translation (NAT) routing or direct routing with LVS. The following sections briefly describe NAT routing and direct routing with LVS.
+			</para>
+			<section id="Cluster_Suite_Overview-Routing_Methods-NAT_Routing">
+				<title>NAT Routing</title>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-NAT_Routing-LVS_Implemented_with_NAT_Routing" />, illustrates LVS using NAT routing to move requests between the Internet and a private network.
+				</para>
+				<figure id="Cluster_Suite_Overview-NAT_Routing-LVS_Implemented_with_NAT_Routing">
+					<title>LVS Implemented with NAT Routing</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/lvs-nat-routing.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								LVS Implemented with NAT Routing
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+					In the example, there are two NICs in the active LVS router. The NIC for the Internet has a <firstterm>real IP address</firstterm> on eth0 and has a floating IP address aliased to eth0:1. The NIC for the private network interface has a real IP address on eth1 and has a floating IP address aliased to eth1:1. In the event of failover, the virtual interface facing the Internet and the private facing virtual interface are taken over by the backup LVS router simultaneously. All the real servers on the private network use the floating IP for the NAT router as their default route to communicate with the active LVS router so that their abilities to respond to requests from the Internet is not impaired.
+				</para>
+				<para>
+					In the example, the LVS router&#39;s public LVS floating IP address and private NAT floating IP address are aliased to two physical NICs. While it is possible to associate each floating IP address to its physical device on the LVS router nodes, having more than two NICs is not a requirement.
+				</para>
+				<para>
+					Using this topology, the active LVS router receives the request and routes it to the appropriate server. The real server then processes the request and returns the packets to the LVS router. The LVS router uses network address translation to replace the address of the real server in the packets with the LVS routers public VIP address. This process is called <firstterm>IP masquerading</firstterm> because the actual IP addresses of the real servers is hidden from the requesting clients.
+				</para>
+				<para>
+					Using NAT routing, the real servers can be any kind of computers running a variety operating systems. The main disadvantage of NAT routing is that the LVS router may become a bottleneck in large deployments because it must process outgoing and incoming requests.
+				</para>
+			</section>
+			
+			<section id="Cluster_Suite_Overview-Routing_Methods-Direct_Routing">
+				<title>Direct Routing</title>
+				<indexterm>
+					<primary>LVS</primary>
+					<secondary>direct routing</secondary>
+					<tertiary>requirements, hardware</tertiary>
+				</indexterm>
+				<indexterm>
+					<primary>LVS</primary>
+					<secondary>direct routing</secondary>
+					<tertiary>requirements, network</tertiary>
+				</indexterm>
+				<indexterm>
+					<primary>LVS</primary>
+					<secondary>direct routing</secondary>
+					<tertiary>requirements, software</tertiary>
+				</indexterm>
+				<para>
+					Direct routing provides increased performance benefits compared to NAT routing. Direct routing allows the real servers to process and route packets directly to a requesting user rather than passing outgoing packets through the LVS router. Direct routing reduces the possibility of network performance issues by relegating the job of the LVS router to processing incoming packets only.
+				</para>
+				<figure id="Cluster_Suite_Overview-Direct_Routing-LVS_Implemented_with_Direct_Routing">
+					<title>LVS Implemented with Direct Routing</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/lvs-direct-routing.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								LVS Implemented with Direct Routing
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+					In a typical direct-routing LVS configuration, an LVS router receives incoming server requests through a virtual IP (VIP) and uses a scheduling algorithm to route the request to real servers. Each real server processes requests and sends responses directly to clients, bypassing the LVS routers. Direct routing allows for scalability in that real servers can be added without the added burden on the LVS router to route outgoing packets from the real server to the client, which can become a bottleneck under heavy network load.
+				</para>
+				<para>
+					While there are many advantages to using direct routing in LVS, there are limitations. The most common issue with direct routing and LVS is with <firstterm>Address Resolution Protocol</firstterm> (<acronym>ARP</acronym>).
+				</para>
+				<para>
+					In typical situations, a client on the Internet sends a request to an IP address. Network routers typically send requests to their destination by relating IP addresses to a machine&#39;s MAC address with ARP. ARP requests are broadcast to all connected machines on a network, and the machine with the correct IP/MAC address combination receives the packet. The IP/MAC associations are stored in an ARP cache, which is cleared periodically (usually every 15 minutes) and refilled with IP/MAC associations.
+				</para>
+				<para>
+					The issue with ARP requests in a direct-routing LVS configuration is that because a client request to an IP address must be associated with a MAC address for the request to be handled, the virtual IP address of the LVS router must also be associated to a MAC. However, because both the LVS router and the real servers have the same VIP, the ARP request is broadcast to all the nodes associated with the VIP. This can cause several problems, such as the VIP being associated directly to one of the real servers and processing requests directly, bypassing the LVS router completely and defeating the purpose of the LVS configuration. Using an LVS router with a powerful CPU that can respond quickly to client requests does not necessarily remedy this issue. If the LVS router is under heavy load, it may respond to the ARP request more slowly than an underutilized real server, which responds more quickly and is assigned the VIP in the ARP cache of the requesting client.
+				</para>
+				<para>
+					To solve this issue, the incoming requests should <emphasis>only</emphasis> associate the VIP to the LVS router, which will properly process the requests and send them to the real server pool. This can be done by using the <command>arptables</command> packet-filtering tool.
+				</para>
+			</section>
+
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server-Persistence_and_Firewall_Marks">
+			<title>Persistence and Firewall Marks</title>
+			<para>
+				In certain situations, it may be desirable for a client to reconnect repeatedly to the same real server, rather than have an LVS load-balancing algorithm send that request to the best available server. Examples of such situations include multi-screen web forms, cookies, SSL, and FTP connections. In those cases, a client may not work properly unless the transactions are being handled by the same server to retain context. LVS provides two different features to handle this: <firstterm>persistence</firstterm> and <firstterm>firewall marks</firstterm>.
+			</para>
+			<section id="Cluster_Suite_Overview-Persistence_and_Firewall_Marks-Persistence">
+				<title>Persistence</title>
+				<para>
+					When enabled, persistence acts like a timer. When a client connects to a service, LVS remembers the last connection for a specified period of time. If that same client IP address connects again within that period, it is sent to the same server it connected to previously &mdash; bypassing the load-balancing mechanisms. When a connection occurs outside the time window, it is handled according to the scheduling rules in place.
+				</para>
+				<para>
+					Persistence also allows you to specify a subnet mask to apply to the client IP address test as a tool for controlling what addresses have a higher level of persistence, thereby grouping connections to that subnet.
+				</para>
+				<para>
+					Grouping connections destined for different ports can be important for protocols that use more than one port to communicate, such as FTP. However, persistence is not the most efficient way to deal with the problem of grouping together connections destined for different ports. For these situations, it is best to use <firstterm>firewall marks</firstterm>.
+				</para>
+			</section>
+			
+			<section id="Cluster_Suite_Overview-Persistence_and_Firewall_Marks-Firewall_Marks">
+				<title>Firewall Marks</title>
+				<para>
+					Firewall marks are an easy and efficient way to a group ports used for a protocol or group of related protocols. For example, if LVS is deployed to run an e-commerce site, firewall marks can be used to bundle HTTP connections on port 80 and secure, HTTPS connections on port 443. By assigning the same firewall mark to the virtual server for each protocol, state information for the transaction can be preserved because the LVS router forwards all requests to the same real server after a connection is opened.
+				</para>
+				<para>
+					Because of its efficiency and ease-of-use, administrators of LVS should use firewall marks instead of persistence whenever possible for grouping connections. However, you should still add persistence to the virtual servers in conjunction with firewall marks to ensure the clients are reconnected to the same server for an adequate period of time.
+				</para>
+			</section>
+
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Cluster_Administration_Tools">
+		<title>Cluster Administration Tools</title>
+		<para>
+			&RHCS; provides a variety of tools to configure and manage your &RH; Cluster. This section provides an overview of the administration tools available with &RHCS;:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-Cluster_Administration_Tools-Conga" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-Cluster_Administration_Tools-Cluster_Administration_GUI" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Suite_Overview-Cluster_Administration_Tools-Command_Line_Administration_Tools" />
+				</para>
+			</listitem>
+		</itemizedlist>
+		<section id="Cluster_Suite_Overview-Cluster_Administration_Tools-Conga">
+			<title>Conga</title>
+			<indexterm>
+				<primary>Conga</primary>
+				<secondary>overview</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>Conga overview</primary>
+			</indexterm>
+			<para>
+				<application>Conga</application> is an integrated set of software components that provides centralized configuration and management of &RH; clusters and storage. <application>Conga</application> provides the following major features:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						One Web interface for managing cluster and storage
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Automated Deployment of Cluster Data and Supporting Packages
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Easy Integration with Existing Clusters
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						No Need to Re-Authenticate
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Integration of Cluster Status and Logs
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Fine-Grained Control over User Permissions
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				The primary components in <application>Conga</application> are <application>luci</application> and <application>ricci</application>, which are separately installable. <application>luci</application> is a server that runs on one computer and communicates with multiple clusters and computers via <application>ricci</application>. <application>ricci</application> is an agent that runs on each computer (either a cluster member or a standalone computer) managed by <application>Conga</application>.
+			</para>
+			<para>
+				<application>luci</application> is accessible through a Web browser and provides three major functions that are accessible through the following tabs:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<guimenu>homebase</guimenu> &mdash; Provides tools for adding and deleting computers, adding and deleting users, and configuring user privileges. Only a system administrator is allowed to access this tab.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<guimenu>cluster</guimenu> &mdash; Provides tools for creating and configuring clusters. Each instance of <application>luci</application> lists clusters that have been set up with that <application>luci</application>. A system administrator can administer all clusters listed on this tab. Other users can administer only clusters that the user has permission to manage (granted by an administrator).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<guimenu>storage</guimenu> &mdash; Provides tools for remote administration of storage. With the tools on this tab, you can manage storage on computers whether they belong to a cluster or not.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				To administer a cluster or storage, an administrator adds (or <firstterm>registers</firstterm>) a cluster or a computer to a <application>luci</application> server. When a cluster or a computer is registered with <application>luci</application>, the FQDN hostname or IP address of each computer is stored in a <application>luci</application> database.
+			</para>
+			<para>
+				You can populate the database of one <application>luci</application> instance from another <application>luci</application>instance. That capability provides a means of replicating a <application>luci</application> server instance and provides an efficient upgrade and testing path. When you install an instance of <application>luci</application>, its database is empty. However, you can import part or all of a <application>luci</application> database from an existing <application>luci</application> server when deploying a new <application>luci</application> server.
+			</para>
+			<para>
+				Each <application>luci</application> instance has one user at initial installation &mdash; admin. Only the admin user may add systems to a <application>luci</application> server. Also, the admin user can create additional user accounts and determine which users are allowed to access clusters and computers registered in the <application>luci</application> database. It is possible to import users as a batch operation in a new <application>luci</application> server, just as it is possible to import clusters and computers.
+			</para>
+			<para>
+				When a computer is added to a <application>luci</application> server to be administered, authentication is done once. No authentication is necessary from then on (unless the certificate used is revoked by a CA). After that, you can remotely configure and manage clusters and storage through the <application>luci</application> user interface. <application>luci</application> and <application>ricci</application> communicate with each other via XML.
+			</para>
+			<para>
+				The following figures show sample displays of the three major <application>luci</application> tabs: <guimenu>homebase</guimenu>, <guimenu>cluster</guimenu>, and <guimenu>storage</guimenu>.
+			</para>
+			<para>
+				For more information about <application>Conga</application>, refer to <citetitle>Configuring and Managing a Red Hat Cluster</citetitle> and the online help available with the <application>luci</application> server.
+			</para>
+			<figure id="Cluster_Suite_Overview-Conga-luci__homebase_Tab">
+				<title><application>luci </application><guimenu>homebase</guimenu> Tab</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/luci-homebase-tab.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster status tool
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<figure id="Cluster_Suite_Overview-Conga-luci__clusterTab">
+				<title><application>luci </application><guimenu>cluster</guimenu> Tab</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/luci-cluster-tab.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster status tool
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<figure id="Cluster_Suite_Overview-Conga-luci__storageTab">
+				<title><application>luci </application><guimenu>storage</guimenu> Tab</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/luci-storage-tab.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster status tool
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Cluster_Administration_Tools-Cluster_Administration_GUI">
+			<title>Cluster Administration GUI</title>
+			<para>
+				This section provides an overview of the <command>system-config-cluster</command> cluster administration graphical user interface (GUI) available with &RHCS;. The GUI is for use with the cluster infrastructure and the high-availability service management components (refer to <xref linkend="Cluster_Suite_Overview-RHCS_Overview-Cluster_Infrastructure" /> and <xref linkend="Cluster_Suite_Overview-RHCS_Overview-High_availability_Service_Management" />). The GUI consists of two major functions: the <application>&RHCLUSTERTOOL;</application> and the <application>&RHCLUSTERSTATTOOL;</application>. The <application>&RHCLUSTERTOOL;</application> provides the capability to create, edit, and propagate the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>). The <application>&RHCLUSTERSTATTOOL;</application> provides the capability to manage high-availability services. The following sections summarize those functions.
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<xref linkend="Cluster_Suite_Overview-Cluster_Administration_GUI-RHCLUSTERTOOL" />
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<xref linkend="Cluster_Suite_Overview-Cluster_Administration_GUI-RHCLUSTERSTATTOOL" />
+					</para>
+				</listitem>
+			</itemizedlist>
+			<section id="Cluster_Suite_Overview-Cluster_Administration_GUI-RHCLUSTERTOOL">
+				<title><application>&RHCLUSTERTOOL;</application></title>
+				<para>
+					You can access the <application>&RHCLUSTERTOOL;</application> (<xref linkend="Cluster_Suite_Overview-RHCLUSTERTOOL-RHCLUSTERTOOL" />) through the <guilabel>Cluster Configuration</guilabel> tab in the Cluster Administration GUI.
+				</para>
+				<figure id="Cluster_Suite_Overview-RHCLUSTERTOOL-RHCLUSTERTOOL">
+					<title><application>&RHCLUSTERTOOL;</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="./images/clustertoolgui.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								cluster tool
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+					The <application>&RHCLUSTERTOOL;</application> represents cluster configuration components in the configuration file (<filename>/etc/cluster/cluster.conf</filename>) with a hierarchical graphical display in the left panel. A triangle icon to the left of a component name indicates that the component has one or more subordinate components assigned to it. Clicking the triangle icon expands and collapses the portion of the tree below a component. The components displayed in the GUI are summarized as follows:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guilabel>Cluster Nodes</guilabel> &mdash; Displays cluster nodes. Nodes are represented by name as subordinate elements under <guilabel>Cluster Nodes</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can add nodes, delete nodes, edit node properties, and configure fencing methods for each node.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Fence Devices</guilabel> &mdash; Displays fence devices. Fence devices are represented as subordinate elements under <guilabel>Fence Devices</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can add fence devices, delete fence devices, and edit fence-device properties. Fence devices must be defined before you can configure fencing (with the <guibutton>Manage Fencing For This Node</guibutton> button) for each node.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Managed Resources</guilabel> &mdash; Displays failover domains, resources, and services.
+						</para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									<guilabel>Failover Domains</guilabel> &mdash; For configuring one or more subsets of cluster nodes used to run a high-availability service in the event of a node failure. Failover domains are represented as subordinate elements under <guilabel>Failover Domains</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create failover domains (when <guilabel>Failover Domains</guilabel> is selected) or edit failover domain properties (when a failover domain is selected).
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<guilabel>Resources</guilabel> &mdash; For configuring shared resources to be used by high-availability services. Shared resources consist of file systems, IP addresses, NFS mounts and exports, and user-created scripts that are available to any high-availability service in the cluster. Resources are represented as subordinate elements under <guilabel>Resources</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create resources (when <guilabel>Resources</guilabel> is selected) or edit resource properties (when a resource is selected).
+								</para>
+								<note>
+									<title>Note</title>
+									<para>
+										The <application>&RHCLUSTERTOOL;</application> provides the capability to configure private resources, also. A private resource is a resource that is configured for use with only one service. You can configure a private resource within a <application>Service</application> component in the GUI.
+									</para>
+								</note>
+							</listitem>
+							<listitem>
+								<para>
+									<guilabel>Services</guilabel> &mdash; For creating and configuring high-availability services. A service is configured by assigning resources (shared or private), assigning a failover domain, and defining a recovery policy for the service. Services are represented as subordinate elements under <guilabel>Services</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create services (when <guilabel>Services</guilabel> is selected) or edit service properties (when a service is selected).
+								</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</itemizedlist>
+				<indexterm>
+					<primary><application>&RHCLUSTERTOOL;</application></primary>
+					<secondary>accessing</secondary>
+				</indexterm>
+			</section>
+			
+			<section id="Cluster_Suite_Overview-Cluster_Administration_GUI-RHCLUSTERSTATTOOL">
+				<title><application>&RHCLUSTERSTATTOOL;</application></title>
+				<para>
+					You can access the <application>&RHCLUSTERSTATTOOL;</application> (<xref linkend="Cluster_Suite_Overview-RHCLUSTERSTATTOOL-RHCLUSTERSTATTOOL" />) through the <guimenu>Cluster Management</guimenu> tab in Cluster Administration GUI.
+				</para>
+				<figure id="Cluster_Suite_Overview-RHCLUSTERSTATTOOL-RHCLUSTERSTATTOOL">
+					<title><application>&RHCLUSTERSTATTOOL;</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="./images/clustatus.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								cluster status tool
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+					The nodes and services displayed in the <application>&RHCLUSTERSTATTOOL;</application> are determined by the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>). You can use the <application>&RHCLUSTERSTATTOOL;</application> to enable, disable, restart, or relocate a high-availability service.
+				</para>
+				<indexterm>
+					<primary>cluster administration</primary>
+					<secondary>displaying cluster and service status</secondary>
+				</indexterm>
+				<indexterm>
+					<primary>cluster</primary>
+					<secondary>displaying status</secondary>
+				</indexterm>
+				<indexterm>
+					<primary>cluster service</primary>
+					<secondary>displaying status</secondary>
+				</indexterm>
+			</section>
+
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Cluster_Administration_Tools-Command_Line_Administration_Tools">
+			<title>Command Line Administration Tools</title>
+			<indexterm>
+				<primary>table</primary>
+				<secondary>command line tools</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>command line tools table</primary>
+			</indexterm>
+			<para>
+				In addition to <application>Conga</application> and the <command>system-config-cluster</command> Cluster Administration GUI, command line tools are available for administering the cluster infrastructure and the high-availability service management components. The command line tools are used by the Cluster Administration GUI and init scripts supplied by &RH;. <xref linkend="Cluster_Suite_Overview-Command_Line_Administration_Tools-Command_Line_Tools" /> summarizes the command line tools.
+			</para>
+			<table id="Cluster_Suite_Overview-Command_Line_Administration_Tools-Command_Line_Tools">
+				<title>Command Line Tools</title>
+				<tgroup cols="3">
+					<colspec colname="Command_Line_Tool" colnum="1" colwidth="3*"></colspec>
+					<colspec colname="Used_With" colnum="2" colwidth="3*"></colspec>
+					<colspec colname="Purpose" colnum="3" colwidth="9*"></colspec>
+					<thead>
+						<row>
+							<entry>
+								Command Line Tool
+							</entry>
+							<entry>
+								Used With
+							</entry>
+							<entry>
+								Purpose
+							</entry>
+						</row>
+					</thead>
+					<tbody>
+						<row>
+							<entry>
+								<command>ccs_tool</command> &mdash; Cluster Configuration System Tool
+							</entry>
+							<entry>
+								Cluster Infrastructure
+							</entry>
+							<entry>
+								<command>ccs_tool</command> is a program for making online updates to the cluster configuration file. It provides the capability to create and modify cluster infrastructure components (for example, creating a cluster, adding and removing a node). For more information about this tool, refer to the ccs_tool(8) man page.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<command>cman_tool</command> &mdash; Cluster Management Tool
+							</entry>
+							<entry>
+								Cluster Infrastructure
+							</entry>
+							<entry>
+								<command>cman_tool</command> is a program that manages the CMAN cluster manager. It provides the capability to join a cluster, leave a cluster, kill a node, or change the expected quorum votes of a node in a cluster. For more information about this tool, refer to the cman_tool(8) man page.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<command>fence_tool</command> &mdash; Fence Tool
+							</entry>
+							<entry>
+								Cluster Infrastructure
+							</entry>
+							<entry>
+								<command>fence_tool</command> is a program used to join or leave the default fence domain. Specifically, it starts the fence daemon (<command>fenced</command>) to join the domain and kills <command>fenced</command> to leave the domain. For more information about this tool, refer to the fence_tool(8) man page.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<command>clustat</command> &mdash; Cluster Status Utility
+							</entry>
+							<entry>
+								High-availability Service Management Components
+							</entry>
+							<entry>
+								The <command>clustat</command> command displays the status of the cluster. It shows membership information, quorum view, and the state of all configured user services. For more information about this tool, refer to the clustat(8) man page.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<command>clusvcadm</command> &mdash; Cluster User Service Administration Utility
+							</entry>
+							<entry>
+								High-availability Service Management Components
+							</entry>
+							<entry>
+								The <command>clusvcadm</command> command allows you to enable, disable, relocate, and restart high-availability services in a cluster. For more information about this tool, refer to the clusvcadm(8) man page.
+							</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Overview-Linux_Virtual_Server_Administration_GUI">
+		<title>Linux Virtual Server Administration GUI</title>
+		<para>
+			This section provides an overview of the LVS configuration tool available with &RHCS; &mdash; the <application>&PIRANHA;</application>. The <application>&PIRANHA;</application> is a Web-browser graphical user interface (GUI) that provides a structured approach to creating the configuration file for LVS &mdash; <filename>/etc/sysconfig/ha/lvs.cf</filename>.
+		</para>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary>necessary software</secondary>
+		</indexterm>
+		<para>
+			To access the <application>&PIRANHA;</application> you need the <command>piranha-gui</command> service running on the active LVS router. You can access the <application>&PIRANHA;</application> locally or remotely with a Web browser. You can access it locally with this URL: <userinput>http://localhost:3636</userinput>. You can access it remotely with either the hostname or the real IP address followed by <userinput>:3636</userinput>. If you are accessing the <application>&PIRANHA;</application> remotely, you need an <command>ssh</command> connection to the active LVS router as the root user.
+		</para>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary>login panel</secondary>
+		</indexterm>
+		<para>
+			Starting the <application>&PIRANHA;</application> causes the <application>&PIRANHA;</application> welcome page to be displayed (refer to <xref linkend="Cluster_Suite_Overview-Linux_Virtual_Server_Administration_GUI-The_Welcome_Panel" />). Logging in to the welcome page provides access to the four main screens or <firstterm>panels</firstterm>: <guilabel>CONTROL/MONITORING</guilabel>, <guilabel>GLOBAL SETTINGS</guilabel>, <guilabel>REDUNDANCY</guilabel>, and <guilabel>VIRTUAL SERVERS</guilabel>. In addition, the <guilabel>VIRTUAL SERVERS</guilabel> panel contains four <firstterm>subsections</firstterm>. The <guilabel>CONTROL/MONITORING</guilabel> panel is the first panel displayed after you log in at the welcome screen.
+		</para>
+		<figure id="Cluster_Suite_Overview-Linux_Virtual_Server_Administration_GUI-The_Welcome_Panel">
+			<title>The Welcome Panel</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/main.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						The Welcome Panel
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			The following sections provide a brief description of the <application>&PIRANHA;</application> configuration pages.
+		</para>
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server_Administration_GUI-CONTROLMONITORING">
+			<title><guilabel>CONTROL/MONITORING</guilabel></title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>CONTROL/MONITORING</guilabel></secondary>
+			</indexterm>
+			<para>
+				The <guilabel>CONTROL/MONITORING</guilabel> Panel displays runtime status. It displays the status of the <command>pulse</command> daemon, the LVS routing table, and the LVS-spawned <command>nanny</command> processes.
+			</para>
+			<figure id="Cluster_Suite_Overview-CONTROLMONITORING-The_CONTROLMONITORING_Panel">
+				<title>The <guilabel>CONTROL/MONITORING</guilabel> Panel</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/control-monitoring.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>CONTROL/MONITORING</guilabel> Panel
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Auto update</guilabel></term>
+					<listitem>
+						<para>
+							Enables the status display to be updated automatically at a user-configurable interval set in the <guilabel>Update frequency in seconds</guilabel> text box (the default value is 10 seconds).
+						</para>
+						<para>
+							It is not recommended that you set the automatic update to an interval less than 10 seconds. Doing so may make it difficult to reconfigure the <guilabel>Auto update</guilabel> interval because the page will update too frequently. If you encounter this issue, simply click on another panel and then back on <guilabel>CONTROL/MONITORING</guilabel>.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guibutton>Update information now</guibutton></term>
+					<listitem>
+						<para>
+							Provides manual update of the status information.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guibutton>CHANGE PASSWORD</guibutton></term>
+					<listitem>
+						<para>
+							Clicking this button takes you to a help screen with information on how to change the administrative password for the <application>&PIRANHA;</application>.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server_Administration_GUI-GLOBAL_SETTINGS">
+			<title><guilabel>GLOBAL SETTINGS</guilabel></title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>GLOBAL SETTINGS</guilabel></secondary>
+			</indexterm>
+			<para>
+				The <guilabel>GLOBAL SETTINGS</guilabel> panel is where the LVS administrator defines the networking details for the primary LVS router&#39;s public and private network interfaces.
+			</para>
+			<figure id="Cluster_Suite_Overview-GLOBAL_SETTINGS-The_GLOBAL_SETTINGS_Panel">
+				<title>The <guilabel>GLOBAL SETTINGS</guilabel> Panel</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/global-settings.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>GLOBAL SETTINGS</guilabel> Panel
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The top half of this panel sets up the primary LVS router&#39;s public and private network interfaces.
+			</para>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Primary server public IP</guilabel></term>
+					<listitem>
+						<para>
+							The publicly routable real IP address for the primary LVS node.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Primary server private IP</guilabel></term>
+					<listitem>
+						<para>
+							The real IP address for an alternative network interface on the primary LVS node. This address is used solely as an alternative heartbeat channel for the backup router.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Use network type</guilabel></term>
+					<listitem>
+						<para>
+							Selects select NAT routing.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<para>
+				The next three fields are specifically for the NAT router&#39;s virtual network interface connected the private network with the real servers.
+			</para>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>NAT Router IP</guilabel></term>
+					<listitem>
+						<para>
+							The private floating IP in this text field. This floating IP should be used as the gateway for the real servers.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>NAT Router netmask</guilabel></term>
+					<listitem>
+						<para>
+							If the NAT router&#39;s floating IP needs a particular netmask, select it from drop-down list.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>NAT Router device</guilabel></term>
+					<listitem>
+						<para>
+							Defines the device name of the network interface for the floating IP address, such as <userinput>eth1:1</userinput>.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server_Administration_GUI-REDUNDANCY">
+			<title><guilabel>REDUNDANCY</guilabel></title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>REDUNDANCY</guilabel></secondary>
+			</indexterm>
+			<para>
+				The <guilabel>REDUNDANCY</guilabel> panel allows you to configure of the backup LVS router node and set various heartbeat monitoring options.
+			</para>
+			<figure id="Cluster_Suite_Overview-REDUNDANCY-The_REDUNDANCY_Panel">
+				<title>The <guilabel>REDUNDANCY</guilabel> Panel</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/redundancy.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>REDUNDANCY</guilabel> Panel
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Redundant server public IP</guilabel></term>
+					<listitem>
+						<para>
+							The public real IP address for the backup LVS router.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Redundant server private IP</guilabel></term>
+					<listitem>
+						<para>
+							The backup router&#39;s private real IP address.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<para>
+				The rest of the panel is for configuring the heartbeat channel, which is used by the backup node to monitor the primary node for failure.
+			</para>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Heartbeat Interval (seconds)</guilabel></term>
+					<listitem>
+						<para>
+							Sets the number of seconds between heartbeats &mdash; the interval that the backup node will check the functional status of the primary LVS node.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Assume dead after (seconds)</guilabel></term>
+					<listitem>
+						<para>
+							If the primary LVS node does not respond after this number of seconds, then the backup LVS router node will initiate failover.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Heartbeat runs on port</guilabel></term>
+					<listitem>
+						<para>
+							Sets the port at which the heartbeat communicates with the primary LVS node. The default is set to 539 if this field is left blank.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+		
+		<section id="Cluster_Suite_Overview-Linux_Virtual_Server_Administration_GUI-VIRTUAL_SERVERS">
+			<title><guilabel>VIRTUAL SERVERS</guilabel></title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>VIRTUAL SERVERS</guilabel></secondary>
+			</indexterm>
+			<para>
+				The <guilabel>VIRTUAL SERVERS</guilabel> panel displays information for each currently defined virtual server. Each table entry shows the status of the virtual server, the server name, the virtual IP assigned to the server, the netmask of the virtual IP, the port number to which the service communicates, the protocol used, and the virtual device interface.
+			</para>
+			<figure id="Cluster_Suite_Overview-VIRTUAL_SERVERS-The_VIRTUAL_SERVERS_Panel">
+				<title>The <guilabel>VIRTUAL SERVERS</guilabel> Panel</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/virtual-servers.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>VIRTUAL SERVERS</guilabel> Panel
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Each server displayed in the <guilabel>VIRTUAL SERVERS</guilabel> panel can be configured on subsequent screens or <firstterm>subsections</firstterm>.
+			</para>
+			<para>
+				To add a service, click the <guibutton>ADD</guibutton> button. To remove a service, select it by clicking the radio button next to the virtual server and click the <guibutton>DELETE</guibutton> button.
+			</para>
+			<para>
+				To enable or disable a virtual server in the table click its radio button and click the <guibutton>(DE)ACTIVATE</guibutton> button.
+			</para>
+			<para>
+				After adding a virtual server, you can configure it by clicking the radio button to its left and clicking the <guilabel>EDIT</guilabel> button to display the <guilabel>VIRTUAL SERVER</guilabel> subsection.
+			</para>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+			</indexterm>
+			<section id="Cluster_Suite_Overview-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection">
+				<title>The <guilabel>VIRTUAL SERVER</guilabel> Subsection</title>
+				<para>
+					The <guilabel>VIRTUAL SERVER</guilabel> subsection panel shown in <xref linkend="Cluster_Suite_Overview-The_VIRTUAL_SERVER_Subsection-The_VIRTUAL_SERVERS_Subsection" /> allows you to configure an individual virtual server. Links to subsections related specifically to this virtual server are located along the top of the page. But before configuring any of the subsections related to this virtual server, complete this page and click on the <guibutton>ACCEPT</guibutton> button.
+				</para>
+				<figure id="Cluster_Suite_Overview-The_VIRTUAL_SERVER_Subsection-The_VIRTUAL_SERVERS_Subsection">
+					<title>The <guilabel>VIRTUAL SERVERS</guilabel> Subsection</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/virtual-server-sub.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								The <guilabel>VIRTUAL SERVERS</guilabel> Subsection
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<variablelist>
+					<varlistentry>
+						<term><guilabel>Name</guilabel></term>
+						<listitem>
+							<para>
+								A descriptive name to identify the virtual server. This name is <emphasis>not</emphasis> the hostname for the machine, so make it descriptive and easily identifiable. You can even reference the protocol used by the virtual server, such as HTTP.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Application port</guilabel></term>
+						<listitem>
+							<para>
+								The port number through which the service application will listen.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guimenu>Protocol</guimenu></term>
+						<listitem>
+							<para>
+								Provides a choice of UDP or TCP, in a drop-down menu.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Virtual IP Address</guilabel></term>
+						<listitem>
+							<indexterm>
+								<primary><application>&PIRANHA;</application></primary>
+								<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+								<tertiary><guilabel>Virtual IP Address</guilabel></tertiary>
+							</indexterm>
+							<para>
+								The virtual server&#39;s floating IP address.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guimenu>Virtual IP Network Mask</guimenu></term>
+						<listitem>
+							<para>
+								The netmask for this virtual server, in the drop-down menu.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Firewall Mark</guilabel></term>
+						<listitem>
+							<indexterm>
+								<primary><application>&PIRANHA;</application></primary>
+								<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+								<tertiary><guilabel>Firewall Mark</guilabel></tertiary>
+							</indexterm>
+							<para>
+								For entering a firewall mark integer value when bundling multi-port protocols or creating a multi-port virtual server for separate, but related protocols.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Device</guilabel></term>
+						<listitem>
+							<para>
+								The name of the network device to which you want the floating IP address defined in the <guilabel>Virtual IP Address</guilabel> field to bind.
+							</para>
+							<para>
+								You should alias the public floating IP address to the Ethernet interface connected to the public network.
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+				<variablelist>
+					<varlistentry>
+						<term><guilabel>Re-entry Time</guilabel></term>
+						<listitem>
+							<para>
+								An integer value that defines the number of seconds before the active LVS router attempts to use a real server after the real server failed.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Service Timeout</guilabel></term>
+						<listitem>
+							<para>
+								An integer value that defines the number of seconds before a real server is considered dead and not available.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Quiesce server</guilabel></term>
+						<listitem>
+							<para>
+								When the <guilabel>Quiesce server</guilabel> radio button is selected, anytime a new real server node comes online, the least-connections table is reset to zero so the active LVS router routes requests as if all the real servers were freshly added to the cluster. This option prevents the a new server from becoming bogged down with a high number of connections upon entering the cluster.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Load monitoring tool</guilabel></term>
+						<listitem>
+							<para>
+								The LVS router can monitor the load on the various real servers by using either <command>rup</command> or <command>ruptime</command>. If you select <command>rup</command> from the drop-down menu, each real server must run the <command>rstatd</command> service. If you select <command>ruptime</command>, each real server must run the <command>rwhod</command> service.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Scheduling</guilabel></term>
+						<listitem>
+							<indexterm>
+								<primary><application>&PIRANHA;</application></primary>
+								<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+								<tertiary><guilabel>Scheduling</guilabel></tertiary>
+							</indexterm>
+							<para>
+								The preferred scheduling algorithm from the drop-down menu. The default is <userinput>Weighted least-connection</userinput>.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Persistence</guilabel></term>
+						<listitem>
+							<indexterm>
+								<primary><application>&PIRANHA;</application></primary>
+								<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+								<tertiary><guilabel>Persistence</guilabel></tertiary>
+							</indexterm>
+							<para>
+								Used if you need persistent connections to the virtual server during client transactions. Specifies the number of seconds of inactivity allowed to lapse before a connection times out in this text field.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guimenu>Persistence Network Mask</guimenu></term>
+						<listitem>
+							<para>
+								To limit persistence to particular subnet, select the appropriate network mask from the drop-down menu.
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</section>
+			
+			<section id="Cluster_Suite_Overview-VIRTUAL_SERVERS-REAL_SERVER_Subsection">
+				<title><guilabel>REAL SERVER</guilabel> Subsection</title>
+				<indexterm>
+					<primary><application>&PIRANHA;</application></primary>
+					<secondary><guilabel>REAL SERVER</guilabel> subsection</secondary>
+				</indexterm>
+				<para>
+					Clicking on the <guilabel>REAL SERVER</guilabel> subsection link at the top of the panel displays the <guilabel>EDIT REAL SERVER</guilabel> subsection. It displays the status of the physical server hosts for a particular virtual service.
+				</para>
+				<figure id="Cluster_Suite_Overview-REAL_SERVER_Subsection-The_REAL_SERVER_Subsection">
+					<title>The <guilabel>REAL SERVER</guilabel> Subsection</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/real-server-sub.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								The <guilabel>REAL SERVER</guilabel> Subsection
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Click the <guibutton>ADD</guibutton> button to add a new server. To delete an existing server, select the radio button beside it and click the <guibutton>DELETE</guibutton> button. Click the <guibutton>EDIT</guibutton> button to load the <guilabel>EDIT REAL SERVER</guilabel> panel, as seen in <xref linkend="Cluster_Suite_Overview-REAL_SERVER_Subsection-The_REAL_SERVER_Configuration_Panel" />.
+				</para>
+				<figure id="Cluster_Suite_Overview-REAL_SERVER_Subsection-The_REAL_SERVER_Configuration_Panel">
+					<title>The <guilabel>REAL SERVER</guilabel> Configuration Panel</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/real-server-sub-2.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								The <guilabel>REAL SERVER</guilabel> Configuration Panel
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+					This panel consists of three entry fields:
+				</para>
+				<variablelist>
+					<varlistentry>
+						<term><guilabel>Name</guilabel></term>
+						<listitem>
+							<para>
+								A descriptive name for the real server.
+							</para>
+							<tip>
+								<title>Tip</title>
+								<para>
+									This name is <emphasis>not</emphasis> the hostname for the machine, so make it descriptive and easily identifiable.
+								</para>
+							</tip>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Address</guilabel></term>
+						<listitem>
+							<para>
+								The real server&#39;s IP address. Since the listening port is already specified for the associated virtual server, do not add a port number.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Weight</guilabel></term>
+						<listitem>
+							<para>
+								An integer value indicating this host&#39;s capacity relative to that of other hosts in the pool. The value can be arbitrary, but treat it as a ratio in relation to other real servers.
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</section>
+			
+			<section id="Cluster_Suite_Overview-VIRTUAL_SERVERS-EDIT_MONITORING_SCRIPTS_Subsection">
+				<title><guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection</title>
+				<indexterm>
+					<primary><application>&PIRANHA;</application></primary>
+					<secondary><guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection</secondary>
+				</indexterm>
+				<para>
+					Click on the <guilabel>MONITORING SCRIPTS</guilabel> link at the top of the page. The <guilabel>EDIT MONITORING SCRIPTS</guilabel> subsection allows the administrator to specify a send/expect string sequence to verify that the service for the virtual server is functional on each real server. It is also the place where the administrator can specify customized scripts to check services requiring dynamically changing data.
+				</para>
+				<figure id="Cluster_Suite_Overview-EDIT_MONITORING_SCRIPTS_Subsection-The_EDIT_MONITORING_SCRIPTS_Subsection">
+					<title>The <guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/monitoring-scripts-sub.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								The <guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<variablelist>
+					<varlistentry>
+						<term><guilabel>Sending Program</guilabel></term>
+						<listitem>
+							<para>
+								For more advanced service verification, you can use this field to specify the path to a service-checking script. This function is especially helpful for services that require dynamically changing data, such as HTTPS or SSL.
+							</para>
+							<para>
+								To use this function, you must write a script that returns a textual response, set it to be executable, and type the path to it in the <guilabel>Sending Program</guilabel> field.
+							</para>
+							<note>
+								<title>Note</title>
+								<para>
+									If an external program is entered in the <guilabel>Sending Program</guilabel> field, then the <guilabel>Send</guilabel> field is ignored.
+								</para>
+							</note>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Send</guilabel></term>
+						<listitem>
+							<para>
+								A string for the <command>nanny</command> daemon to send to each real server in this field. By default the send field is completed for HTTP. You can alter this value depending on your needs. If you leave this field blank, the <command>nanny</command> daemon attempts to open the port and assume the service is running if it succeeds.
+							</para>
+							<para>
+								Only one send sequence is allowed in this field, and it can only contain printable, ASCII characters as well as the following escape characters:
+							</para>
+							<itemizedlist>
+								<listitem>
+									<para>
+										&bsol;n for new line.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										&bsol;r for carriage return.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										&bsol;t for tab.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										&bsol; to escape the next character which follows it.
+									</para>
+								</listitem>
+							</itemizedlist>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term><guilabel>Expect</guilabel></term>
+						<listitem>
+							<para>
+								The textual response the server should return if it is functioning properly. If you wrote your own sending program, enter the response you told it to send if it was successful.
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</section>
+
+		</section>
+
+	</section>
+
+</chapter>
+

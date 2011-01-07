@@ -1,0 +1,908 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA">
+	<title>Configuring the LVS Routers with <application>&PIRANHA;</application></title>
+	<indexterm>
+		<primary><application>&PIRANHA;</application></primary>
+		<secondary>overview of</secondary>
+	</indexterm>
+	<para>
+		The <application>&PIRANHA;</application> provides a structured approach to creating the necessary configuration file for a Piranha cluster &mdash; <filename>/etc/sysconfig/ha/lvs.cf</filename>. This chapter describes the basic operation of the <application>&PIRANHA;</application> and how to activate the cluster once configuration is complete.
+	</para>
+	<important>
+		<title>Important</title>
+		<para>
+			The configuration file for the LVS cluster follows strict formatting rules. Using the <application>&PIRANHA;</application> is the best way to prevent syntax errors in the <filename>lvs.cf</filename> and therefore prevent software failures.
+		</para>
+	</important>
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Necessary_Software">
+		<title>Necessary Software</title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary>necessary software</secondary>
+		</indexterm>
+		<para>
+			The <command>piranha-gui</command> service must be running on the primary LVS router to use the <application>&PIRANHA;</application>. To configure the cluster, you minimally need a text-only Web browser, such as <command>links</command>. If you are accessing the LVS router from another machine, you also need an <command>ssh</command> connection to the primary LVS router as the root user.
+		</para>
+		<para>
+			While configuring the primary LVS router it is a good idea to keep a concurrent <command>ssh</command> connection in a terminal window. This connection provides a secure way to restart <command>pulse</command> and other services, configure network packet filters, and monitor <filename>/var/log/messages</filename> during trouble shooting.
+		</para>
+		<para>
+			The next four sections walk through each of the configuration pages of the <application>&PIRANHA;</application> and give instructions on using it to set up the LVS cluster.
+		</para>
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Logging_Into_the_PIRANHA">
+		<title>Logging Into the <application>&PIRANHA;</application></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary>login panel</secondary>
+		</indexterm>
+		<para>
+			When configuring an LVS cluster, you should always begin by configuring the primary router with the <application>&PIRANHA;</application>. To do this,verify that the <command>piranha-gui</command> service is running and an administrative password has been set, as described in <xref linkend="Virtual_Server_Administration-Initial_LVS_Configuration-Setting_a_Password_for_the_PIRANHA" />.
+		</para>
+		<para>
+			If you are accessing the machine locally, you can open <userinput>http://localhost:3636</userinput> in a Web browser to access the <application>&PIRANHA;</application>. Otherwise, type in the hostname or real IP address for the server followed by <userinput>:3636</userinput>. Once the browser connects, you will see the screen shown in <xref linkend="Virtual_Server_Administration-Logging_Into_the_PIRANHA-The_Welcome_Panel" />.
+		</para>
+		<figure id="Virtual_Server_Administration-Logging_Into_the_PIRANHA-The_Welcome_Panel">
+			<title>The Welcome Panel</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/ha-piranha-gui/main.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						The Welcome Panel
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			Click on the <guibutton>Login</guibutton> button and enter <userinput>piranha</userinput> for the <guilabel>Username</guilabel> and the administrative password you created in the <guilabel>Password</guilabel> field.
+		</para>
+		<para>
+			The <application>&PIRANHA;</application> is made of four main screens or <firstterm>panels</firstterm>. In addition, the <guilabel>Virtual Servers</guilabel> panel contains four <firstterm>subsections</firstterm>. The <guilabel>CONTROL/MONITORING</guilabel> panel is the first panel after the login screen.
+		</para>
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-CONTROLMONITORING">
+		<title><guilabel>CONTROL/MONITORING</guilabel></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary><guilabel>CONTROL/MONITORING</guilabel></secondary>
+		</indexterm>
+		<para>
+			The <guilabel>CONTROL/MONITORING</guilabel> Panel presents the cluster administrator with a limited runtime status of the cluster. It displays the status of the <command>pulse</command> daemon, the LVS routing table, and the LVS-spawned <command>nanny</command> processes.
+		</para>
+		<note>
+			<title>Note</title>
+			<para>
+				The fields for <guilabel>CURRENT LVS ROUTING TABLE</guilabel> and <guilabel>CURRENT LVS PROCESSES</guilabel> remain blank until you actually start the cluster, as shown in <xref linkend="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Starting_the_Cluster" />.
+			</para>
+		</note>
+		<figure id="Virtual_Server_Administration-CONTROLMONITORING-The_CONTROLMONITORING_Panel">
+			<title>The <guilabel>CONTROL/MONITORING</guilabel> Panel</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/ha-piranha-gui/control-monitoring.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						The <guilabel>CONTROL/MONITORING</guilabel> Panel
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<variablelist>
+			<varlistentry>
+				<term><guilabel>Auto update</guilabel></term>
+				<listitem>
+					<para>
+						The status display on this page can be updated automatically at a user configurable interval. To enable this feature, click on the <guilabel>Auto update</guilabel> checkbox and set the desired update frequency in the <guilabel>Update frequency in seconds</guilabel> text box (the default value is 10 seconds).
+					</para>
+					<para>
+						It is not recommended that you set the automatic update to an interval less than 10 seconds. Doing so may make it difficult to reconfigure the <guilabel>Auto update</guilabel> interval because the page will update too frequently. If you encounter this issue, simply click on another panel and then back on <guilabel>CONTROL/MONITORING</guilabel>.
+					</para>
+					<para>
+						The <guilabel>Auto update</guilabel> feature does not work with all browsers, such as <application>Mozilla</application>.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guibutton>Update information now</guibutton></term>
+				<listitem>
+					<para>
+						You can manually update the status information manually by clicking this button.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guibutton>CHANGE PASSWORD</guibutton></term>
+				<listitem>
+					<para>
+						Clicking this button takes you to a help screen with information on how to change the administrative password for the <application>&PIRANHA;</application>.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-GLOBAL_SETTINGS">
+		<title><guilabel>GLOBAL SETTINGS</guilabel></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary><guilabel>GLOBAL SETTINGS</guilabel></secondary>
+		</indexterm>
+		<para>
+			The <guilabel>GLOBAL SETTINGS</guilabel> panel is where the cluster administrator defines the networking details for the primary LVS router&#39;s public and private network interfaces.
+		</para>
+		<figure id="Virtual_Server_Administration-GLOBAL_SETTINGS-The_GLOBAL_SETTINGS_Panel">
+			<title>The <guilabel>GLOBAL SETTINGS</guilabel> Panel</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/ha-piranha-gui/global-settings.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						The <guilabel>GLOBAL SETTINGS</guilabel> Panel
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			The top half of this panel sets up the primary LVS router&#39;s public and private network interfaces. These are the interfaces already configured in <xref linkend="Virtual_Server_Administration-The_NAT_LVS_Cluster-Configuring_Network_Interfaces_for_a_NAT_LVS_Cluster" />.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term><guilabel>Primary server public IP</guilabel></term>
+				<listitem>
+					<para>
+						In this field, enter the publicly routable real IP address for the primary LVS node.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>Primary server private IP</guilabel></term>
+				<listitem>
+					<para>
+						Enter the real IP address for an alternative network interface on the primary LVS node. This address is used solely as an alternative heartbeat channel for the backup router and does not have to correlate to the real private IP address assigned in <xref linkend="Virtual_Server_Administration-The_NAT_LVS_Cluster-Configuring_Network_Interfaces_for_a_NAT_LVS_Cluster" />. You may leave this field blank, but doing so will mean there is no alternate heartbeat channel for the backup LVS router to use and therefore will create a single point of failure.
+					</para>
+					<tip>
+						<title>Tip</title>
+						<para>
+							The private IP address is not needed for <guibutton>Direct Routing</guibutton> configurations, as all real servers as well as the LVS directors share the same virtual IP addresses and should have the same IP route configuration.
+						</para>
+					</tip>
+					<tip>
+						<title>Tip</title>
+						<para>
+							The primary LVS router&#39;s private IP can be configured on any interface that accepts TCP/IP, whether it be an Ethernet adapter or a serial port.
+						</para>
+					</tip>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>Use network type</guilabel></term>
+				<listitem>
+					<para>
+						Click the <guibutton>NAT</guibutton> button to select NAT routing.
+					</para>
+					<para>
+						Click the <guibutton>Direct Routing</guibutton> button to select direct routing.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<para>
+			The next three fields deal specifically with the NAT router&#39;s virtual network interface connecting the private network with the real servers. These fields <emphasis>do not</emphasis> apply to the direct routing network type.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term><guilabel>NAT Router IP</guilabel></term>
+				<listitem>
+					<para>
+						Enter the private floating IP in this text field. This floating IP should be used as the gateway for the real servers.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>NAT Router netmask</guilabel></term>
+				<listitem>
+					<para>
+						If the NAT router&#39;s floating IP needs a particular netmask, select it from drop-down list.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>NAT Router device</guilabel></term>
+				<listitem>
+					<para>
+						Use this text field to define the device name of the network interface for the floating IP address, such as <userinput>eth1:1</userinput>.
+					</para>
+					<tip>
+						<title>Tip</title>
+						<para>
+							You should alias the NAT floating IP address to the Ethernet interface connected to the private network. In this example, the private network is on the <filename>eth1</filename> interface, so <userinput>eth1:1</userinput> is the floating IP address.
+						</para>
+					</tip>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<warning>
+			<title>Warning</title>
+			<para>
+				After completing this page, click the <guibutton>ACCEPT</guibutton> button to make sure you do not lose any changes when selecting a new panel.
+			</para>
+		</warning>
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-REDUNDANCY">
+		<title><guilabel>REDUNDANCY</guilabel></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary><guilabel>REDUNDANCY</guilabel></secondary>
+		</indexterm>
+		<para>
+			The <guilabel>REDUNDANCY</guilabel> panel allows you to configure of the backup LVS router node and set various heartbeat monitoring options.
+		</para>
+		<tip>
+			<title>Tip</title>
+			<para>
+				The first time you visit this screen, it displays an "inactive" <guilabel>Backup</guilabel> status and an <guibutton>ENABLE</guibutton> button. To configure the backup LVS router, click on the <guibutton>ENABLE</guibutton> button so that the screen matches <xref linkend="Virtual_Server_Administration-REDUNDANCY-The_REDUNDANCY_Panel" />.
+			</para>
+		</tip>
+		<figure id="Virtual_Server_Administration-REDUNDANCY-The_REDUNDANCY_Panel">
+			<title>The <guilabel>REDUNDANCY</guilabel> Panel</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/ha-piranha-gui/redundancy.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						The <guilabel>REDUNDANCY</guilabel> Panel
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<variablelist>
+			<varlistentry>
+				<term><guilabel>Redundant server public IP</guilabel></term>
+				<listitem>
+					<para>
+						Enter the public real IP address for the backup LVS router node.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>Redundant server private IP</guilabel></term>
+				<listitem>
+					<para>
+						Enter the backup node&#39;s private real IP address in this text field.
+					</para>
+					<para>
+						If you do not see the field called <guilabel>Redundant server private IP</guilabel>, go back to the <guilabel>GLOBAL SETTINGS</guilabel> panel and enter a <guilabel>Primary server private IP</guilabel> address and click <guibutton>ACCEPT</guibutton>.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<para>
+			The rest of the panel is devoted to configuring the heartbeat channel, which is used by the backup node to monitor the primary node for failure.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term><guilabel>Heartbeat Interval (seconds)</guilabel></term>
+				<listitem>
+					<para>
+						This field sets the number of seconds between heartbeats &mdash; the interval that the backup node will check the functional status of the primary LVS node.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>Assume dead after (seconds)</guilabel></term>
+				<listitem>
+					<para>
+						If the primary LVS node does not respond after this number of seconds, then the backup LVS router node will initiate failover.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><guilabel>Heartbeat runs on port</guilabel></term>
+				<listitem>
+					<para>
+						This field sets the port at which the heartbeat communicates with the primary LVS node. The default is set to 539 if this field is left blank.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<warning>
+			<title>Warning</title>
+			<para>
+				Remember to click the <guibutton>ACCEPT</guibutton> button after making any changes in this panel to make sure you do not lose any changes when selecting a new panel.
+			</para>
+		</warning>
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-VIRTUAL_SERVERS">
+		<title><guilabel>VIRTUAL SERVERS</guilabel></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary><guilabel>VIRTUAL SERVERS</guilabel></secondary>
+		</indexterm>
+		<para>
+			The <guilabel>VIRTUAL SERVERS</guilabel> panel displays information for each currently defined virtual server. Each table entry shows the status of the virtual server, the server name, the virtual IP assigned to the server, the netmask of the virtual IP, the port number to which the service communicates, the protocol used, and the virtual device interface.
+		</para>
+		<figure id="Virtual_Server_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVERS_Panel">
+			<title>The <guilabel>VIRTUAL SERVERS</guilabel> Panel</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/ha-piranha-gui/virtual-servers.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						The <guilabel>VIRTUAL SERVERS</guilabel> Panel
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			Each server displayed in the <guilabel>VIRTUAL SERVERS</guilabel> panel can be configured on subsequent screens or <firstterm>subsections</firstterm>.
+		</para>
+		<para>
+			To add a service, click the <guibutton>ADD</guibutton> button. To remove a service, select it by clicking the radio button next to the virtual server and click the <guibutton>DELETE</guibutton> button.
+		</para>
+		<para>
+			To enable or disable a virtual server in the table click its radio button and click the <guibutton>(DE)ACTIVATE</guibutton> button.
+		</para>
+		<para>
+			After adding a virtual server, you can configure it by clicking the radio button to its left and clicking the <guilabel>EDIT</guilabel> button to display the <guilabel>VIRTUAL SERVER</guilabel> subsection.
+		</para>
+		<section id="Virtual_Server_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection">
+			<title>The <guilabel>VIRTUAL SERVER</guilabel> Subsection</title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+			</indexterm>
+			<para>
+				The <guilabel>VIRTUAL SERVER</guilabel> subsection panel shown in <xref linkend="Virtual_Server_Administration-The_VIRTUAL_SERVER_Subsection-The_VIRTUAL_SERVERS_Subsection" /> allows you to configure an individual virtual server. Links to subsections related specifically to this virtual server are located along the top of the page. But before configuring any of the subsections related to this virtual server, complete this page and click on the <guibutton>ACCEPT</guibutton> button.
+			</para>
+			<figure id="Virtual_Server_Administration-The_VIRTUAL_SERVER_Subsection-The_VIRTUAL_SERVERS_Subsection">
+				<title>The <guilabel>VIRTUAL SERVERS</guilabel> Subsection</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/ha-piranha-gui/virtual-server-sub.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>VIRTUAL SERVERS</guilabel> Subsection
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Name</guilabel></term>
+					<listitem>
+						<para>
+							Enter a descriptive name to identify the virtual server. This name is <emphasis>not</emphasis> the hostname for the machine, so make it descriptive and easily identifiable. You can even reference the protocol used by the virtual server, such as HTTP.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Application port</guilabel></term>
+					<listitem>
+						<para>
+							Enter the port number through which the service application will listen. Since this example is for HTTP services, port 80 is used.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guimenu>Protocol</guimenu></term>
+					<listitem>
+						<para>
+							Choose between UDP and TCP in the drop-down menu. Web servers typically communicate via the TCP protocol, so this is selected in the example above.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Virtual IP Address</guilabel></term>
+					<listitem>
+						<indexterm>
+							<primary><application>&PIRANHA;</application></primary>
+							<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+							<tertiary><guilabel>Virtual IP Address</guilabel></tertiary>
+						</indexterm>
+						<para>
+							Enter the virtual server&#39;s floating IP address in this text field.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guimenu>Virtual IP Network Mask</guimenu></term>
+					<listitem>
+						<para>
+							Set the netmask for this virtual server with the drop-down menu.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Firewall Mark</guilabel></term>
+					<listitem>
+						<indexterm>
+							<primary><application>&PIRANHA;</application></primary>
+							<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+							<tertiary><guilabel>Firewall Mark</guilabel></tertiary>
+						</indexterm>
+						<para>
+							Do <emphasis>not</emphasis> enter a firewall mark integer value in this field unless you are bundling multi-port protocols or creating a multi-port virtual server for separate, but related protocols. In this example, the above virtual server has a <guilabel>Firewall Mark</guilabel> of 80 because we are bundling connections to HTTP on port 80 and to HTTPS on port 443 using the firewall mark value of 80. When combined with persistence, this technique will ensure users accessing both insecure and secure webpages are routed to the same real server, preserving state.
+						</para>
+						<warning>
+							<title>Warning</title>
+							<para>
+								Entering a firewall mark in this field allows IPVS to recognize that packets bearing this firewall mark are treated the same, but you must perform further configuration outside of the <application>&PIRANHA;</application> to actually assign the firewall marks. See <xref linkend="Virtual_Server_Administration-Setting_Up_a_PROD_LVS_Cluster-Multi_port_Services_and_LVS_Clustering" /> for instructions on creating multi-port services and <xref linkend="Virtual_Server_Administration-Setting_Up_a_PROD_LVS_Cluster-FTP_In_an_LVS_Cluster" /> for creating a highly available FTP virtual server.
+							</para>
+						</warning>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Device</guilabel></term>
+					<listitem>
+						<para>
+							Enter the name of the network device to which you want the floating IP address defined the <guilabel>Virtual IP Address</guilabel> field to bind.
+						</para>
+						<para>
+							You should alias the public floating IP address to the Ethernet interface connected to the public network. In this example, the public network is on the <filename>eth0</filename> interface, so <userinput>eth0:1</userinput> should be entered as the device name.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Re-entry Time</guilabel></term>
+					<listitem>
+						<para>
+							Enter an integer value which defines the length of time, in seconds, before the active LVS router attempts to bring a real server back into the cluster after a failure.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Service Timeout</guilabel></term>
+					<listitem>
+						<para>
+							Enter an integer value which defines the length of time, in seconds, before a real server is considered dead and removed from the cluster.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Quiesce server</guilabel></term>
+					<listitem>
+						<para>
+							When the <guilabel>Quiesce server</guilabel> radio button is selected, anytime a new real server node comes online, the least-connections table is reset to zero so the active LVS router routes requests as if all the real servers were freshly added to the cluster. This option prevents the a new server from becoming bogged down with a high number of connections upon entering the cluster.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Load monitoring tool</guilabel></term>
+					<listitem>
+						<para>
+							The LVS router can monitor the load on the various real servers by using either <command>rup</command> or <command>ruptime</command>. If you select <command>rup</command> from the drop-down menu, each real server must run the <command>rstatd</command> service. If you select <command>ruptime</command>, each real server must run the <command>rwhod</command> service.
+						</para>
+						<caution>
+							<title>Caution</title>
+							<para>
+								Load monitoring is <emphasis>not</emphasis> the same as load balancing and can result in hard to predict scheduling behavior when combined with weighted scheduling algorithms. Also, if you use load monitoring, the real servers in the cluster must be Linux machines.
+							</para>
+						</caution>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Scheduling</guilabel></term>
+					<listitem>
+						<indexterm>
+							<primary><application>&PIRANHA;</application></primary>
+							<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+							<tertiary><guilabel>Scheduling</guilabel></tertiary>
+						</indexterm>
+						<para>
+							Select your preferred scheduling algorithm from the drop-down menu. The default is <userinput>Weighted least-connection</userinput>. For more information on scheduling algorithms, see <xref linkend="Virtual_Server_Administration-LVS_Scheduling_Overview-Scheduling_Algorithms" />.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Persistence</guilabel></term>
+					<listitem>
+						<indexterm>
+							<primary><application>&PIRANHA;</application></primary>
+							<secondary><guilabel>VIRTUAL SERVER</guilabel> subsection</secondary>
+							<tertiary><guilabel>Persistence</guilabel></tertiary>
+						</indexterm>
+						<para>
+							If an administrator needs persistent connections to the virtual server during client transactions, enter the number of seconds of inactivity allowed to lapse before a connection times out in this text field.
+						</para>
+						<important>
+							<title>Important</title>
+							<para>
+								If you entered a value in the <guilabel>Firewall Mark</guilabel> field above, you should enter a value for persistence as well. Also, be sure that if you use firewall marks and persistence together, that the amount of persistence is the same for each virtual server with the firewall mark. For more on persistence and firewall marks, refer to <xref linkend="Virtual_Server_Administration-Linux_Virtual_Server_Overview-Persistence_and_Firewall_Marks" />.
+							</para>
+						</important>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guimenu>Persistence Network Mask</guimenu></term>
+					<listitem>
+						<para>
+							To limit persistence to particular subnet, select the appropriate network mask from the drop-down menu.
+						</para>
+						<note>
+							<title>Note</title>
+							<para>
+								Before the advent of firewall marks, persistence limited by subnet was a crude way of bundling connections. Now, it is best to use persistence in relation to firewall marks to achieve the same result.
+							</para>
+						</note>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<warning>
+				<title>Warning</title>
+				<para>
+					Remember to click the <guibutton>ACCEPT</guibutton> button after making any changes in this panel. To make sure you do not lose changes when selecting a new panel.
+				</para>
+			</warning>
+		</section>
+		
+		<section id="Virtual_Server_Administration-VIRTUAL_SERVERS-REAL_SERVER_Subsection">
+			<title><guilabel>REAL SERVER</guilabel> Subsection</title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>REAL SERVER</guilabel> subsection</secondary>
+			</indexterm>
+			<para>
+				Clicking on the <guilabel>REAL SERVER</guilabel> subsection link at the top of the panel displays the <guilabel>EDIT REAL SERVER</guilabel> subsection. It displays the status of the physical server hosts for a particular virtual service.
+			</para>
+			<figure id="Virtual_Server_Administration-REAL_SERVER_Subsection-The_REAL_SERVER_Subsection">
+				<title>The <guilabel>REAL SERVER</guilabel> Subsection</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/ha-piranha-gui/real-server-sub.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>REAL SERVER</guilabel> Subsection
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Click the <guibutton>ADD</guibutton> button to add a new server. To delete an existing server, select the radio button beside it and click the <guibutton>DELETE</guibutton> button. Click the <guibutton>EDIT</guibutton> button to load the <guilabel>EDIT REAL SERVER</guilabel> panel, as seen in <xref linkend="Virtual_Server_Administration-REAL_SERVER_Subsection-The_REAL_SERVER_Configuration_Panel" />.
+			</para>
+			<figure id="Virtual_Server_Administration-REAL_SERVER_Subsection-The_REAL_SERVER_Configuration_Panel">
+				<title>The <guilabel>REAL SERVER</guilabel> Configuration Panel</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/ha-piranha-gui/real-server-sub-2.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>REAL SERVER</guilabel> Configuration Panel
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This panel consists of three entry fields:
+			</para>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Name</guilabel></term>
+					<listitem>
+						<para>
+							A descriptive name for the real server.
+						</para>
+						<tip>
+							<title>Tip</title>
+							<para>
+								This name is <emphasis>not</emphasis> the hostname for the machine, so make it descriptive and easily identifiable.
+							</para>
+						</tip>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Address</guilabel></term>
+					<listitem>
+						<para>
+							The real server&#39;s IP address. Since the listening port is already specified for the associated virtual server, do not add a port number.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Weight</guilabel></term>
+					<listitem>
+						<para>
+							An integer value indicating this host&#39;s capacity relative to that of other hosts in the pool. The value can be arbitrary, but treat it as a ratio in relation to other real servers in the cluster. For more on server weight, see <xref linkend="Virtual_Server_Administration-LVS_Scheduling_Overview-Server_Weight_and_Scheduling" />.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<warning>
+				<title>Warning</title>
+				<para>
+					Remember to click the <guibutton>ACCEPT</guibutton> button after making any changes in this panel. To make sure you do not lose any changes when selecting a new panel.
+				</para>
+			</warning>
+		</section>
+		
+		<section id="Virtual_Server_Administration-VIRTUAL_SERVERS-EDIT_MONITORING_SCRIPTS_Subsection">
+			<title><guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection</title>
+			<indexterm>
+				<primary><application>&PIRANHA;</application></primary>
+				<secondary><guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection</secondary>
+			</indexterm>
+			<para>
+				Click on the <guilabel>MONITORING SCRIPTS</guilabel> link at the top of the page. The <guilabel>EDIT MONITORING SCRIPTS</guilabel> subsection allows the administrator to specify a send/expect string sequence to verify that the service for the virtual server is functional on each real server. It is also the place where the administrator can specify customized scripts to check services requiring dynamically changing data.
+			</para>
+			<figure id="Virtual_Server_Administration-EDIT_MONITORING_SCRIPTS_Subsection-The_EDIT_MONITORING_SCRIPTS_Subsection">
+				<title>The <guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/ha-piranha-gui/monitoring-scripts-sub.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							The <guilabel>EDIT MONITORING SCRIPTS</guilabel> Subsection
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<variablelist>
+				<varlistentry>
+					<term><guilabel>Sending Program</guilabel></term>
+					<listitem>
+						<para>
+							For more advanced service verification, you can use this field to specify the path to a service-checking script. This functionality is especially helpful for services that require dynamically changing data, such as HTTPS or SSL.
+						</para>
+						<para>
+							To use this functionality, you must write a script that returns a textual response, set it to be executable, and type the path to it in the <guilabel>Sending Program</guilabel> field.
+						</para>
+						<tip>
+							<title>Tip</title>
+							<para>
+								To ensure that each server in the real server pool is checked, use the special token <userinput>%h</userinput> after the path to the script in the <guilabel>Sending Program</guilabel> field. This token is replaced with each real server&#39;s IP address as the script is called by the <command>nanny</command> daemon.
+							</para>
+						</tip>
+						<para>
+							The following is a sample script to use as a guide when composing an external service-checking script:
+						</para>
+<screen>
+#!/bin/sh
+
+TEST=`dig -t soa example.com @$1 | grep -c dns.example.com
+
+if [ $TEST != "1" ]; then
+	echo "OK
+else
+	echo "FAIL"
+fi
+</screen>
+						<note>
+							<title>Note</title>
+							<para>
+								If an external program is entered in the <guilabel>Sending Program</guilabel> field, then the <guilabel>Send</guilabel> field is ignored.
+							</para>
+						</note>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Send</guilabel></term>
+					<listitem>
+						<para>
+							Enter a string for the <command>nanny</command> daemon to send to each real server in this field. By default the send field is completed for HTTP. You can alter this value depending on your needs. If you leave this field blank, the <command>nanny</command> daemon attempts to open the port and assume the service is running if it succeeds.
+						</para>
+						<para>
+							Only one send sequence is allowed in this field, and it can only contain printable, ASCII characters as well as the following escape characters:
+						</para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									&bsol;n for new line.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									&bsol;r for carriage return.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									&bsol;t for tab.
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									&bsol; to escape the next character which follows it.
+								</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term><guilabel>Expect</guilabel></term>
+					<listitem>
+						<para>
+							Enter a the textual response the server should return if it is functioning properly. If you wrote your own sending program, enter the response you told it to send if it was successful.
+						</para>
+						<tip>
+							<title>Tip</title>
+							<para>
+								To determine what to send for a given service, you can open a <command>telnet</command> connection to the port on a real server and see what is returned. For instance, FTP reports 220 upon connecting, so could enter <userinput>quit</userinput> in the <guilabel>Send</guilabel> field and <userinput>220</userinput> in the <guilabel>Expect</guilabel> field.
+							</para>
+						</tip>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<warning>
+				<title>Warning</title>
+				<para>
+					Remember to click the <guibutton>ACCEPT</guibutton> button after making any changes in this panel. To make sure you do not lose any changes when selecting a new panel.
+				</para>
+			</warning>
+			<para>
+				Once you have configured virtual servers using the <application>&PIRANHA;</application>, you must copy specific configuration files to the backup LVS router. See <xref linkend="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Synchronizing_Configuration_Files" /> for details.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Synchronizing_Configuration_Files">
+		<title>Synchronizing Configuration Files</title>
+		<indexterm>
+			<primary>synchronizing configuration files</primary>
+		</indexterm>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>synchronizing configuration files</secondary>
+		</indexterm>
+		<para>
+			After configuring the primary LVS router, there are several configuration files that must be copied to the backup LVS router before you start the cluster.
+		</para>
+		<para>
+			These files include:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<filename>/etc/sysconfig/ha/lvs.cf</filename> &mdash; the configuration file for the LVS routers.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<filename>/etc/sysctl</filename> &mdash; the configuration file that, among other things, turns on packet forwarding in the kernel.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<filename>/etc/sysconfig/iptables</filename> &mdash; If you are using firewall marks, you should synchronize one of these files based on which network packet filter you are using.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<important>
+			<title>Important</title>
+			<para>
+				The <filename>/etc/sysctl.conf</filename> and <filename>/etc/sysconfig/iptables</filename> files do <emphasis>not </emphasis> change when you configure the cluster using the <application>&PIRANHA;</application>.
+			</para>
+		</important>
+		<section id="Virtual_Server_Administration-Synchronizing_Configuration_Files-Synchronizing_lvs.cf">
+			<title>Synchronizing <filename>lvs.cf</filename></title>
+			<para>
+				Anytime the LVS configuration file, <computeroutput>/etc/sysconfig/ha/lvs.cf</computeroutput>, is created or updated, you must copy it to the backup LVS router node.
+			</para>
+			<warning>
+				<title>Warning</title>
+				<para>
+					Both the active and backup LVS router nodes must have identical <computeroutput>lvs.cf</computeroutput> files. Mismatched LVS configuration files between the LVS router nodes can prevent failover.
+				</para>
+			</warning>
+			<para>
+				The best way to do this is to use the <command>scp</command> command.
+			</para>
+			<important>
+				<title>Important</title>
+				<para>
+					To use <command>scp</command> the <command>sshd</command> must be running on the backup router, see <xref linkend="Virtual_Server_Administration-Initial_LVS_Configuration-Configuring_Services_on_the_LVS_Routers" /> for details on how to properly configure the necessary services on the LVS routers.
+				</para>
+			</important>
+			<para>
+				Issue the following command as the root user from the primary LVS router to sync the <userinput>lvs.cf</userinput> files between the router nodes:
+			</para>
+			<para>
+				<command>scp /etc/sysconfig/ha/lvs.cf <replaceable>n.n.n.n</replaceable>:/etc/sysconfig/ha/lvs.cf</command>
+			</para>
+			<para>
+				In the command, replace <replaceable>n.n.n.n</replaceable> with the real IP address of the backup LVS router.
+			</para>
+		</section>
+		
+		<section id="Virtual_Server_Administration-Synchronizing_Configuration_Files-Synchronizing_sysctl">
+			<title>Synchronizing <filename>sysctl</filename></title>
+			<para>
+				The <filename>sysctl</filename> file is only modified once in most situations. This file is read at boot time and tells the kernel to turn on packet forwarding.
+			</para>
+			<important>
+				<title>Important</title>
+				<para>
+					If you are not sure whether or not packet forwarding is enabled in the kernel, see <xref linkend="Virtual_Server_Administration-Initial_LVS_Configuration-Turning_on_Packet_Forwarding" /> for instructions on how to check and, if necessary, enable this key functionality.
+				</para>
+			</important>
+		</section>
+		
+		<section id="Virtual_Server_Administration-Synchronizing_Configuration_Files-Synchronizing_Network_Packet_Filtering_Rules">
+			<title>Synchronizing Network Packet Filtering Rules</title>
+			<para>
+				If you are using <filename>iptables</filename>, you will need to synchronize the appropriate configuration file on the backup LVS router.
+			</para>
+			<para>
+				If you alter the any network packet filter rules, enter the following command as root from the primary LVS router:
+			</para>
+			<para>
+				<command>scp /etc/sysconfig/iptables <replaceable>n.n.n.n</replaceable>:/etc/sysconfig/</command>
+			</para>
+			<para>
+				In the command, replace <replaceable>n.n.n.n</replaceable> with the real IP address of the backup LVS router.
+			</para>
+			<para>
+				Next either open an <command>ssh</command> session to the backup router or log into the machine as root and type the following command:
+			</para>
+			<para>
+				<command>/sbin/service iptables restart</command>
+			</para>
+			<para>
+				Once you have copied these files over to the backup router and started the appropriate services (see <xref linkend="Virtual_Server_Administration-Initial_LVS_Configuration-Configuring_Services_on_the_LVS_Routers" /> for more on this topic) you are ready to start the cluster.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Virtual_Server_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Starting_the_Cluster">
+		<title>Starting the Cluster</title>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>starting the cluster</secondary>
+		</indexterm>
+		<para>
+			To start the LVS cluster, it is best to have two root terminals open simultaneously or two simultaneous root open <command>ssh</command> sessions to the primary LVS router.
+		</para>
+		<para>
+			In one terminal, watch the kernel log messages with the command:
+		</para>
+		<para>
+			<command>tail -f /var/log/messages</command>
+		</para>
+		<para>
+			Then start the cluster by typing the following command into the other terminal:
+		</para>
+		<para>
+			<command>/sbin/service pulse start</command>
+		</para>
+		<para>
+			Follow the progress of the <command>pulse</command> service&#39;s startup in the terminal with the kernel log messages. When you see the following output, the pulse daemon has started properly:
+		</para>
+		<para>
+			<computeroutput>gratuitous lvs arps finished</computeroutput>
+		</para>
+		<para>
+			To stop watching <filename>/var/log/messages</filename>, type <keycombo><keycap>Ctrl</keycap><keycap>c</keycap></keycombo>.
+		</para>
+		<para>
+			From this point on, the primary LVS router is also the active LVS router. While you can make requests to the cluster at this point, you should start the backup LVS router before putting the cluster into service. To do this, simply repeat the process described above on the backup LVS router node.
+		</para>
+		<para>
+			After completing this final step, the cluster will be up and running.
+		</para>
+	</section>
+
+</chapter>
+

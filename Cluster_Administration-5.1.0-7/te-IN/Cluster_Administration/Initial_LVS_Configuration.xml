@@ -1,0 +1,281 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-Initial_LVS_Configuration">
+	<title>Initial LVS Configuration</title>
+	<indexterm>
+		<primary>LVS</primary>
+		<secondary>initial configuration</secondary>
+	</indexterm>
+	<indexterm>
+		<primary>LVS</primary>
+		<secondary>LVS routers</secondary>
+		<tertiary>primary node</tertiary>
+	</indexterm>
+	<para>
+		After installing &PROD;, you must take some basic steps to set up both the LVS routers and the real servers in the LVS cluster. This chapter covers these initial steps in detail.
+	</para>
+	<note>
+		<title>Note</title>
+		<para>
+			The LVS router node that becomes the active node once the cluster is started is also referred to as the <firstterm>primary node</firstterm>. When configuring an LVS cluster, use the <application>&PIRANHA;</application> on the primary node.
+		</para>
+	</note>
+	<indexterm>
+		<primary>LVS</primary>
+		<secondary>LVS routers</secondary>
+		<tertiary>configuring services</tertiary>
+	</indexterm>
+	<section id="Cluster_Administration-Initial_LVS_Configuration-Configuring_Services_on_the_LVS_Routers">
+		<title>Configuring Services on the LVS Routers</title>
+		<para>
+			The &PROD; installation program installs all of the components needed to set up an LVS cluster, but the appropriate services must be activated before configuring the cluster. For both LVS routers, set the appropriate services to start at boot time. There are three primary tools available for setting services to activate at boot time under &PROD;: the command line program <command>chkconfig</command>, the ncurses-based program <command>ntsysv</command>, and the graphical <application>&RHSERVICESTOOL;</application>. All of these tools require root access.
+		</para>
+		<tip>
+			<title>Tip</title>
+			<para>
+				To attain root access, open a shell prompt and type the following command followed by the root password:
+			</para>
+<screen><command>su -</command></screen>
+		</tip>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>LVS routers</secondary>
+			<tertiary>necessary services</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary><command>iptables</command></primary>
+		</indexterm>
+		<indexterm>
+			<primary><command>sshd</command> service</primary>
+		</indexterm>
+		<indexterm>
+			<primary><command>piranha-gui</command> service</primary>
+		</indexterm>
+		<indexterm>
+			<primary><command>pulse</command> service</primary>
+		</indexterm>
+		<para>
+			On the LVS routers, there are three services which need to be set to activate at boot time:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					The <command>piranha-gui</command> service (primary node only)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The <command>pulse</command> service
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The <command>sshd</command> service
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			If you are clustering multi-port services or using firewall marks, you must also enable the <command>iptables</command> service.
+		</para>
+		<para>
+			It is best to set these services to activate in both runlevel 3 and runlevel 5. To accomplish this using <command>chkconfig</command>, type the following command for each service:
+		</para>
+		<indexterm>
+			<primary>chkconfig</primary>
+		</indexterm>
+<screen><command>/sbin/chkconfig --level 35 <replaceable>daemon</replaceable> on</command></screen>
+		<para>
+			In the above command, replace <replaceable>daemon</replaceable> with the name of the service you are activating. To get a list of services on the system as well as what runlevel they are set to activate on, issue the following command:
+		</para>
+<screen><command>/sbin/chkconfig --list</command></screen>
+		<warning>
+			<title>Warning</title>
+			<para>
+				Turning any of the above services on using <command>chkconfig</command> does not actually start the daemon. To do this use the <command>/sbin/service</command> command. See <xref linkend="Cluster_Administration-Initial_LVS_Configuration-Starting_the_PIRANHA_Service" /> for an example of how to use the <command>/sbin/service</command> command.
+			</para>
+		</warning>
+		<para>
+			For more information on runlevels and configuring services with <command>ntsysv</command> and the <application>&RHSERVICESTOOL;</application>, refer to the chapter titled <citetitle>"Controlling Access to Services"</citetitle> in the <citetitle>&RHELSAG;</citetitle>.
+		</para>
+	</section>
+	
+	<section id="Cluster_Administration-Initial_LVS_Configuration-Setting_a_Password_for_the_PIRANHA">
+		<title>Setting a Password for the <application>&PIRANHA;</application></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary>setting a password</secondary>
+		</indexterm>
+		<indexterm>
+			<primary><command>piranha-passwd</command></primary>
+		</indexterm>
+		<para>
+			Before using the <application>&PIRANHA;</application> for the first time on the primary LVS router, you must restrict access to it by creating a password. To do this, login as root and issue the following command:
+		</para>
+<screen><command>/usr/sbin/piranha-passwd</command></screen>
+		<para>
+			After entering this command, create the administrative password when prompted.
+		</para>
+		<warning>
+			<title>Warning</title>
+			<para>
+				For a password to be more secure, it should not contain proper nouns, commonly used acronyms, or words in a dictionary from any language. Do not leave the password unencrypted anywhere on the system.
+			</para>
+		</warning>
+		<para>
+			If the password is changed during an active <application>&PIRANHA;</application> session, the administrator is prompted to provide the new password.
+		</para>
+	</section>
+	
+	<section id="Cluster_Administration-Initial_LVS_Configuration-Starting_the_PIRANHA_Service">
+		<title>Starting the <application>&PIRANHA;</application> Service</title>
+		<para>
+			After you have set the password for the <application>&PIRANHA;</application>, start or restart the <command>piranha-gui</command> service located in <command>/etc/rc.d/init.d/piranha-gui</command>. To do this, type the following command as root:
+		</para>
+<screen><command>/sbin/service piranha-gui start</command></screen>
+		<para>
+			or
+		</para>
+<screen><command>/sbin/service piranha-gui restart</command></screen>
+		<para>
+			Issuing this command starts a private session of the &HTTPD; by calling the symbolic link <command>/usr/sbin/piranha_gui -&gt; /usr/sbin/httpd</command>. For security reasons, the <command>piranha-gui</command> version of <command>httpd</command> runs as the piranha user in a separate process. The fact that <command>piranha-gui</command> leverages the <command>httpd</command> service means that:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					The &HTTPD; must be installed on the system.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Stopping or restarting the &HTTPD; via the <command>service</command> command stops the <command>piranha-gui</command> service.
+				</para>
+			</listitem>
+		</orderedlist>
+		<warning>
+			<title>Warning</title>
+			<para>
+				If the command <command>/sbin/service httpd stop</command> or <command>/sbin/service httpd restart</command> is issued on an LVS router, you must start the <command>piranha-gui</command> service by issuing the following command:
+			</para>
+<screen><command>/sbin/service piranha-gui start</command></screen>
+		</warning>
+		<para>
+			The <command>piranha-gui</command> service is all that is necessary to begin configuring an LVS cluster. However, if you are configuring the cluster remotely, the <command>sshd</command> service is also required. You do <emphasis>not</emphasis> need to start the <command>pulse</command> service until configuration using the <application>&PIRANHA;</application> is complete. See <xref linkend="Cluster_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Starting_the_Cluster" /> for information on starting the <command>pulse</command> service.
+		</para>
+		<section id="Cluster_Administration-Starting_the_PIRANHA_Service-Configuring_the_PIRANHA_Web_Server_Port">
+			<title>Configuring the <application>&PIRANHA;</application> Web Server Port</title>
+			<para>
+				The <application>&PIRANHA;</application> runs on port 3636 by default. To change this port number, change the line <computeroutput>Listen 3636 </computeroutput> in Section 2 of the <command>piranha-gui</command> Web server configuration file <filename>/etc/sysconfig/ha/conf/httpd.conf</filename>.
+			</para>
+			<para>
+				To use the <application>&PIRANHA;</application> you need at minimum a text-only Web browser. If you start a Web browser on the primary LVS router, open the location <userinput>http://<replaceable>localhost</replaceable>:3636</userinput>. You can reach the <application>&PIRANHA;</application> from anywhere via Web browser by replacing <replaceable>localhost</replaceable> with the hostname or IP address of the primary LVS router.
+			</para>
+			<para>
+				When your browser connects to the <application>&PIRANHA;</application>, you must login to access the cluster configuration services. Enter <userinput>piranha</userinput> in the <guilabel>Username</guilabel> field and the password set with <command>piranha-passwd</command> in the <guilabel>Password</guilabel> field.
+			</para>
+			<para>
+				Now that the <application>&PIRANHA;</application> is running, you may wish to consider limiting who has access to the tool over the network. The next section reviews ways to accomplish this task.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Initial_LVS_Configuration-Limiting_Access_To_the_PIRANHA">
+		<title>Limiting Access To the <application>&PIRANHA;</application></title>
+		<indexterm>
+			<primary><application>&PIRANHA;</application></primary>
+			<secondary>limiting access to</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>security</primary>
+			<secondary><application>&PIRANHA;</application></secondary>
+		</indexterm>
+		<para>
+			The <application>&PIRANHA;</application> prompts for a valid username and password combination. However, because all of the data passed to the <application>&PIRANHA;</application> is in plain text, it is recommended that you restrict access only to trusted networks or to the local machine.
+		</para>
+		<para>
+			The easiest way to restrict access is to use the &HTTPD;&#39;s built in access control mechanisms by editing <filename>/etc/sysconfig/ha/web/secure/.htaccess</filename>. After altering the file you do not have to restart the <command>piranha-gui</command> service because the server checks the <filename>.htaccess</filename> file each time it accesses the directory.
+		</para>
+		<para>
+			By default, the access controls for this directory allow anyone to view the contents of the directory. Here is what the default access looks like:
+		</para>
+<screen>
+Order deny,allow
+Allow from all
+</screen>
+		<para>
+			To limit access of the <application>&PIRANHA;</application> to only the localhost change the <filename>.htaccess</filename> file to allow access from only the loopback device (127.0.0.1). For more information on the loopback device, see the chapter titled <citetitle>Network Scripts</citetitle> in the <citetitle>&RHELRG;</citetitle>.
+		</para>
+<screen>
+Order deny,allow
+Deny from all
+Allow from 127.0.0.1
+</screen>
+		<para>
+			You can also allow specific hosts or subnets as seen in this example:
+		</para>
+<screen>
+Order deny,allow
+Deny from all
+Allow from 192.168.1.100
+Allow from 172.16.57
+</screen>
+		<para>
+			In this example, only Web browsers from the machine with the IP address of 192.168.1.100 and machines on the 172.16.57/24 network can access the <application>&PIRANHA;</application>.
+		</para>
+		<caution>
+			<title>Caution</title>
+			<para>
+				Editing the <application>&PIRANHA;</application><filename>.htaccess</filename> file limits access to the configuration pages in the <filename>/etc/sysconfig/ha/web/secure/</filename> directory but not to the login and the help pages in <filename>/etc/sysconfig/ha/web/</filename>. To limit access to this directory, create a <filename>.htaccess</filename> file in the <filename>/etc/sysconfig/ha/web/</filename> directory with <userinput>order</userinput>, <userinput>allow</userinput>, and <userinput>deny</userinput> lines identical to <filename>/etc/sysconfig/ha/web/secure/.htaccess</filename>.
+			</para>
+		</caution>
+	</section>
+	
+	<section id="Cluster_Administration-Initial_LVS_Configuration-Turning_on_Packet_Forwarding">
+		<title>Turning on Packet Forwarding</title>
+		<indexterm>
+			<primary>packet forwarding</primary>
+			<seealso>LVS clustering</seealso>
+		</indexterm>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>packet forwarding</secondary>
+		</indexterm>
+		<para>
+			In order for the LVS router to forward network packets properly to the real servers, each LVS router node must have IP forwarding turned on in the kernel. Log in as root and change the line which reads <computeroutput>net.ipv4.ip_forward = 0</computeroutput> in <filename>/etc/sysctl.conf</filename> to the following:
+		</para>
+<screen><computeroutput>net.ipv4.ip_forward = <userinput>1</userinput></computeroutput></screen>
+		<para>
+			The changes take effect when you reboot the system.
+		</para>
+		<para>
+			To check if IP forwarding is turned on, issue the following command as root:
+		</para>
+<screen><command>/sbin/sysctl net.ipv4.ip_forward</command></screen>
+		<para>
+			If the above command returns a <computeroutput>1</computeroutput>, then IP forwarding is enabled. If it returns a <computeroutput>0</computeroutput>, then you can turn it on manually using the following command:
+		</para>
+<screen><command>/sbin/sysctl -w net.ipv4.ip_forward=1</command></screen>
+	</section>
+	
+	<section id="Cluster_Administration-Initial_LVS_Configuration-Configuring_Services_on_the_Real_Servers">
+		<title>Configuring Services on the Real Servers</title>
+		<indexterm>
+			<primary>real servers</primary>
+			<secondary>configuring services</secondary>
+		</indexterm>
+		<para>
+			If the real servers in the cluster are &PROD; systems, set the appropriate server daemons to activate at boot time. These daemons can include <command>httpd</command> for Web services or <command>xinetd</command> for FTP or Telnet services.
+		</para>
+		<para>
+			It may also be useful to access the real servers remotely, so the <command>sshd</command> daemon should also be installed and running.
+		</para>
+	</section>
+
+</chapter>
+

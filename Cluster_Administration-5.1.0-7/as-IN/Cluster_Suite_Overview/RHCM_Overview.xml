@@ -1,0 +1,538 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Suite_Overview-RHCM_Overview">
+	<title>&RHCM; Overview</title>
+	<para>
+		&RHCM; allows administrators to connect separate systems (called <firstterm>members</firstterm> or <firstterm>nodes</firstterm>) together to create failover clusters that ensure application availability and data integrity under several failure conditions. Administrators can use Red Hat Cluster Manager with database applications, file sharing services, web servers, and more.
+	</para>
+	<para>
+		To set up a failover cluster, you must connect the nodes to the cluster hardware, and configure the nodes into the cluster environment. The foundation of a cluster is an advanced host membership algorithm. This algorithm ensures that the cluster maintains complete data integrity by using the following methods of inter-node communication:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				Network connections between the cluster systems
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				A Cluster Configuration System daemon (ccsd) that synchronizes configuration between cluster nodes
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		To make an application and data highly available in a cluster, you must configure a <firstterm>cluster service</firstterm>, an application that would benefit from &RHCM; to ensure high availability. A cluster service is made up of cluster <firstterm>resources</firstterm>, components that can be failed over from one node to another, such as an IP address, an application initialization script, or a &RHGFS; shared partition. Building a cluster using &RHCM; allows transparent client access to cluster services. For example, you can provide clients with access to highly-available database applications by building a cluster service using &RHCM; to manage service availability and shared &RHGFS; storage partitions for the database data and end-user applications.
+	</para>
+	<para>
+		You can associate a cluster service with a <firstterm>failover domain</firstterm>, a subset of cluster nodes that are eligible to run a particular cluster service. In general, any eligible, properly-configured node can run the cluster service. However, each cluster service can run on only one cluster node at a time in order to maintain data integrity. You can specify whether or not the nodes in a failover domain are ordered by preference. You can also specify whether or not a cluster service is restricted to run only on nodes of its associated failover domain. (When associated with an unrestricted failover domain, a cluster service can be started on any cluster node in the event no member of the failover domain is available.)
+	</para>
+	<para>
+		You can set up an <firstterm>active-active</firstterm> configuration in which the members run different cluster services simultaneously, or a <firstterm>hot-standby</firstterm> configuration in which primary nodes run all the cluster services, and a backup cluster system takes over only if the primary nodes fail.
+	</para>
+	<para>
+		If a hardware or software failure occurs, the cluster automatically restarts the failed node&#39;s cluster services on the functional node. This <firstterm>cluster-service failover</firstterm> capability ensures that no data is lost, and there is little disruption to users. When the failed node recovers, the cluster can re-balance the cluster services across the nodes.
+	</para>
+	<para>
+		In addition, you can cleanly stop the cluster services running on a cluster system and then restart them on another system. This <firstterm>cluster-service relocation</firstterm> capability allows you to maintain application and data availability when a cluster node requires maintenance.
+	</para>
+	<section id="Cluster_Suite_Overview-RHCM_Overview-RHCM_Features">
+		<title>&RHCM; Features</title>
+		<para>
+			Cluster systems deployed with Red Hat Cluster Manager include the following features:
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term>No-single-point-of-failure hardware configuration </term>
+				<listitem>
+					<para>
+						Clusters can include a dual-controller RAID array, multiple bonded network channels, and redundant uninterruptible power supply (UPS) systems to ensure that no single failure results in application down time or loss of data.
+					</para>
+					<para>
+						Alternatively, a low-cost cluster can be set up to provide less availability than a no-single-point-of-failure cluster. For example, you can set up a cluster with a single-controller RAID array and only a single Ethernet channel.
+					</para>
+					<para>
+						Certain low-cost alternatives, such as host RAID controllers, software RAID without cluster support, and multi-initiator parallel SCSI configurations are not compatible or appropriate for use as shared cluster storage.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Cluster configuration and administration framework </term>
+				<listitem>
+					<para>
+						&RHCM; allows you to easily configure and administer cluster services to make resources such as applications, server daemons, and shared data highly available. To create a cluster service, you specify the resources used in the cluster service as well as the properties of the cluster service, such as the cluster service name, application initialization (init) scripts, disk partitions, mount points, and the cluster nodes on which you prefer the cluster service to run. After you add a cluster service, the cluster management software stores the information in a cluster configuration file, and the configuration data is aggregated to all cluster nodes using the <firstterm>Cluster Configuration System</firstterm> (or <acronym>CCS</acronym>), a daemon installed on each cluster node that allows retrieval of changes to the XML-based <filename>/etc/cluster/cluster.conf</filename> configuration file.
+					</para>
+					<para>
+						&RHCM; provides an easy-to-use framework for database applications. For example, a database cluster service serves highly-available data to a database application. The application running on a cluster node provides network access to database client systems, such as Web applications. If the cluster service fails over to another node, the application can still access the shared database data. A network-accessible database cluster service is usually assigned an IP address, which is failed over along with the cluster service to maintain transparent access for clients.
+					</para>
+					<para>
+						The cluster cluster-service framework can also easily extend to other applications through the use of customized init scripts.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Cluster administration user interface</term>
+				<listitem>
+					<para>
+						The <application>&RHCLUSTERTOOL;</application> interface facilitiates the administration and monitoring tasks of cluster resources, such as: creating, starting, and stopping cluster services; relocating cluster services from one node to another; modifying the cluster service configuration; and monitoring the cluster nodes. The CMAN interface allows administrators to individually control the cluster on a per-node basis.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Failover domains</term>
+				<listitem>
+					<para>
+						By assigning a cluster service to a <firstterm>restricted failover domain</firstterm>, you can limit the nodes that are eligible to run a cluster service in the event of a failover. (A cluster service that is assigned to a restricted failover domain cannot be started on a cluster node that is not included in that failover domain.) You can order the nodes in a failover domain by preference to ensure that a particular node runs the cluster service (as long as that node is active). If a cluster service is assigned to an unrestricted failover domain, the cluster service starts on any available cluster node (if none of the nodes of the failover domain are available).
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Data integrity assurance</term>
+				<listitem>
+					<para>
+						To ensure data integrity, only one node can run a cluster service and access cluster-service data at one time. The use of power switches in the cluster hardware configuration enables a node to power-cycle another node before restarting that node&#39;s cluster services during the failover process. This prevents any two systems from simultaneously accessing the same data and corrupting it. It is strongly recommended that <firstterm>fence devices</firstterm> (hardware or software solutions that remotely power, shutdown, and reboot cluster nodes) are used to guarantee data integrity under all failure conditions. Watchdog timers are an alternative used to ensure correct operation of cluster service failover.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Ethernet channel bonding</term>
+				<listitem>
+					<para>
+						To monitor the health of the other nodes, each node monitors the health of the remote power switch, if any, and issues heartbeat pings over network channels. With Ethernet channel bonding, multiple Ethernet interfaces are configured to behave as one, reducing the risk of a single-point-of-failure in the typical switched Ethernet connection between systems.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>cluster-service failover capability</term>
+				<listitem>
+					<para>
+						If a hardware or software failure occurs, the cluster takes the appropriate action to maintain application availability and data integrity. For example, if a node completely fails, a healthy node (in the associated failover domain, if used) starts the service or services that the failed node was running prior to failure. Cluster services already running on the healthy node are not significantly disrupted during the failover process.
+					</para>
+					<para>
+						When a failed node reboots, it can rejoin the cluster and resume running the cluster service. Depending on how the cluster services are configured, the cluster can re-balance services among the nodes.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Manual cluster-service relocation capability</term>
+				<listitem>
+					<para>
+						In addition to automatic cluster-service failover, a cluster allows you to cleanly stop cluster services on one node and restart them on another node. You can perform planned maintenance on a node system while continuing to provide application and data availability.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Event logging facility</term>
+				<listitem>
+					<para>
+						To ensure that problems are detected and resolved before they affect cluster-service availability, the cluster daemons log messages by using the conventional Linux syslog subsystem.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Application monitoring</term>
+				<listitem>
+					<para>
+						The infrastructure in a cluster monitors the state and health of an application. In this manner, should an application-specific failure occur, the cluster automatically restarts the application. In response to the application failure, the application attempts to be restarted on the node it was initially running on; failing that, it restarts on another cluster node. You can specify which nodes are eligible to run a cluster service by assigning a failover domain to the cluster service.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<section id="Cluster_Suite_Overview-RHCM_Features-RHCM_Subsystem_Overview">
+			<title>&RHCM; Subsystem Overview</title>
+			<indexterm>
+				<primary>&RHCM;</primary>
+				<secondary>subsystem</secondary>
+			</indexterm>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCM_Subsystem_Overview-RHCM_Software_Subsystem_Components" /> summarizes the GFS Software subsystems and their components.
+			</para>
+			<indexterm>
+				<primary>tables</primary>
+				<secondary>GFS software subsystem components</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>GFS software subsystem components table</primary>
+			</indexterm>
+			<table id="Cluster_Suite_Overview-RHCM_Subsystem_Overview-RHCM_Software_Subsystem_Components">
+				<title>&RHCM; Software Subsystem Components</title>
+				<tgroup cols="3">
+					<colspec colname="Subsystem" colnum="1" colwidth="3*"></colspec>
+					<colspec colname="Component" colnum="2" colwidth="4*"></colspec>
+					<colspec colname="Description" colnum="3" colwidth="5*"></colspec>
+					<thead>
+						<row>
+							<entry>
+								Software Subsystem
+							</entry>
+							<entry>
+								Components
+							</entry>
+							<entry>
+								Description
+							</entry>
+						</row>
+					</thead>
+					<tbody>
+						<row>
+							<entry>
+								<application>&RHCLUSTERTOOL;</application>
+							</entry>
+							<entry>
+								<command>system-config-cluster</command>
+							</entry>
+							<entry>
+								Command used to manage cluster configuration in a graphical setting.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								Cluster Configuration System (CCS)
+							</entry>
+							<entry>
+								<command>ccs_tool</command>
+							</entry>
+							<entry>
+								Command used to create CCS archives.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>ccs_test</command>
+							</entry>
+							<entry>
+								Diagnostic and testing command that is used to retrieve information from configuration files through <command>ccsd</command>.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>ccsd</command>
+							</entry>
+							<entry>
+								CCS daemon that runs on all cluster nodes and provides configuration file data to cluster software.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								Resource Group Manager (rgmanager)
+							</entry>
+							<entry>
+								<command>clusvcadm</command>
+							</entry>
+							<entry>
+								Command used to manually enable, disable, relocate, and restart user services in a cluster
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>clustat</command>
+							</entry>
+							<entry>
+								Command used to display the status of the cluster, including node membership and services running.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>clurgmgrd</command>
+							</entry>
+							<entry>
+								Daemon used to handle user service requests including service start, service disable, service relocate, and service restart
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>clurmtabd</command>
+							</entry>
+							<entry>
+								Daemon used to handle Clustered NFS mount tables
+							</entry>
+						</row>
+						<row>
+							<entry>
+								Fence
+							</entry>
+							<entry>
+								<command>fence_node</command>
+							</entry>
+							<entry>
+								Command used by <command>lock_gulmd</command> when a fence operation is required. This command takes the name of a node and fences it based on the node&#39;s fencing configuration.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_apc</command>
+							</entry>
+							<entry>
+								Fence agent for APC power switch.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_bladecenter</command>
+							</entry>
+							<entry>
+								Fence agent for for IBM Bladecenters with Telnet interface.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_bullpap</command>
+							</entry>
+							<entry>
+								Fence agent for Bull Novascale Platform Administration Processor (PAP) Interface.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_ipmilan</command>
+							</entry>
+							<entry>
+								Fence agent for Bull Novascale Intelligent Platform Management Interface (IPMI).
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_wti</command>
+							</entry>
+							<entry>
+								Fence agent for WTI power switch.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_brocade</command>
+							</entry>
+							<entry>
+								Fence agent for Brocade Fibre Channel switch.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_mcdata</command>
+							</entry>
+							<entry>
+								Fence agent for McData Fibre Channel switch.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_vixel</command>
+							</entry>
+							<entry>
+								Fence agent for Vixel Fibre Channel switch.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_sanbox2</command>
+							</entry>
+							<entry>
+								Fence agent for SANBox2 Fibre Channel switch.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_ilo</command>
+							</entry>
+							<entry>
+								Fence agent for HP ILO interfaces (formerly fence_rib).
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_gnbd</command>
+							</entry>
+							<entry>
+								Fence agent used with GNBD storage.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_egenera</command>
+							</entry>
+							<entry>
+								Fence agent used with Egenera BladeFrame system.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_manual</command>
+							</entry>
+							<entry>
+								Fence agent for manual interaction.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>fence_ack_manual</command>
+							</entry>
+							<entry>
+								User interface for <command>fence_manual</command> agent.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								DLM
+							</entry>
+							<entry>
+								<command>libdlm.so.1.0.0</command>
+							</entry>
+							<entry>
+								Library for Distributed Lock Manager (DLM) support.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>dlm.ko</command>
+							</entry>
+							<entry>
+								Kernel module that is installed on cluster nodes for Distributed Lock Manager (DLM) support.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								LOCK_GULM
+							</entry>
+							<entry>
+								<command>lock_gulm.o</command>
+							</entry>
+							<entry>
+								Kernel module that is installed on GFS nodes using the LOCK_GULM lock module.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>lock_gulmd</command>
+							</entry>
+							<entry>
+								Server/daemon that runs on each node and communicates with all nodes in GFS cluster.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>libgulm.so.<replaceable>xxx</replaceable></command>
+							</entry>
+							<entry>
+								Library for GULM lock manager support
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>gulm_tool</command>
+							</entry>
+							<entry>
+								Command that configures and debugs the <command>lock_gulmd</command> server.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								LOCK_NOLOCK
+							</entry>
+							<entry>
+								<command>lock_nolock.o</command>
+							</entry>
+							<entry>
+								Kernel module installed on a node using GFS as a local file system.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								GNBD
+							</entry>
+							<entry>
+								<command>gnbd.o</command>
+							</entry>
+							<entry>
+								Kernel module that implements the GNBD device driver on clients.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>gnbd_serv.o</command>
+							</entry>
+							<entry>
+								Kernel module that implements the GNBD server. It allows a node to export local storage over the network.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>gnbd_export</command>
+							</entry>
+							<entry>
+								Command to create, export and manage GNBDs on a GNBD server.
+							</entry>
+						</row>
+						<row>
+							<entry>
+							</entry>
+							<entry>
+								<command>gnbd_import</command>
+							</entry>
+							<entry>
+								Command to import and manage GNBDs on a GNBD client.
+							</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</section>
+
+	</section>
+
+</chapter>
+

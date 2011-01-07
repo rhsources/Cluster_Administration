@@ -1,0 +1,194 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Virtual_Server_Administration-Introduction_to_Linux_Virtual_Server">
+	<title>Introduction to Linux Virtual Server</title>
+	<indexterm>
+		<primary>&PROD;</primary>
+	</indexterm>
+	<indexterm>
+		<primary>Linux Virtual Server</primary>
+		<see>LVS clustering</see>
+	</indexterm>
+	<para>
+		Using &PROD;, it is possible to create highly available server clustering solutions able to withstand many common hardware and software failures with little or no interruption of critical services. By allowing multiple computers to work together in offering these critical services, system administrators can plan and execute system maintenance and upgrades without service interruption.
+	</para>
+	<para>
+		The chapters in this part guide you through the following steps in understanding and deploying a clustering solution based on the &PROD; <firstterm>Linux Virtual Server</firstterm> (LVS) technology:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				Explains the Linux Virtual Server technology used by &PROD; to create a load-balancing cluster
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Explains how to configure a &PROD; LVS cluster
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Guides you through the <application>&PIRANHA;</application>, a graphical interface used for configuring and monitoring an LVS cluster
+			</para>
+		</listitem>
+	</itemizedlist>
+	<section id="Virtual_Server_Administration-Introduction_to_Linux_Virtual_Server-Technology_Overview">
+		<title>Technology Overview</title>
+		<indexterm>
+			<primary>cluster</primary>
+			<see>cluster types</see>
+		</indexterm>
+		<indexterm>
+			<primary>high-availability clustering</primary>
+			<see>cluster types</see>
+		</indexterm>
+		<indexterm>
+			<primary>compute-clustering</primary>
+			<see>cluster types</see>
+		</indexterm>
+		<indexterm>
+			<primary>load-balance clustering</primary>
+			<see>cluster types</see>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>overview of</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>compute-clustering</secondary>
+			<tertiary>Beowulf</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>compute-clustering</secondary>
+			<tertiary>definition of</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>high-availability clustering</secondary>
+			<seealso>&RHCM;</seealso>
+		</indexterm>
+		<indexterm>
+			<primary>&RHCM;</primary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>high-availability clustering</secondary>
+			<tertiary>definition of</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>load-balance clustering</secondary>
+			<seealso>LVS clustering</seealso>
+		</indexterm>
+		<indexterm>
+			<primary>cluster types</primary>
+			<secondary>load-balance clustering</secondary>
+			<tertiary>definition of</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>definition of</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>&PROD;</primary>
+			<secondary>overview of</secondary>
+		</indexterm>
+		<para>
+			&PROD; implements highly available server solutions via clustering. It is important to note that <firstterm>cluster</firstterm> computing consists of three distinct branches:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<firstterm>Compute clustering</firstterm> (such as Beowulf) uses multiple machines to provide greater computing power for computationally intensive tasks. This type of clustering is not addressed by &PROD;.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<firstterm>High-availability (HA) clustering</firstterm> uses multiple machines to add an extra level of reliability for a service or group of services.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<firstterm>Load-balance clustering</firstterm> uses specialized routing techniques to dispatch traffic to a pool of servers.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			&PROD; addresses the latter two types of clustering technology. Using a collection of programs to monitor the health of the systems and services in the cluster.
+		</para>
+		<note>
+			<title>Note</title>
+			<para>
+				The clustering technology included in &PROD; is not synonymous with <firstterm>fault tolerance</firstterm>. Fault tolerant systems use highly specialized and often very expensive hardware to implement a fully redundant environment in which services can run uninterrupted by hardware failures.
+			</para>
+			<para>
+				However, fault tolerant systems do not account for operator and software errors which &PROD; can address through service redundancy. Also, since &PROD; is designed to run on commodity hardware, it creates an environment with a high level of system availability at a fraction of the cost of fault tolerant hardware.
+			</para>
+		</note>
+	</section>
+	
+	<section id="Virtual_Server_Administration-Introduction_to_Linux_Virtual_Server-Basic_Configurations">
+		<title>Basic Configurations</title>
+		<para>
+			While &PROD; can be configured in a variety of different ways, the configurations can be broken into two major categories:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					High-availability clusters using &RHCM;
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Load-balancing clusters using Linux Virtual Servers
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			This part explains what a load-balancing cluster system is and how to configure a load-balancing system using <firstterm>Linux Virtual Servers</firstterm> on &PROD;.
+		</para>
+		<section id="Virtual_Server_Administration-Basic_Configurations-Load_Balancing_Clusters_Using_Linux_Virtual_Servers">
+			<title>Load-Balancing Clusters Using Linux Virtual Servers</title>
+			<indexterm>
+				<primary>LVS</primary>
+				<secondary>overview of</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>LVS</primary>
+				<secondary>real servers</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>active router</primary>
+				<see>LVS clustering</see>
+			</indexterm>
+			<indexterm>
+				<primary>backup router</primary>
+				<see>LVS clustering</see>
+			</indexterm>
+			<indexterm>
+				<primary>real servers</primary>
+				<see>LVS clustering</see>
+			</indexterm>
+			<para>
+				To an outside user accessing a hosted service (such as a website or database application), a Linux Virtual Server (LVS) cluster appears as one server. In reality, however, the user is actually accessing a cluster of two or more servers behind a pair of redundant LVS routers that distribute client requests evenly throughout the cluster system. Load-balanced clustered services allow administrators to use commodity hardware and &PROD; to create continuous and consistent access to all hosted services while also addressing availability requirements.
+			</para>
+			<para>
+				An LVS cluster consists of at least two layers. The first layer is composed of a pair of similarly configured Linux machines or <firstterm>cluster members</firstterm>. One of these machine acts as the <firstterm>LVS routers</firstterm>, configured to direct requests from the Internet to the cluster. The second layer consists of a cluster of machines called <firstterm>real servers</firstterm>. The real servers provide the critical services to the end-user while the LVS router balances the load on these servers.
+			</para>
+			<para>
+				For a detailed overview of LVS clustering, refer to <xref linkend="Virtual_Server_Administration-Linux_Virtual_Server_Overview" />.
+			</para>
+		</section>
+
+	</section>
+
+</chapter>
+

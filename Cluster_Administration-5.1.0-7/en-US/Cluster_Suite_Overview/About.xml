@@ -1,0 +1,113 @@
+<?xml version='1.0'?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<preface id="Cluster_Suite_Overview-Introduction">
+	<title>Introduction</title>
+	<indexterm>
+		<primary>introduction</primary>
+	</indexterm>
+	<para>
+		This document provides a high-level overview of &RHCS; for &RHEL; 5 and is is organized as follows:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Overview" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Component_Summary" />
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		Although the information in this document is an overview, you should have advanced working knowledge of &PROD; and understand the concepts of server computing to gain a good comprehension of the information.
+	</para>
+	<para>
+		For more information about using &PROD;, refer to the following resources:
+	</para>
+	<indexterm>
+		<primary>introduction</primary>
+		<secondary>other &PROD; documents</secondary>
+	</indexterm>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<citetitle>&PROD; Installation Guide</citetitle> &mdash; Provides information regarding installation of &PROD; 5.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<citetitle>&PROD; Deployment Guide</citetitle> &mdash; Provides information regarding the deployment, configuration and administration of &PROD; 5.
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		For more information about &RHCS; for &PROD; 5, refer to the following resources:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<citetitle>Configuring and Managing a Red Hat Cluster</citetitle> &mdash; Provides information about installing, configuring and managing Red Hat Cluster components.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<citetitle>LVM Administrator&#39;s Guide: Configuration and Administration</citetitle> &mdash; Provides a description of the Logical Volume Manager (LVM), including information on running LVM in a clustered environment.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<citetitle>Global File System: Configuration and Administration</citetitle> &mdash; Provides information about installing, configuring, and maintaining Red Hat GFS (Red Hat Global File System).
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<citetitle>Using GNBD with Global File System</citetitle> &mdash; Provides an overview on using Global Network Block Device (GNBD) with Red Hat GFS.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<citetitle>Linux Virtual Server Administration</citetitle> &mdash; Provides information on configuring high-performance systems and services with the Linux Virtual Server (LVS).
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<citetitle>Red Hat Cluster Suite Release Notes</citetitle> &mdash; Provides information about the current release of Red Hat Cluster Suite.
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		&RHCS; documentation and other &RH; documents are available in HTML, PDF, and RPM versions on the &RHEL; Documentation CD and online at <ulink url="http://www.redhat.com/docs/">http://www.redhat.com/docs/</ulink>.
+	</para>
+	<xi:include href="Common_Content/Conventions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<section id="Cluster_Suite_Overview-Introduction-Feedback">
+		<title>Feedback</title>
+		<indexterm>
+			<primary>feedback</primary>
+		</indexterm>
+		<para>
+			If you spot a typo, or if you have thought of a way to make this document better, we would love to hear from you. Please submit a report in Bugzilla (<ulink url="http://bugzilla.redhat.com/bugzilla/">http://bugzilla.redhat.com/bugzilla/</ulink>) against the component <computeroutput>&RHCSGS;</computeroutput>.
+		</para>
+		<para>
+			Be sure to mention the document&#39;s identifier:
+		</para>
+<screen>
+sac_cl_over(EN)-5 (2007-02-15:T16:51)
+</screen>
+		<para>
+			By mentioning this document&#39;s identifier, we know exactly which version of the guide you have.
+		</para>
+		<para>
+			If you have a suggestion for improving the documentation, try to be as specific as possible. If you have found an error, please include the section number and some of the surrounding text so we can find it easily.
+		</para>
+	</section>
+
+</preface>
+

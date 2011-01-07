@@ -1,0 +1,2397 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga">
+	<title>Installing and Configuring &RHCS; Software With <application>Conga</application></title>
+	<indexterm>
+		<primary>cluster software installation and configuration</primary>
+	</indexterm>
+	<indexterm>
+		<primary>cluster software</primary>
+		<secondary>installation and configuration</secondary>
+	</indexterm>
+	<para>
+		This chapter describes how to install and configure &RHCS; software and consists of the following sections:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Software_Installation_and_Configuration_Tasks" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Overview_of_the_RHCLUSTERTOOL" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Installing_the_RHCS_Packages" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Starting_the_RHCLUSTERTOOL" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Naming_The_Cluster" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_Fence_Devices" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_and_Deleting_Members" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_Cluster_Resources" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_a_Cluster_Service_to_the_Cluster" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Propagating_The_Configuration_File_New_Cluster" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Starting_the_Cluster_Software" />
+			</para>
+		</listitem>
+	</itemizedlist>
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Software_Installation_and_Configuration_Tasks">
+		<title>Software Installation and Configuration Tasks</title>
+		<para>
+			Installing and configuring &RHCS; software consists of the following steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Installing &RHCS; software.
+				</para>
+				<para>
+					Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Installing_the_RHCS_Packages" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Starting the <application>&RHCLUSTERTOOL;.</application>
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							Creating a new configuration file or using an existing one.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Choose locking: either DLM or GULM.
+						</para>
+					</listitem>
+				</orderedlist>
+				<para>
+					Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Starting_the_RHCLUSTERTOOL" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Naming the cluster. Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Naming_The_Cluster" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Creating fence devices. Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_Fence_Devices" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Creating cluster members. Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_and_Deleting_Members" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Creating failover domains. Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Creating resources. Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_Cluster_Resources" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Creating cluster services.
+				</para>
+				<para>
+					Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_a_Cluster_Service_to_the_Cluster" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Propagating the configuration file to the other nodes in the cluster.
+				</para>
+				<para>
+					Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Propagating_The_Configuration_File_New_Cluster" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Starting the cluster software. Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Starting_the_Cluster_Software" />.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Overview_of_the_RHCLUSTERTOOL">
+		<title>Overview of the <application>&RHCLUSTERTOOL;</application></title>
+		<para>
+			The <application>&RHCLUSTERTOOL;</application> (<xref linkend="Cluster_Administration-Overview_of_the_RHCLUSTERTOOL-RHCLUSTERTOOL" />) is a graphical user interface (GUI) for creating, editing, saving, and propagating the cluster configuration file, <filename>/etc/cluster/cluster.conf</filename>. The <application>&RHCLUSTERTOOL;</application> is part of the &RHCS; management GUI, (the <filename>system-config-cluster</filename> package) and is accessed by the <guilabel>Cluster Configuration</guilabel> tab in the &RHCS; management GUI.
+		</para>
+		<figure id="Cluster_Administration-Overview_of_the_RHCLUSTERTOOL-RHCLUSTERTOOL">
+			<title><application>&RHCLUSTERTOOL;</application></title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/clustertoolgui.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						cluster tool
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			The <application>&RHCLUSTERTOOL;</application> uses a hierarchical structure to show relationships among components in the cluster configuration. A triangle icon to the left of a component name indicates that the component has one or more subordinate components assigned to it. To expand or collapse the portion of the tree below a component, click the triangle icon.
+		</para>
+		<para>
+			The <application>&RHCLUSTERTOOL;</application> represents the cluster configuration with the following components in the left frame:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<guilabel>Cluster Nodes</guilabel> &mdash; Defines cluster nodes. Nodes are represented by name as subordinate elements under <guilabel>Cluster Nodes</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can add nodes, delete nodes, edit node properties, and configure fencing methods for each node.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>Fence Devices</guilabel> &mdash; Defines fence devices. Fence devices are represented as subordinate elements under <guilabel>Fence Devices</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can add fence devices, delete fence devices, and edit fence-device properties. Fence devices must be defined before you can configure fencing (with the <guibutton>Manage Fencing For This Node</guibutton> button) for each node.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>Managed Resources</guilabel> &mdash; Defines failover domains, resources, and services.
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guilabel>Failover Domains</guilabel> &mdash; Use this section to configure one or more subsets of cluster nodes used to run a service in the event of a node failure. Failover domains are represented as subordinate elements under <guilabel>Failover Domains</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create failover domains (when <guilabel>Failover Domains</guilabel> is selected) or edit failover domain properties (when a failover domain is selected).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Resources</guilabel> &mdash; Use this section to configure resources to be managed by the system. Choose from the available list of file systems, IP addresses, NFS mounts and exports, and user-created scripts and configure them individually. Resources are represented as subordinate elements under <guilabel>Resources</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create resources (when <guilabel>Resources</guilabel> is selected) or edit resource properties (when a resource is selected).
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Services</guilabel> &mdash; Use this section to create and configure services that combine cluster resources, nodes, and failover domains as needed. Services are represented as subordinate elements under <guilabel>Services</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create services (when <guilabel>Services</guilabel> is selected) or edit service properties (when a service is selected).
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+		</itemizedlist>
+		<indexterm>
+			<primary><application>&RHCLUSTERTOOL;</application></primary>
+			<secondary>accessing</secondary>
+		</indexterm>
+		<warning>
+			<title>Warning</title>
+			<para>
+				Do not manually edit the contents of the <filename>/etc/cluster/cluster.conf</filename> file without guidance from an authorized &RH; representative or unless you fully understand the consequences of editing the <filename>/etc/cluster/cluster.conf</filename> file manually.
+			</para>
+		</warning>
+		<para>
+			<xref linkend="Cluster_Administration-Overview_of_the_RHCLUSTERTOOL-Cluster_Configuration_Structure" /> shows the hierarchical relationship among cluster configuration components. The cluster comprises cluster nodes. The cluster nodes are connected to one or more fencing devices. Nodes can be separated by failover domains to a cluster service. The services comprise managed resources such as NFS exports, IP addresses, and shared GFS partitions. The structure is ultimately reflected in the <filename>/etc/cluster/cluster.conf</filename> XML structure. The <application>&RHCLUSTERTOOL;</application> provides a convenient way to create and manipulate the <filename>/etc/cluster/cluster.conf</filename> file.
+		</para>
+		<figure id="Cluster_Administration-Overview_of_the_RHCLUSTERTOOL-Cluster_Configuration_Structure">
+			<title>Cluster Configuration Structure</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/flowchart1.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						cluster config flowchart
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Installing_the_RHCS_Packages">
+		<title>Installing the &RHCS; Packages</title>
+		<indexterm>
+			<primary>cluster software</primary>
+			<secondary>installation and configuration</secondary>
+			<tertiary>steps for installing and initializing</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>&RHCS;</primary>
+		</indexterm>
+		<indexterm>
+			<primary>&RHCS;</primary>
+			<secondary>installation</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster software</primary>
+			<secondary>steps for installing and initializing</secondary>
+		</indexterm>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Starting_the_RHCLUSTERTOOL">
+		<title>Starting the <application>&RHCLUSTERTOOL;</application></title>
+		<para>
+			You can start the <application>&RHCLUSTERTOOL;</application> by logging in to a cluster node as root with the <command>ssh -Y</command> command and issuing the <command>system-config-cluster</command> command. For example, to start the <application>&RHCLUSTERTOOL;</application> on cluster node nano-01, do the following:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Log in to a cluster node and run <command>system-config-cluster</command>. For example:
+				</para>
+<screen>
+$<userinput>ssh -Y root@nano-01</userinput>
+       .
+       .
+       .
+#<userinput>system-config-cluster</userinput></screen>
+				<orderedlist>
+					<listitem>
+						<para>
+							If this is the first time you have started the <application>&RHCLUSTERTOOL;</application>, the program prompts you to either open an existing configuration or create a new one. Click <guibutton>Create New Configuration</guibutton> to start a new configuration file (refer to <xref linkend="Cluster_Administration-Starting_the_RHCLUSTERTOOL-Starting_a_New_Configuration_File" />).
+						</para>
+						<figure id="Cluster_Administration-Starting_the_RHCLUSTERTOOL-Starting_a_New_Configuration_File">
+							<title>Starting a New Configuration File</title>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/cluconfig-new.png" />
+								</imageobject>
+								<textobject>
+									<para>
+										Starting a New Configuration File.
+									</para>
+								</textobject>
+							</mediaobject>
+						</figure>
+						<note>
+							<title>Note</title>
+							<para>
+								The <guilabel>Cluster Management</guilabel> tab for the &RHCS; management GUI is available after you save the configuration file with the <application>&RHCLUSTERTOOL;</application>, exit, and restart the the &RHCS; management GUI (<command>system-config-cluster</command>). (The <guilabel>Cluster Management</guilabel> tab displays the status of the cluster service manager, cluster nodes, and resources, and shows statistics concerning cluster service operation. To manage the cluster system further, choose the <guilabel>Cluster Configuration</guilabel> tab.)
+							</para>
+						</note>
+					</listitem>
+					<listitem>
+						<para>
+							For a new configuration, a <guilabel>Lock Method</guilabel> dialog box is displayed requesting a choice of either the GULM or DLM lock method (and multicast address for DLM).
+						</para>
+						<figure id="Cluster_Administration-Starting_the_RHCLUSTERTOOL-Choosing_a_Lock_Method">
+							<title>Choosing a Lock Method</title>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/cluconfig-lockmethod-new.png" />
+								</imageobject>
+								<textobject>
+									<para>
+										Choosing a Lock Method.
+									</para>
+								</textobject>
+							</mediaobject>
+						</figure>
+					</listitem>
+				</orderedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Starting the <application>&RHCLUSTERTOOL;</application> displays a graphical representation of the configuration (<xref linkend="Cluster_Administration-Starting_the_RHCLUSTERTOOL-The_RHCLUSTERTOOL" />) as specified in the cluster configuration file, <filename>/etc/cluster/cluster.conf</filename>.
+				</para>
+				<figure id="Cluster_Administration-Starting_the_RHCLUSTERTOOL-The_RHCLUSTERTOOL">
+					<title>The <application>&RHCLUSTERTOOL;</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/cluconfig-start.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								The <application>&RHCLUSTERTOOL;</application>.
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Naming_The_Cluster">
+		<title>Naming The Cluster</title>
+		<para>
+			Naming the cluster consists of specifying a cluster name, a configuration version (optional), and values for <guilabel>Post-Join Delay</guilabel> and <guilabel>Post-Fail Delay</guilabel>. Name the cluster as follows:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					At the left frame, click <guilabel>Cluster</guilabel>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Edit Cluster Properties</guibutton> button. Clicking that button causes a <guilabel>Cluster Properties</guilabel> dialog box to be displayed. The <guilabel>Cluster Properties</guilabel> dialog box presents text boxes for <guilabel>Name</guilabel>, <guilabel>Config Version</guilabel>, and two <guilabel>Fence Daemon Properties</guilabel> parameters: <guilabel>Post-Join Delay</guilabel> and <guilabel>Post-Fail Delay</guilabel>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the <guilabel>Name</guilabel> text box, specify a name for the cluster. The name should be descriptive enough to distinguish it from other clusters and systems on your network (for example, <userinput>nfs_cluster</userinput> or <userinput>httpd_cluster</userinput>). The cluster name cannot exceed 15 characters.
+				</para>
+				<tip>
+					<title>Tip</title>
+					<para>
+						Choose the cluster name carefully. The only way to change the name of a Red Hat cluster is to create a new cluster configuration with the new name.
+					</para>
+				</tip>
+			</listitem>
+			<listitem>
+				<para>
+					(Optional) The <guilabel>Config Version</guilabel> value is set to <userinput>1</userinput> by default and is automatically incremented each time you save your cluster configuration. However, if you need to set it to another value, you can specify it at the <guilabel>Config Version</guilabel> text box.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Specify the <guilabel>Fence Daemon Properties</guilabel> parameters: <guilabel>Post-Join Delay</guilabel> and <guilabel>Post-Fail Delay</guilabel>.
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							The <guilabel>Post-Join Delay</guilabel> parameter is the number of seconds the fence daemon (<command>fenced</command>) waits before fencing a node after the node joins the fence domain. The <guilabel>Post-Join Delay</guilabel> default value is <userinput>3</userinput>. A typical setting for <guilabel>Post-Join Delay</guilabel> is between 20 and 30 seconds, but can vary according to cluster and network performance.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The <guilabel>Post-Fail Delay</guilabel> parameter is the number of seconds the fence daemon (<command>fenced</command>) waits before fencing a node (a member of the fence domain) after the node has failed.The <guilabel>Post-Fail Delay</guilabel> default value is <userinput>0</userinput>. Its value may be varied to suit cluster and network performance.
+						</para>
+					</listitem>
+				</orderedlist>
+				<note>
+					<title>Note</title>
+					<para>
+						For more information about <guilabel>Post-Join Delay</guilabel> and <guilabel>Post-Fail Delay</guilabel>, refer to the <citerefentry><refentrytitle>fenced</refentrytitle><manvolnum>8</manvolnum></citerefentry> man page.
+					</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para>
+					Save cluster configuration changes by selecting <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem>.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Configuring_Fence_Devices">
+		<title>Configuring Fence Devices</title>
+		<para>
+			Configuring fence devices for the cluster consists of selecting one or more fence devices and specifying fence-device-dependent parameters (for example, name, IP address, login, and password).
+		</para>
+		<para>
+			To configure fence devices, follow these steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Click <guilabel>Fence Devices</guilabel>. At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Add a Fence Device</guibutton> button. Clicking <guibutton> Add a Fence Device</guibutton> causes the <guilabel>Fence Device Configuration</guilabel> dialog box to be displayed (refer to <xref linkend="Cluster_Administration-Configuring_Fence_Devices-Fence_Device_Configuration" />).
+				</para>
+				<figure id="Cluster_Administration-Configuring_Fence_Devices-Fence_Device_Configuration">
+					<title>Fence Device Configuration</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/fence-device-config-dbox.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								fence configuration dialog box
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					At the <guilabel>Fence Device Configuration</guilabel> dialog box, click the drop-down box under <guilabel>Add a New Fence Device</guilabel> and select the type of fence device to configure.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Specify the information in the <guilabel>Fence Device Configuration</guilabel> dialog box according to the type of fence device. Refer to the following tables for more information.
+				</para>
+				<indexterm>
+					<primary>tables</primary>
+					<secondary>power controller connection, configuring</secondary>
+				</indexterm>
+				<indexterm>
+					<primary>power controller connection, configuring</primary>
+				</indexterm>
+				<indexterm>
+					<primary>power switch</primary>
+					<seealso>power controller</seealso>
+				</indexterm>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_APC_Fence_Device">
+					<title>Configuring an APC Fence Device</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the APC device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_Brocade_Fibre_Channel_Switch">
+					<title>Configuring a Brocade Fibre Channel Switch</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the Brocade device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_Bull_Platform_Administration_Processor_PAP_Interface">
+					<title>Configuring a Bull Platform Administration Processor (PAP) Interface</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the PAP console.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the PAP console.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the PAP console.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_Dell_Remote_Access_ControllerModular_Chassis_DRACMC____________Interface">
+					<title>Configuring a Dell Remote Access Controller/Modular Chassis (DRAC/MC) Interface</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									The name assigned to the DRAC.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the DRAC.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the DRAC.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the DRAC.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_Egenera_BladeFrame">
+					<title>Configuring an Egenera BladeFrame</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the BladeFrame device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									CServer
+								</entry>
+								<entry>
+									The hostname (and optionally the username in the form of <userinput>username@hostname</userinput>) assigned to the device. Refer to the <citerefentry><refentrytitle>fence_egenera</refentrytitle><manvolnum>8</manvolnum></citerefentry> man page.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_Global_Network_Block_Device_GNBD_fencing_agent">
+					<title>Configuring a Global Network Block Device (GNBD) fencing agent</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the GNBD device used to fence the cluster. Note that the GFS server must be accessed via GNBD for cluster node fencing support.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Server
+								</entry>
+								<entry>
+									The hostname of each GNBD to disable. For multiple hostnames, separate each hostname with a space.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_HP_Integrated_Lights_Out_iLO_card">
+					<title>Configuring an HP Integrated Lights Out (iLO) card</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the server with HP iLO support.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Hostname
+								</entry>
+								<entry>
+									The hostname assigned to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_IBM_Blade_Center_that_Supports_Telnet">
+					<title>Configuring an IBM Blade Center that Supports Telnet</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the IBM Bladecenter device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_IBM_Remote_Supervisor_Adapter_II_RSA_II">
+					<title>Configuring an IBM Remote Supervisor Adapter II (RSA II)</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the RSA device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_Intelligent_Platform_Management_Interface_IPMI">
+					<title>Configuring an Intelligent Platform Management Interface (IPMI)</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the IPMI port.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name of a user capable of issuing power on/off commands to the given IPMI port.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the IPMI port.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_Manual_Fencing">
+					<title>Configuring Manual Fencing</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name to assign the Manual fencing agent. Refer to <command>fence_manual</command>(8) for more information.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<note>
+					<title>Note</title>
+					<para>
+						Manual fencing is <emphasis>not</emphasis> supported for production environments.
+					</para>
+				</note>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_McData_Fibre_Channel_Switch">
+					<title>Configuring a McData Fibre Channel Switch</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the McData device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_an_RPS_10_Power_Switch_two_node_clusters_only">
+					<title>Configuring an RPS-10 Power Switch (two-node clusters only)</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the WTI RPS-10 power switch connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Device
+								</entry>
+								<entry>
+									The device the switch is connected to on the controlling host (for example, <filename>/dev/ttys2</filename>).
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Port
+								</entry>
+								<entry>
+									The switch outlet number.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_QLogic_SANBox2_Switch">
+					<title>Configuring a QLogic SANBox2 Switch</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the SANBox2 device connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Login
+								</entry>
+								<entry>
+									The login name used to access the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_Vixel_SAN_Fibre_Channel_Switch">
+					<title>Configuring a Vixel SAN Fibre Channel Switch</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the Vixel switch connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+				<table id="Cluster_Administration-Configuring_Fence_Devices-Configuring_a_WTI_Network_Power_Switch">
+					<title>Configuring a WTI Network Power Switch</title>
+					<tgroup cols="2">
+						<colspec colname="Field" colnum="1" colwidth="2*"></colspec>
+						<colspec colname="Description" colnum="2" colwidth="10*"></colspec>
+						<thead>
+							<row>
+								<entry>
+									Field
+								</entry>
+								<entry>
+									Description
+								</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									Name
+								</entry>
+								<entry>
+									A name for the WTI power switch connected to the cluster.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									IP Address
+								</entry>
+								<entry>
+									The IP address assigned to the device.
+								</entry>
+							</row>
+							<row>
+								<entry>
+									Password
+								</entry>
+								<entry>
+									The password used to authenticate the connection to the device.
+								</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+			</listitem>
+			<listitem>
+				<para>
+					Click <guibutton>OK</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Adding_and_Deleting_Members">
+		<title>Adding and Deleting Members</title>
+		<para>
+			The procedure to add a member to a cluster varies depending on whether the cluster is a newly-configured cluster or a cluster that is already configured and running. To add a member to a new cluster, refer to <xref linkend="Cluster_Administration-Adding_and_Deleting_Members-Adding_a_Member_to_a_Cluster" />. To add a member to an existing cluster, refer to <xref linkend="Cluster_Administration-Adding_and_Deleting_Members-Adding_a_Member_to_a_Running_Cluster" />. To delete a member from a cluster, refer to <xref linkend="Cluster_Administration-Adding_and_Deleting_Members-Deleting_a_Member_from_a_Cluster" />.
+		</para>
+		<section id="Cluster_Administration-Adding_and_Deleting_Members-Adding_a_Member_to_a_Cluster">
+			<title>Adding a Member to a Cluster</title>
+			<para>
+				To add a member to a new cluster, follow these steps:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						Click <guilabel>Cluster Node</guilabel>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Add a Cluster Node</guibutton> button. Clicking that button causes a <guilabel>Node Properties</guilabel> dialog box to be displayed. For a DLM cluster, the <guilabel>Node Properties</guilabel> dialog box presents text boxes for <guilabel>Cluster Node Name</guilabel> and <guilabel>Quorum Votes</guilabel> (refer to <xref linkend="Cluster_Administration-Adding_a_Member_to_a_Cluster-Adding_a_Member_to_a_New_DLM_Cluster" />). For a GULM cluster, the <guilabel>Node Properties</guilabel> dialog box presents text boxes for <guilabel>Cluster Node Name</guilabel> and <guilabel>Quorum Votes</guilabel>, and presents a checkbox for <guilabel>GULM Lockserver</guilabel> (refer to <xref linkend="Cluster_Administration-Adding_a_Member_to_a_Cluster-Adding_a_Member_to_a_New_GULM_Cluster" />).
+					</para>
+					<figure id="Cluster_Administration-Adding_a_Member_to_a_Cluster-Adding_a_Member_to_a_New_DLM_Cluster">
+						<title>Adding a Member to a New DLM Cluster</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata fileref="images/newmember-dlm.png" />
+							</imageobject>
+							<textobject>
+								<para>
+									new member dialog DLM
+								</para>
+							</textobject>
+						</mediaobject>
+					</figure>
+					<figure id="Cluster_Administration-Adding_a_Member_to_a_Cluster-Adding_a_Member_to_a_New_GULM_Cluster">
+						<title>Adding a Member to a New GULM Cluster</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata fileref="images/newmember-gulm.png" />
+							</imageobject>
+							<textobject>
+								<para>
+									new member dialog GULM
+								</para>
+							</textobject>
+						</mediaobject>
+					</figure>
+				</listitem>
+				<listitem>
+					<para>
+						At the <guilabel>Cluster Node Name</guilabel> text box, specify a node name. The entry can be a name or an IP address of the node on the cluster subnet.
+					</para>
+					<note>
+						<title>Note</title>
+						<para>
+							Each node must be on the same subnet as the node from which you are running the <application>&RHCLUSTERTOOL;</application> and must be defined either in DNS or in the <filename>/etc/hosts</filename> file of each cluster node.
+						</para>
+					</note>
+					<note>
+						<title>Note</title>
+						<para>
+							The node on which you are running the <application>&RHCLUSTERTOOL;</application> must be explicitly added as a cluster member; the node is not automatically added to the cluster configuration as a result of running the <application>&RHCLUSTERTOOL;</application>.
+						</para>
+					</note>
+				</listitem>
+				<listitem>
+					<para>
+						Optionally, at the <guilabel>Quorum Votes</guilabel> text box, you can specify a value; however in most configurations you can leave it blank. Leaving the <guilabel>Quorum Votes</guilabel> text box blank causes the quorum votes value for that node to be set to the default value of <userinput>1</userinput>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						If the cluster is a GULM cluster and you want this node to be a GULM lock server, click the <guilabel>GULM Lockserver</guilabel> checkbox (marking it as checked).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Click <guibutton>OK</guibutton>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Configure fencing for the node:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								Click the node that you added in the previous step.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								At the bottom of the right frame (below <guilabel>Properties</guilabel>), click <guibutton>Manage Fencing For This Node</guibutton>. Clicking <guibutton>Manage Fencing For This Node</guibutton> causes the <guilabel>Fence Configuration</guilabel> dialog box to be displayed.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								At the <guilabel>Fence Configuration</guilabel> dialog box, bottom of the right frame (below <guilabel>Properties</guilabel>), click <guibutton>Add a New Fence Level</guibutton>. Clicking <guibutton>Add a New Fence Level</guibutton> causes a fence-level element (for example, <guilabel>Fence-Level-1</guilabel>, <guilabel>Fence-Level-2</guilabel>, and so on) to be displayed below the node in the left frame of the <guilabel>Fence Configuration</guilabel> dialog box.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Click the fence-level element.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								At the bottom of the right frame (below <guilabel>Properties</guilabel>), click <guibutton>Add a New Fence to this Level</guibutton>. Clicking <guibutton>Add a New Fence to this Level</guibutton> causes the <guilabel>Fence Properties</guilabel> dialog box to be displayed.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								At the <guilabel>Fence Properties</guilabel> dialog box, click the <guilabel>Fence Device Type</guilabel> drop-down box and select the fence device for this node. Also, provide additional information required (for example, <guilabel>Port</guilabel> and <guilabel>Switch</guilabel> for an APC Power Device).
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								At the <guilabel>Fence Properties</guilabel> dialog box, click <guilabel>OK</guilabel>. Clicking <guilabel>OK</guilabel> causes a fence device element to be displayed below the fence-level element.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								To create additional fence devices at this fence level, return to step 6d. Otherwise, proceed to the next step.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								To create additional fence levels, return to step 6c. Otherwise, proceed to the next step.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								If you have configured all the fence levels and fence devices for this node, click <guilabel>Close</guilabel>.
+							</para>
+						</listitem>
+					</orderedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+					</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		
+		<section id="Cluster_Administration-Adding_and_Deleting_Members-Adding_a_Member_to_a_Running_Cluster">
+			<title>Adding a Member to a Running Cluster</title>
+			<para>
+				The procedure for adding a member to a running cluster depends on whether the cluster contains only two nodes or more than two nodes. To add a member to a running cluster, follow the steps in one of the following sections according to the number of nodes in the cluster:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						For clusters with <emphasis>only</emphasis> two nodes &mdash;
+					</para>
+					<para>
+						<xref linkend="Cluster_Administration-Adding_a_Member_to_a_Running_Cluster-Adding_a_Member_to_a_Running_Cluster_That_Contains__________Only_Two_Nodes" />
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						For clusters with <emphasis>more than</emphasis> two nodes &mdash;
+					</para>
+					<para>
+						<xref linkend="Cluster_Administration-Adding_a_Member_to_a_Running_Cluster-Adding_a_Member_to_a_Running_Cluster_That_Contains_More__________Than_Two_Nodes" />
+					</para>
+				</listitem>
+			</itemizedlist>
+			<section id="Cluster_Administration-Adding_a_Member_to_a_Running_Cluster-Adding_a_Member_to_a_Running_Cluster_That_Contains__________Only_Two_Nodes">
+				<title>Adding a Member to a Running Cluster That Contains <emphasis>Only</emphasis> Two Nodes</title>
+				<para>
+					To add a member to an existing cluster that is currently in operation, and contains <emphasis>only</emphasis> two nodes, follow these steps:
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							Add the node and configure fencing for it as in
+						</para>
+						<para>
+							<xref linkend="Cluster_Administration-Adding_and_Deleting_Members-Adding_a_Member_to_a_Cluster" />.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Click <guibutton>Send to Cluster</guibutton> to propagate the updated configuration to other running nodes in the cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Use the <command>scp</command> command to send the updated <filename>/etc/cluster/cluster.conf</filename> file from one of the existing cluster nodes to the new node.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							At the &RHCS; management GUI <application>&RHCLUSTERSTATTOOL;</application> tab, disable each service listed under <guilabel>Services</guilabel>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Stop the cluster software on the two running nodes by running the following commands at each node in this order:
+						</para>
+						<orderedlist>
+							<listitem>
+								<para>
+									<command>service rgmanager stop</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service gfs stop</command>, if you are using &RHGFS;
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service clvmd stop</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service fenced stop</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service cman stop</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service ccsd stop</command>
+								</para>
+							</listitem>
+						</orderedlist>
+					</listitem>
+					<listitem>
+						<para>
+							Start cluster software on all cluster nodes (including the added one) by running the following commands in this order:
+						</para>
+						<orderedlist>
+							<listitem>
+								<para>
+									<command>service ccsd start</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service cman start</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service fenced start</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service clvmd start</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service gfs start</command>, if you are using &RHGFS;
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service rgmanager start</command>
+								</para>
+							</listitem>
+						</orderedlist>
+					</listitem>
+					<listitem>
+						<para>
+							Start the &RHCS; management GUI. At the <application>&RHCLUSTERTOOL;</application> tab, verify that the configuration is correct. At the <application>&RHCLUSTERSTATTOOL;</application> tab verify that the nodes and services are running as expected.
+						</para>
+					</listitem>
+				</orderedlist>
+			</section>
+			
+			<section id="Cluster_Administration-Adding_a_Member_to_a_Running_Cluster-Adding_a_Member_to_a_Running_Cluster_That_Contains_More__________Than_Two_Nodes">
+				<title>Adding a Member to a Running Cluster That Contains <emphasis>More Than</emphasis> Two Nodes</title>
+				<para>
+					To add a member to an existing cluster that is currently in operation, and contains <emphasis>more than</emphasis> two nodes, follow these steps:
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							Add the node and configure fencing for it as in
+						</para>
+						<para>
+							<xref linkend="Cluster_Administration-Adding_and_Deleting_Members-Adding_a_Member_to_a_Cluster" />.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Click <guibutton>Send to Cluster</guibutton> to propagate the updated configuration to other running nodes in the cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Use the <command>scp</command> command to send the updated <filename>/etc/cluster/cluster.conf</filename> file from one of the existing cluster nodes to the new node.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Start cluster services on the new node by running the following commands in this order:
+						</para>
+						<orderedlist>
+							<listitem>
+								<para>
+									<command>service ccsd start</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service lock_gulmd start</command> or <command> service cman start</command> according to the type of lock manager used
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service fenced start</command> (DLM clusters only)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service clvmd start</command>
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service gfs start</command>, if you are using &RHGFS;
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									<command>service rgmanager start</command>
+								</para>
+							</listitem>
+						</orderedlist>
+					</listitem>
+					<listitem>
+						<para>
+							Start the &RHCS; management GUI. At the <application>&RHCLUSTERTOOL;</application> tab, verify that the configuration is correct. At the <application>&RHCLUSTERSTATTOOL;</application> tab verify that the nodes and services are running as expected.
+						</para>
+					</listitem>
+				</orderedlist>
+			</section>
+
+		</section>
+		
+		<section id="Cluster_Administration-Adding_and_Deleting_Members-Deleting_a_Member_from_a_Cluster">
+			<title>Deleting a Member from a Cluster</title>
+			<para>
+				To delete a member from an existing cluster that is currently in operation, follow these steps:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						At one of the running nodes (not to be removed), run the &RHCS; management GUI. At the <application>&RHCLUSTERSTATTOOL;</application> tab, under <guilabel>Services</guilabel>, disable or relocate each service that is running on the node to be deleted.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Stop the cluster software on the node to be deleted by running the following commands at that node in this order:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								<command>service rgmanager stop</command>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service gfs stop</command>, if you are using &RHGFS;
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service clvmd stop</command>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service fenced stop</command> (DLM clusters only)
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service lock_gulmd stop</command> or <command> service cman stop</command> according to the type of lock manager used
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service ccsd stop</command>
+							</para>
+						</listitem>
+					</orderedlist>
+				</listitem>
+				<listitem>
+					<para>
+						At the <application>&RHCLUSTERTOOL;</application> (on one of the running members), delete the member as follows:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								If necessary, click the triangle icon to expand the <guilabel>Cluster Nodes</guilabel> property.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Select the cluster node to be deleted. At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Delete Node</guibutton> button.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Clicking the <guibutton>Delete Node</guibutton> button causes a warning dialog box to be displayed requesting confirmation of the deletion (<xref linkend="Cluster_Administration-Deleting_a_Member_from_a_Cluster-Confirm_Deleting_a_Member" />).
+							</para>
+							<figure id="Cluster_Administration-Deleting_a_Member_from_a_Cluster-Confirm_Deleting_a_Member">
+								<title>Confirm Deleting a Member</title>
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="images/deletemember.png" />
+									</imageobject>
+									<textobject>
+										<para>
+											delete member box
+										</para>
+									</textobject>
+								</mediaobject>
+							</figure>
+						</listitem>
+						<listitem>
+							<para>
+								At that dialog box, click <guibutton>Yes</guibutton> to confirm deletion.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Propagate the updated configuration by clicking the <guilabel>Send to Cluster</guilabel> button. (Propagating the updated configuration automatically saves the configuration.)
+							</para>
+						</listitem>
+					</orderedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Stop the cluster software on the all remaining running nodes (including GULM lock-server nodes for GULM clusters) by running the following commands at each node in this order:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								<command>service rgmanager stop</command>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service gfs stop</command>, if you are using &RHGFS;
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service clvmd stop</command>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service fenced stop</command> (DLM clusters only)
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service lock_gulmd stop</command> or <command> service cman stop</command> according to the type of lock manager used
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service ccsd stop</command>
+							</para>
+						</listitem>
+					</orderedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Start cluster software on all remaining cluster nodes (including the GULM lock-server nodes for a GULM cluster) by running the following commands in this order:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								<command>service ccsd start</command>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service lock_gulmd start</command> or <command> service cman start</command> according to the type of lock manager used
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service fenced start</command> (DLM clusters only)
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service clvmd start</command>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service gfs start</command>, if you are using &RHGFS;
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<command>service rgmanager start</command>
+							</para>
+						</listitem>
+					</orderedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Start the &RHCS; management GUI. At the <application>&RHCLUSTERTOOL;</application> tab, verify that the configuration is correct. At the <application>&RHCLUSTERSTATTOOL;</application> tab verify that the nodes and services are running as expected.
+					</para>
+				</listitem>
+			</orderedlist>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Configuring_a_Failover_Domain">
+		<title>Configuring a Failover Domain</title>
+		<para>
+			A failover domain is a named subset of cluster nodes that are eligible to run a cluster service in the event of a node failure. A failover domain can have the following characteristics:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Unrestricted &mdash; Allows you to specify that a subset of members are preferred, but that a cluster service assigned to this domain can run on any available member.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Restricted &mdash; Allows you to restrict the members that can run a particular cluster service. If none of the members in a restricted failover domain are available, the cluster service cannot be started (either manually or by the cluster software).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Unordered &mdash; When a cluster service is assigned to an unordered failover domain, the member on which the cluster service runs is chosen from the available failover domain members with no priority ordering.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Ordered &mdash; Allows you to specify a preference order among the members of a failover domain. The member at the top of the list is the most preferred, followed by the second member in the list, and so on.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			By default, failover domains are unrestricted and unordered.
+		</para>
+		<para>
+			In a cluster with several members, using a restricted failover domain can minimize the work to set up the cluster to run a cluster service (such as <filename>httpd</filename>), which requires you to set up the configuration identically on all members that run the cluster service). Instead of setting up the entire cluster to run the cluster service, you must set up only the members in the restricted failover domain that you associate with the cluster service.
+		</para>
+		<tip>
+			<title>Tip</title>
+			<para>
+				To configure a preferred member, you can create an unrestricted failover domain comprising only one cluster member. Doing that causes a cluster service to run on that cluster member primarily (the preferred member), but allows the cluster service to fail over to any of the other members.
+			</para>
+		</tip>
+		<para>
+			The following sections describe adding a failover domain, removing a failover domain, and removing members from a failover domain:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Administration-Configuring_a_Failover_Domain-Adding_a_Failover_Domain" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Administration-Configuring_a_Failover_Domain-Removing_a_Failover_Domain" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="Cluster_Administration-Configuring_a_Failover_Domain-Removing_a_Member_from_a_Failover_Domain" />
+				</para>
+			</listitem>
+		</itemizedlist>
+		<section id="Cluster_Administration-Configuring_a_Failover_Domain-Adding_a_Failover_Domain">
+			<title>Adding a Failover Domain</title>
+			<para>
+				To add a failover domain, follow these steps:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						At the left frame of the the <application>&RHCLUSTERTOOL;</application>, click <guilabel>Failover Domains</guilabel>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Create a Failover Domain</guibutton> button. Clicking the <guibutton>Create a Failover Domain</guibutton> button causes the <guilabel>Add Failover Domain</guilabel> dialog box to be displayed.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the <guilabel>Add Failover Domain</guilabel> dialog box, specify a failover domain name at the <guilabel>Name for new Failover Domain</guilabel> text box and click <guilabel>OK</guilabel>. Clicking <guilabel>OK</guilabel> causes the <guilabel>Failover Domain Configuration</guilabel> dialog box to be displayed (<xref linkend="Cluster_Administration-Adding_a_Failover_Domain-Failover_Domain_Configuration_Configuring_a______________Failover_Domain" />).
+					</para>
+					<note>
+						<title>Note</title>
+						<para>
+							The name should be descriptive enough to distinguish its purpose relative to other names used in your cluster.
+						</para>
+					</note>
+					<figure id="Cluster_Administration-Adding_a_Failover_Domain-Failover_Domain_Configuration_Configuring_a______________Failover_Domain">
+						<title><guilabel>Failover Domain Configuration</guilabel>: Configuring a Failover Domain</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata fileref="images/failoverdn.png" />
+							</imageobject>
+							<textobject>
+								<para>
+									failover dialog box
+								</para>
+							</textobject>
+						</mediaobject>
+					</figure>
+				</listitem>
+				<listitem>
+					<para>
+						Click the <guilabel>Available Cluster Nodes</guilabel> drop-down box and select the members for this failover domain.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						To restrict failover to members in this failover domain, click (check) the <guilabel>Restrict Failover To This Domains Members</guilabel> checkbox. (With <guilabel>Restrict Failover To This Domains Members</guilabel> checked, services assigned to this failover domain fail over only to nodes in this failover domain.)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						To prioritize the order in which the members in the failover domain assume control of a failed cluster service, follow these steps:
+					</para>
+					<orderedlist>
+						<listitem>
+							<para>
+								Click (check) the <guilabel>Prioritized List</guilabel> checkbox (<xref linkend="Cluster_Administration-Adding_a_Failover_Domain-Failover_Domain_Configuration_Adjusting_Priority" />). Clicking <guilabel>Prioritized List</guilabel> causes the <guilabel>Priority</guilabel> column to be displayed next to the <guilabel>Member Node</guilabel> column.
+							</para>
+							<figure id="Cluster_Administration-Adding_a_Failover_Domain-Failover_Domain_Configuration_Adjusting_Priority">
+								<title><guilabel>Failover Domain Configuration</guilabel>: Adjusting Priority</title>
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="images/failoverdn-pri.png" />
+									</imageobject>
+									<textobject>
+										<para>
+											failover dialog box priority
+										</para>
+									</textobject>
+								</mediaobject>
+							</figure>
+						</listitem>
+						<listitem>
+							<para>
+								For each node that requires a priority adjustment, click the node listed in the <guilabel>Member Node/Priority</guilabel> columns and adjust priority by clicking one of the <guilabel>Adjust Priority</guilabel> arrows. Priority is indicated by the position in the <guilabel>Member Node</guilabel> column and the value in the <guilabel>Priority</guilabel> column. The node priorities are listed highest to lowest, with the highest priority node at the top of the <guilabel>Member Node</guilabel> column (having the lowest <guilabel>Priority</guilabel> number).
+							</para>
+						</listitem>
+					</orderedlist>
+				</listitem>
+				<listitem>
+					<para>
+						Click <guibutton>Close</guibutton> to create the domain.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the <application>&RHCLUSTERTOOL;</application>, perform one of the following actions depending on whether the configuration is for a new cluster or for one that is operational and running:
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								New cluster &mdash; If this is a new cluster, choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Running cluster &mdash; If this cluster is operational and running, and you want to propagate the change immediately, click the <guibutton>Send to Cluster</guibutton> button. Clicking <guibutton>Send to Cluster</guibutton> automatically saves the configuration change. If you do not want to propagate the change immediately, choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</orderedlist>
+		</section>
+		
+		<section id="Cluster_Administration-Configuring_a_Failover_Domain-Removing_a_Failover_Domain">
+			<title>Removing a Failover Domain</title>
+			<para>
+				To remove a failover domain, follow these steps:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						At the left frame of the the <application>&RHCLUSTERTOOL;</application>, click the failover domain that you want to delete (listed under <guilabel>Failover Domains</guilabel>).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Delete Failover Domain</guibutton> button. Clicking the <guibutton>Delete Failover Domain</guibutton> button causes a warning dialog box do be displayed asking if you want to remove the failover domain. Confirm that the failover domain identified in the warning dialog box is the one you want to delete and click <guibutton>Yes</guibutton>. Clicking <guibutton>Yes</guibutton> causes the failover domain to be removed from the list of failover domains under <guilabel>Failover Domains</guilabel> in the left frame of the <application>&RHCLUSTERTOOL;</application>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the <application>&RHCLUSTERTOOL;</application>, perform one of the following actions depending on whether the configuration is for a new cluster or for one that is operational and running:
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								New cluster &mdash; If this is a new cluster, choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Running cluster &mdash; If this cluster is operational and running, and you want to propagate the change immediately, click the <guibutton>Send to Cluster</guibutton> button. Clicking <guibutton>Send to Cluster</guibutton> automatically saves the configuration change. If you do not want to propagate the change immediately, choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</orderedlist>
+		</section>
+		
+		<section id="Cluster_Administration-Configuring_a_Failover_Domain-Removing_a_Member_from_a_Failover_Domain">
+			<title>Removing a Member from a Failover Domain</title>
+			<para>
+				To remove a member from a failover domain, follow these steps:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						At the left frame of the the <application>&RHCLUSTERTOOL;</application>, click the failover domain that you want to change (listed under <guilabel>Failover Domains</guilabel>).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Edit Failover Domain Properties</guibutton> button. Clicking the <guibutton>Edit Failover Domain Properties</guibutton> button causes the <guilabel>Failover Domain Configuration</guilabel> dialog box to be displayed (<xref linkend="Cluster_Administration-Adding_a_Failover_Domain-Failover_Domain_Configuration_Configuring_a______________Failover_Domain" />).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the <guilabel>Failover Domain Configuration</guilabel> dialog box, in the <guilabel>Member Node</guilabel> column, click the node name that you want to delete from the failover domain and click the <guibutton>Remove Member from Domain</guibutton> button. Clicking <guibutton>Remove Member from Domain</guibutton> removes the node from the <guilabel>Member Node</guilabel> column. Repeat this step for each node that is to be deleted from the failover domain. (Nodes must be deleted one at a time.)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						When finished, click <guibutton>Close</guibutton>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						At the <application>&RHCLUSTERTOOL;</application>, perform one of the following actions depending on whether the configuration is for a new cluster or for one that is operational and running:
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								New cluster &mdash; If this is a new cluster, choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Running cluster &mdash; If this cluster is operational and running, and you want to propagate the change immediately, click the <guibutton>Send to Cluster</guibutton> button. Clicking <guibutton>Send to Cluster</guibutton> automatically saves the configuration change. If you do not want to propagate the change immediately, choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</orderedlist>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Adding_Cluster_Resources">
+		<title>Adding Cluster Resources</title>
+		<para>
+			To specify a device for a cluster service, follow these steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					On the <guilabel>Resources</guilabel> property of the <application>&RHCLUSTERTOOL;</application>, click the <guibutton>Create a Resource</guibutton> button. Clicking the <guibutton>Create a Resource</guibutton> button causes the <guilabel>Resource Configuration</guilabel> dialog box to be displayed.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the <guilabel>Resource Configuration</guilabel> dialog box, under <guilabel>Select a Resource Type</guilabel>, click the drop-down box. At the drop-down box, select a resource to configure. The resource options are described as follows:
+				</para>
+				<variablelist>
+					<varlistentry>
+						<term>GFS</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Create a name for the file system resource.
+							</para>
+							<para>
+								<guilabel>Mount Point</guilabel> &mdash; Choose the path to which the file system resource is mounted.
+							</para>
+							<para>
+								<guilabel>Device</guilabel> &mdash; Specify the device file associated with the file system resource.
+							</para>
+							<para>
+								<guilabel>Options</guilabel> &mdash; Options to pass to the <command>mkfs</command> call for the new file system.
+							</para>
+							<para>
+								<guilabel>File System ID</guilabel> &mdash; When creating a new file system resource, you can leave this field blank. Leaving the field blank causes a file system ID to be assigned automatically after you click <guibutton>OK</guibutton> at the <guilabel>Resource Configuration</guilabel> dialog box. If you need to assign a file system ID explicitly, specify it in this field.
+							</para>
+							<para>
+								<guilabel>Force Unmount</guilabel> checkbox &mdash; If checked, forces the file system to unmount. The default setting is unchecked.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>File System</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Create a name for the file system resource.
+							</para>
+							<para>
+								<guilabel>File System Type</guilabel> &mdash; Choose the file system for the resource using the drop-down menu.
+							</para>
+							<para>
+								<guilabel>Mount Point</guilabel> &mdash; Choose the path to which the file system resource is mounted.
+							</para>
+							<para>
+								<guilabel>Device</guilabel> &mdash; Specify the device file associated with the file system resource.
+							</para>
+							<para>
+								<guilabel>Options</guilabel> &mdash; Options to pass to the <command>mkfs</command> call for the new file system.
+							</para>
+							<para>
+								<guilabel>File System ID</guilabel> &mdash; When creating a new file system resource, you can leave this field blank. Leaving the field blank causes a file system ID to be assigned automatically after you click <guibutton>OK</guibutton> at the <guilabel>Resource Configuration</guilabel> dialog box. If you need to assign a file system ID explicitly, specify it in this field.
+							</para>
+							<para>
+								Checkboxes &mdash; Specify mount and unmount actions when a service is stopped (for example, when disabling or relocating a service):
+							</para>
+							<itemizedlist>
+								<listitem>
+									<para>
+										<guilabel>Force unmount</guilabel> &mdash; If checked, forces the file system to unmount. The default setting is unchecked.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<guilabel>Reboot host node if unmount fails</guilabel> &mdash; If checked, reboots the node if unmounting this file system fails. The default setting is unchecked.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<guilabel>Check file system before mounting</guilabel> &mdash; If checked, causes <command>fsck</command> to be run on the file system before mounting it. The default setting is unchecked.
+									</para>
+								</listitem>
+							</itemizedlist>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>IP Address</term>
+						<listitem>
+							<para>
+								<guilabel>IP Address</guilabel> &mdash; Type the IP address for the resource.
+							</para>
+							<para>
+								<guilabel>Monitor Link</guilabel> checkbox &mdash; Check the box to enable or disable link status monitoring of the IP address resource
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>NFS Mount</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Create a symobolic name for the NFS mount.
+							</para>
+							<para>
+								<guilabel>Mount Point</guilabel> &mdash; Choose the path to which the file system resource is mounted.
+							</para>
+							<para>
+								<guilabel>Host</guilabel> &mdash; Specify the NFS server name.
+							</para>
+							<para>
+								<guilabel>Export Path</guilabel> &mdash; NFS export on the server.
+							</para>
+							<para>
+								<guilabel>NFS</guilabel> and <guilabel>NFS4</guilabel> options &mdash; Specify NFS protocol:
+							</para>
+							<itemizedlist>
+								<listitem>
+									<para>
+										<guilabel>NFS</guilabel> &mdash; Specifies using NFSv3 protocol. The default setting is <guilabel>NFS</guilabel>.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<guilabel>NFS4</guilabel> &mdash; Specifies using NFSv4 protocol.
+									</para>
+								</listitem>
+							</itemizedlist>
+							<para>
+								<guilabel>Options</guilabel> &mdash; NFS-specific options to pass to the <command>mkfs</command> call for the new file system. For more information, refer to the <citerefentry><refentrytitle>nfs</refentrytitle><manvolnum>5</manvolnum></citerefentry> man page.
+							</para>
+							<para>
+								<guilabel>Force Unmount</guilabel> checkbox &mdash; If checked, forces the file system to unmount. The default setting is unchecked.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>NFS Client</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Enter a name for the NFS client resource.
+							</para>
+							<para>
+								<guilabel>Target</guilabel> &mdash; Enter a target for the NFS client resource. Supported targets are hostnames, IP addresses (with wild-card support), and netgroups.
+							</para>
+							<para>
+								<guilabel>Read-Write</guilabel> and <guilabel>Read Only</guilabel> options &mdash; Specify the type of access rights for this NFS client resource:
+							</para>
+							<itemizedlist>
+								<listitem>
+									<para>
+										<guilabel>Read-Write</guilabel> &mdash; Specifies that the NFS client has read-write access. The default setting is <guilabel>Read-Write</guilabel>.
+									</para>
+								</listitem>
+								<listitem>
+									<para>
+										<guilabel>Read Only</guilabel> &mdash; Specifies that the NFS client has read-only access.
+									</para>
+								</listitem>
+							</itemizedlist>
+							<para>
+								<guilabel>Options</guilabel> &mdash; Additional client access rights. For more information, refer to the <citerefentry><refentrytitle>exports</refentrytitle><manvolnum>5</manvolnum></citerefentry> man page, <citerefentry><refentrytitle>General Options</refentrytitle></citerefentry>
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>NFS Export</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Enter a name for the NFS export resource.
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>Script</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Enter a name for the custom user script.
+							</para>
+							<para>
+								<guilabel>File (with path)</guilabel> &mdash; Enter the path where this custom script is located (for example, <filename>/etc/init.d/<replaceable>userscript</replaceable></filename>)
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>Samba Service</term>
+						<listitem>
+							<para>
+								<guilabel>Name</guilabel> &mdash; Enter a name for the Samba server.
+							</para>
+							<para>
+								<guilabel>Work Group</guilabel> &mdash; Enter the Windows workgroup name or Windows NT domain of the Samba service.
+							</para>
+							<note>
+								<title>Note</title>
+								<para>
+									When creating or editing a cluster service, connect a Samba-service resource directly to the service, <emphasis>not</emphasis> to a resource within a service. That is, at the <guilabel>Service Management</guilabel> dialog box, use either <guibutton>Create a new resource for this service</guibutton> or <guibutton>Add a Shared Resource to this service</guibutton>; do <emphasis>not</emphasis> use <guibutton>Attach a new Private Resource to the Selection</guibutton> or <guibutton>Attach a Shared Resource to the selection</guibutton>.
+								</para>
+							</note>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</listitem>
+			<listitem>
+				<para>
+					When finished, click <guibutton>OK</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the change to the <filename>/etc/cluster/cluster.conf</filename> configuration file.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Adding_a_Cluster_Service_to_the_Cluster">
+		<title>Adding a Cluster Service to the Cluster</title>
+		<indexterm>
+			<primary>cluster service managers</primary>
+			<secondary>configuration</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster services</primary>
+			<seealso>adding to the cluster configuration</seealso>
+		</indexterm>
+		<para>
+			To add a cluster service to the cluster, follow these steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					At the left frame, click <guilabel>Services</guilabel>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the bottom of the right frame (labeled <guilabel>Properties</guilabel>), click the <guibutton>Create a Service</guibutton> button. Clicking <guibutton>Create a Service</guibutton> causes the <guilabel>Add a Service</guilabel> dialog box to be displayed.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the <guilabel>Add a Service</guilabel> dialog box, type the name of the service in the <guilabel>Name</guilabel> text box and click <guilabel>OK</guilabel>. Clicking <guilabel>OK</guilabel> causes the <guilabel>Service Management</guilabel> dialog box to be displayed (refer to <xref linkend="Cluster_Administration-Adding_a_Cluster_Service_to_the_Cluster-Adding_a_Cluster_Service" />).
+				</para>
+				<tip>
+					<title>Tip</title>
+					<para>
+						Use a descriptive name that clearly distinguishes the service from other services in the cluster.
+					</para>
+				</tip>
+				<figure id="Cluster_Administration-Adding_a_Cluster_Service_to_the_Cluster-Adding_a_Cluster_Service">
+					<title>Adding a Cluster Service</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/service-management-dbox.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								Add Cluster Service dialog box
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<para>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					If you want to restrict the members on which this cluster service is able to run, choose a failover domain from the <guilabel>Failover Domain</guilabel> drop-down box. (Refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" /> for instructions on how to configure a failover domain.)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>Autostart This Service</guilabel> checkbox &mdash; This is checked by default. If <guilabel>Autostart This Service</guilabel> is checked, the service is started automatically when a cluster is started and running. If <guilabel>Autostart This Service</guilabel> is <emphasis>not</emphasis> checked, the service must be started manually any time the cluster comes up from stopped state.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guilabel>Run Exclusive</guilabel> checkbox &mdash; This sets a policy wherein the service only runs on nodes that have <emphasis>no other</emphasis> services running on them. For example, for a very busy web server that is clustered for high availability, it would would be advisable to keep that service on a node alone with no other services competing for his resources &mdash; that is, <guilabel>Run Exclusive</guilabel> checked. On the other hand, services that consume few resources (like NFS and Samba), can run together on the same node without little concern over contention for resources. For those types of services you can leave the <guilabel>Run Exclusive</guilabel> unchecked.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Select a recovery policy to specify how the resource manager should recover from a service failure. At the upper right of the <guilabel>Service Management</guilabel> dialog box, there are three <guilabel>Recovery Policy</guilabel> options available:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guilabel>Restart</guilabel> &mdash; Restart the service in the node the service is currently located. The default setting is <guilabel>Restart</guilabel>. If the service cannot be restarted in the the current node, the service is relocated.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Relocate</guilabel> &mdash; Relocate the service before restarting. Do not restart the node where the service is currently located.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Disable</guilabel> &mdash; Do not restart the service at all.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Click the <guibutton>Add a Shared Resource to this service</guibutton> button and choose the a resource listed that you have configured in <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_Cluster_Resources" />.
+				</para>
+				<note>
+					<title>Note</title>
+					<para>
+						If you are adding a Samba-service resource, connect a Samba-service resource directly to the service, <emphasis>not</emphasis> to a resource within a service. That is, at the <guilabel>Service Management</guilabel> dialog box, use either <guibutton>Create a new resource for this service</guibutton> or <guibutton>Add a Shared Resource to this service</guibutton>; do <emphasis>not</emphasis> use <guibutton>Attach a new Private Resource to the Selection</guibutton> or <guibutton>Attach a Shared Resource to the selection</guibutton>.
+					</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para>
+					If needed, you may also create a <firstterm>private</firstterm> resource that you can create that becomes a subordinate resource by clicking on the <guibutton>Attach a new Private Resource to the Selection</guibutton> button. The process is the same as creating a shared resource described in <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Adding_Cluster_Resources" />. The private resource will appear as a child to the shared resource to which you associated with the shared resource. Click the triangle icon next to the shared resource to display any private resources associated.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					When finished, click <guibutton>OK</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the changes to the cluster configuration.
+				</para>
+			</listitem>
+		</orderedlist>
+		<note>
+			<title>Note</title>
+			<para>
+				To verify the existence of the IP service resource used in a cluster service, you must use the <command>/sbin/ip addr list</command> command on a cluster node. The following output shows the <command>/sbin/ip addr list</command> command executed on a node running a cluster service:
+			</para>
+<screen><computeroutput> 1: lo: &lt;LOOPBACK,UP&gt; mtu 16436 qdisc noqueue link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00 inet 127.0.0.1/8 scope host lo inet6 ::1/128 scope host valid_lft forever preferred_lft forever 2: eth0: &lt;BROADCAST,MULTICAST,UP&gt; mtu 1356 qdisc pfifo_fast qlen 1000 link/ether 00:05:5d:9a:d8:91 brd ff:ff:ff:ff:ff:ff inet 10.11.4.31/22 brd 10.11.7.255 scope global eth0 inet6 fe80::205:5dff:fe9a:d891/64 scope link inet 10.11.4.240/22 scope global secondary eth0 valid_lft forever preferred_lft forever </computeroutput></screen>
+		</note>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Propagating_The_Configuration_File_New_Cluster">
+		<title>Propagating The Configuration File: New Cluster</title>
+		<indexterm>
+			<primary>cluster service managers</primary>
+			<secondary>configuration</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>configuration file</primary>
+			<secondary>propagation of</secondary>
+		</indexterm>
+		<para>
+			For newly defined clusters, you must propagate the configuration file to the cluster nodes as follows:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Log in to the node where you created the configuration file.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Using the <command>scp</command> command, copy the <filename>/etc/cluster/cluster.conf</filename> file to all nodes in the cluster.
+				</para>
+				<note>
+					<title>Note</title>
+					<para>
+						Propagating the cluster configuration file this way is necessary for the first time a cluster is created. Once a cluster is installed and running, the cluster configuration file is propagated using the &RH; cluster management GUI <guibutton>Send to Cluster</guibutton> button. For more information about propagating the cluster configuration using the GUI <guibutton>Send to Cluster</guibutton> button, refer to <xref linkend="Cluster_Administration-Cluster_Administration_With_system_config_cluster-Modifying_the_Cluster_Configuration" />.
+					</para>
+				</note>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__Conga-Starting_the_Cluster_Software">
+		<title>Starting the Cluster Software</title>
+		<indexterm>
+			<primary>starting the cluster software</primary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster</primary>
+			<secondary>starting</secondary>
+		</indexterm>
+		<para>
+			After you have propagated the cluster configuration to the cluster nodes you can either reboot each node or start the cluster software on each cluster node by running the following commands at each node in this order:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service ccsd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service lock_gulmd start</command> or <command> service cman start</command> according to the type of lock manager used
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced start</command> (DLM clusters only)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs start</command>, if you are using &RHGFS;
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service rgmanager start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Start the &RHCS; management GUI. At the <application>&RHCLUSTERTOOL;</application> tab, verify that the configuration is correct. At the <application>&RHCLUSTERSTATTOOL;</application> tab verify that the nodes and services are running as expected.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+
+</chapter>
+

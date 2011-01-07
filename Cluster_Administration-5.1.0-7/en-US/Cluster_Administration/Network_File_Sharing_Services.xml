@@ -1,0 +1,1100 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-Network_File_Sharing_Services">
+	<title>Network File Sharing Services</title>
+	<para>
+		This chapter contains instructions for configuring &PROD; to make network file sharing services through NFS and Samba highly available.
+	</para>
+	<section id="Cluster_Administration-Network_File_Sharing_Services-Setting_Up_an_NFS_Service">
+		<title>Setting Up an NFS Service</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>NFS service, setting up</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>NFS</primary>
+			<secondary>setting up service</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>file services</primary>
+			<secondary>NFS</secondary>
+			<tertiary>setting up service</tertiary>
+		</indexterm>
+		<para>
+			A highly-available network file system (NFS) is one of the key strengths of the clustering infrastructure. Advantages of clustered NFS services include:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Ensures that NFS clients maintain uninterrupted access to key data in the event of server failure.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Facilitates planned maintenance by allowing transparent relocation of NFS services to one cluster member, allowing you to fix or upgrade the other cluster member.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Allows setup of an active-active configuration to maximize equipment utilization. Refer to <xref linkend="Cluster_Administration-Network_File_Sharing_Services-NFS_Configuration_Active_Active_Example" /> for more information.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<section id="Cluster_Administration-Setting_Up_an_NFS_Service-NFS_Server_Requirements">
+			<title>NFS Server Requirements</title>
+			<indexterm>
+				<primary>cluster services</primary>
+				<secondary>NFS server requirements</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>NFS</primary>
+				<secondary>server requirements</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>file services</primary>
+				<secondary>NFS</secondary>
+				<tertiary>server requirements</tertiary>
+			</indexterm>
+			<para>
+				To create highly available NFS services, there are a few requirements which must be met by each cluster member. (Note: these requirements do not pertain to NFS client systems.) These requirements are as follows:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						The NFS daemon must be running on all cluster servers. Check the status of the servers by running the following:
+					</para>
+<screen>
+/sbin/service nfs status
+</screen>
+					<para>
+						NFS services will not start unless the following NFS daemons are running: <command>nfsd</command>, <command>rpc.mountd</command>, and <command>rpc.statd</command>. If the service is not running, start it with the following commands:
+					</para>
+<screen>
+/sbin/service portmap start
+</screen>
+<screen>
+/sbin/service nfs start
+</screen>
+					<para>
+						To make NFS start upon reboot and when changing runlevels, run the following command:
+					</para>
+<screen>
+/sbin/chkconfig --level 345 nfs on
+</screen>
+				</listitem>
+				<listitem>
+					<para>
+						The RPC <command>portmap</command> daemon must also be enabled with the following command:
+					</para>
+<screen>
+/sbin/chkconfig --level 345 portmap on 
+</screen>
+				</listitem>
+				<listitem>
+					<para>
+						File system mounts and their associated exports for clustered NFS services should <emphasis>not</emphasis> be included in <filename>/etc/fstab</filename> or <filename>/etc/exports</filename>. Rather, for clustered NFS services, the parameters describing mounts and exports are entered via the <application>&RHCLUSTERTOOL;</application>. For your convenience, the tool provides a <guilabel>Bulk Load NFS</guilabel> feature to import entries from an existing file into the cluster configuration file.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						NFS <emphasis>cannot</emphasis> be configured to run over TCP with &RHCM;. For proper failover capabilities, NFS must run over the default UDP.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				For detailed information about setting up an NFS server, refer to the <citetitle>&RHELSAG;</citetitle>.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-Using_the_NFS_Druid">
+		<title>Using the <application>NFS Druid</application></title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary><application>NFS Druid</application></secondary>
+		</indexterm>
+		<indexterm>
+			<primary>NFS</primary>
+			<secondary><application>NFS Druid</application></secondary>
+		</indexterm>
+		<indexterm>
+			<primary>file services</primary>
+			<secondary>NFS</secondary>
+			<tertiary><application>NFS Druid</application></tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>examples</primary>
+			<secondary><application>NFS Druid</application></secondary>
+		</indexterm>
+		<para>
+			This section describes how to use the <application>NFS Druid</application> to quickly configure an NFS share for client access.
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Start the <application>&RHCLUSTERSTATTOOL;</application>. Verify that the cluster daemons are running; if not, choose <guimenu>Cluster</guimenu> =&gt; <guimenuitem>Start Cluster Service</guimenuitem> to start the cluster daemons.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					In the <application>&RHCLUSTERSTATTOOL;</application>, choose <guimenu>Cluster</guimenu> =&gt; <guimenuitem>Configure</guimenuitem> to display the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Start the <application>NFS Druid</application> by choosing <guimenu>Add Exports</guimenu> =&gt; <guimenuitem>NFS...</guimenuitem> and click <guibutton>Forward</guibutton> to continue.
+				</para>
+				<figure id="Cluster_Administration-Using_the_NFS_Druid-NFS_Druid">
+					<title><application>NFS Druid</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/nfsdruid1.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								nfs druid welcome screen
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					Enter the <guilabel>Export Directory</guilabel> &mdash; Specified as a child of a device, the export directory can be the same as the mount point. In this case, the entire file system is accessible through NFS. Alternatively, you can specify a portion (subdirectory) of a mounted file system to be mounted (instead of the entire file system). By exporting subdirectories of a mountpoint, different access rights can be allocated to different sets of NFS clients.
+				</para>
+				<para>
+					Enter the <guilabel>Client Name</guilabel> &mdash; Specified as a child of an export directory, the NFS client specification identifies which systems will be allowed to access the file system as NFS clients. You can specify individual systems (for example, <userinput>fred</userinput>) or groups of systems by using wildcards (for example, <userinput>*.example.com</userinput>). Entering an asterisk (<userinput>*</userinput>) in the <guilabel>Client Name</guilabel> field allows any client to mount the file system.
+				</para>
+				<para>
+					Enter any <guilabel>Client Options</guilabel> in the provided fields &mdash; Specified as part of the <guilabel>NFS Export Client</guilabel> information, this field defines the access rights afforded to the corresponding client(s). Examples include <userinput>ro</userinput> (read only), and <userinput>rw</userinput> (read write). Unless explicitly specified otherwise, the default export options are <userinput>ro</userinput>,<userinput>async</userinput>,<userinput>wdelay</userinput>, <userinput>root_squash</userinput>. Refer to the <command>exports</command>(5) manpage for more options.
+				</para>
+				<figure id="Cluster_Administration-Using_the_NFS_Druid-Export_and_Client_Options">
+					<title><application>Export and Client Options</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/nfsdruid2.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								export options
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					If an existing service contains the device and mountpoint configuration for the directory you want to NFS export, then select that existing service. Otherwise, enter a new <guilabel>Service Name</guilabel> and <guilabel>Service IP Address</guilabel> for the NFS export directory.
+				</para>
+				<para>
+					<guilabel>Service Name</guilabel> &mdash; A name used to uniquely identify this service within the cluster (such as <userinput>nfs_cluster</userinput> or <userinput>marketing</userinput>.)
+				</para>
+				<para>
+					<guilabel>Service IP Address</guilabel> &mdash; NFS clients access file systems from an NFS server which is designated by its IP address (or associated hostname). To keep NFS clients from knowing which specific cluster member is the acting NFS server, the client systems should not use the cluster member&#39;s hostname as the IP address from which a service is started. Rather, clustered NFS services are assigned floating IP addresses which are distinct from the cluster server&#39;s IP addresses. This floating IP address is then configured on whichever cluster member is actively serving the NFS export. Following this approach, the NFS clients are only aware of the floating IP address and are unaware of the fact that clustered NFS server has been deployed.
+				</para>
+				<figure id="Cluster_Administration-Using_the_NFS_Druid-Select_Service_for_Export">
+					<title><application>Select Service for Export</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/nfsdruid3.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								select service
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					For non-clustered file systems, the mount information is typically placed in <filename>/etc/fstab</filename>. However, clustered file systems must not be placed in <filename>/etc/fstab</filename>. This is necessary to ensure that only one cluster member at a time has the file system mounted. Failure to do so will likely result in file system corruption and system crashes.
+				</para>
+				<para>
+					If you selected an existing service, then devices for that service will be listed under <guilabel>Existing Device and Mountpoint</guilabel>. If the device and mount point for your NFS export is listed, then select it.
+				</para>
+				<para>
+					Otherwise, select <guilabel>New Device</guilabel> and use the fields to edit the following settings.
+				</para>
+				<para>
+					<guilabel>Device Special File</guilabel> &mdash; Designates the disk or partition on shared storage.
+				</para>
+				<para>
+					<guilabel>Device Mountpoint</guilabel> &mdash; Specifies the directory on which the file system will be mounted. An NFS service can include more than one file system mount. In this manner, the file systems will be grouped together as a single failover unit.
+				</para>
+				<figure id="Cluster_Administration-Using_the_NFS_Druid-Select_Device_for_Export">
+					<title><application>Select Device for Export</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/nfsdruid4.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								export device
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					At the end of the <application>NFS Druid</application>, click <guibutton>Apply</guibutton> to create the service. Save the configuration by choosing <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> from the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			To modify your NFS service configuration, click the <guilabel>Services</guilabel> tab in the <application>&RHCLUSTERTOOL;</application> and click the triangular icon <inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/triangle.png" />
+				</imageobject>
+			</inlinemediaobject>
+			 next to the NFS service to display the full child tree for the service. Double-click each child to modify options.
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Highlight the <guilabel>&lt;service&gt;</guilabel> and click <guibutton>Properties</guibutton> to configure the the following options:
+				</para>
+				<figure id="Cluster_Administration-Using_the_NFS_Druid-Services_in_the_RHCLUSTERTOOL">
+					<title>Services in the <application>&RHCLUSTERTOOL;</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/displayservice.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								service tab
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guilabel>Service Name</guilabel> &mdash; A name used to uniquely identify this service within the cluster (such as <userinput>nfs_cluster</userinput> or <userinput>marketing</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Failover Domain</guilabel> &mdash; An optional property that specifies a subset (or ordered subset) of cluster members which are eligible to run the service in the event of a failover. You must create the failover domain before you can reference it in an NFS service configuration; see <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" /> for more information.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Check Interval</guilabel> &mdash; An optional property that specifies whether or not to check the status of the NFS daemons at a regular interval (in seconds). The default value is 0 seconds, meaning the daemon status is not checked.
+						</para>
+						<para>
+							If the service returns an error or does not respond to the status check, the cluster attempts to cleanly shut down the service and start it on another member. If at any point it fails to cleanly shut down the NFS service, the cluster will place the service in a <guilabel>Failed</guilabel> state, requiring the administrator to disable the service first before attempting to restart it.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							For the <guilabel>User Script</guilabel>, leave the field as <userinput>None</userinput>, as the cluster infrastructure handles NFS service control and status checking.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>&lt;service ip address&gt;</guilabel> child to change the <guilabel>Service IP Address</guilabel> and to enter a <guilabel>Netmask</guilabel> and <guilabel>Broadcast</guilabel> address, which are both set as <userinput>None</userinput> by default. If these fields are left as <userinput>None</userinput>, then the cluster infrastructure will use the netmask and broadcast IP address configured on the network device of the member running the service.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>&lt;device&gt;</guilabel> child to modify the <guilabel>Device Special File</guilabel>, <guilabel>Device Mount Point</guilabel>, <guilabel>FS Type</guilabel>, and <guilabel>Mount Options</guilabel>. You can also check or uncheck the <guilabel>Force Unmount</guilabel>. When <guilabel>Forced Unmount</guilabel> is enabled, any applications that have the specified file system mounted will be killed prior to disabling or relocating the NFS service (assuming the application is running on the same member that is running the NFS service)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>&lt;nfsexport&gt;</guilabel> child to specify a directory name for clients to mount the exported share.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>&lt;client&gt;</guilabel> child to enter <guilabel>Client Name</guilabel>, any hosts, groups, and domains that are allowed to mount the exported shares (default is <userinput>*</userinput> which allows any client to mount the share) and <guilabel>Options</guilabel> for allowed client mount options (such as <userinput>rw</userinput> for read-write or <userinput>ro</userinput> for read-only).
+				</para>
+			</listitem>
+		</orderedlist>
+		<section id="Cluster_Administration-Using_the_NFS_Druid-NFS_Client_Access">
+			<title>NFS Client Access</title>
+			<indexterm>
+				<primary>cluster services</primary>
+				<secondary>NFS client access</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>NFS</primary>
+				<secondary>client access</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>file services</primary>
+				<secondary>NFS</secondary>
+				<tertiary>client access</tertiary>
+			</indexterm>
+			<para>
+				The NFS usage model for clients is completely unchanged from its normal approach. For example, to mount the NFS share from <computeroutput>clu1.example.com</computeroutput> to the client&#39;s <filename>/mnt/users/</filename> directory, run the following command:
+			</para>
+<screen>
+/bin/mount -t nfs clu1.example.com:/share /mnt/users
+</screen>
+			<para>
+				To simplify the mounting of the NFS share for clients, place the following in the client&#39;s <filename>/etc/fstab</filename> file:
+			</para>
+<screen><computeroutput> clu1.example.com:/share /mnt/users nfs rw,rsize=8192,wsize=8192 0 0 </computeroutput></screen>
+			<para>
+				For additional NFS mount options, refer to the <citetitle>&RHELSAG;</citetitle>.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-NFS_Caveats">
+		<title>NFS Caveats</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>NFS caveats</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>NFS</primary>
+			<secondary>caveats</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>file services</primary>
+			<secondary>NFS</secondary>
+			<tertiary>caveats</tertiary>
+		</indexterm>
+		<para>
+			The following points should be taken into consideration when clustered NFS services are configured.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term>Avoid using <command>exportfs -r</command></term>
+				<listitem>
+					<para>
+						File systems being NFS exported by cluster members do not get specified in the conventional <filename>/etc/exports</filename> file. Rather, the NFS exports associated with cluster services are specified in the cluster configuration file (as established by the <application>&RHCLUSTERTOOL;</application>).
+					</para>
+					<para>
+						The command <command>exportfs -r</command> removes any exports which are not explicitly specified in the <filename>/etc/exports</filename> file. Running this command causes the clustered NFS services to become unavailable until the service is restarted. For this reason, it is recommended to avoid using the <command>exportfs -r</command> command on a cluster on which highly available NFS services are configured. To recover from unintended usage of <command>exportfs -r</command>, the NFS cluster service must be stopped and then restarted.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>NFS File Locking</term>
+				<listitem>
+					<para>
+						NFS file locks are <emphasis>not</emphasis> preserved across a failover or service relocation. This is due to the fact that the Linux NFS implementation stores file locking information in system files. These system files representing NFS locking state are not replicated across the cluster. The implication is that locks may be regranted subsequent to the failover operation.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-Importing_the_Contents_of_an_NFS_Exports_File">
+		<title>Importing the Contents of an NFS Exports File</title>
+		<para>
+			The <guilabel>Bulk Load NFS</guilabel> feature allows you to import all the entries from an <filename>/etc/exports</filename> file without having to create the entries individually as children of a device. This can be convenient for administrators who are transitioning from traditional NFS server systems to a high-availability cluster. To use the <guilabel>Bulk Load NFS</guilabel> feature, follow these steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Stop all non-clustered NFS exports (for example, <command>/sbin/service nfs stop</command>).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Unmount the file systems on which the exports reside (for example, <command>/bin/umount <replaceable>/mnt/nfs/</replaceable></command>, where <replaceable>/mnt/nfs</replaceable> is the directory on which the NFS exported partitions are mounted).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Start the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					On the <guilabel>Services</guilabel> tab, select the device(s) to be loaded by the <filename>/etc/exports</filename> file.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Bulk Load NFS</guimenuitem>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Select the exports file that you want to load into the selected device (by default, the <guilabel>Bulk Load NFS</guilabel> dialog attempts to load <filename>/etc/exports</filename>), and click <guibutton>OK</guibutton>.
+				</para>
+				<para>
+					All entries in the file specified in the <guilabel>Bulk Load NFS</guilabel> dialog box are subjected to the same validation as when an NFS export directory is manually specified. Any entries in the imported file that fail validation are displayed in a message box. Only entries that pass validation are loaded into the selected device.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					If the bulk load successfully completed, you must then remove all exports from the <filename>/etc/exports</filename> file so that it does not affect the cluster NFS services.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> to save the change to the <filename>/etc/cluster/cluster.conf</filename> configuration file.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-NFS_Configuration_Active_Active_Example">
+		<title>NFS Configuration: Active-Active Example</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>active-active NFS configuration</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>NFS</primary>
+			<secondary>active-active configuration</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>file services</primary>
+			<secondary>NFS</secondary>
+			<tertiary>active-active configuration</tertiary>
+		</indexterm>
+		<para>
+			<xref linkend="Cluster_Administration-Network_File_Sharing_Services-Using_the_NFS_Druid" /> described how to configure a simple NFS service using the <application>NFS Druid</application>. This section shows how to configure a second NFS service on another running cluster member. The second service has its own separate IP address and failover domain. This cluster configuration, called an <firstterm>active-active configuration</firstterm>, allows multiple cluster members to simultaneously export file systems. This most effectively utilizes the capacity of cluster. In the event of a failure (or planned maintenance) on any cluster member running NFS services, those services will failover to the active cluster member.
+		</para>
+		<para>
+			For this example, individual subdirectories of the mounted file system will be made accessible on a read-write (<userinput>rw</userinput>) basis by three members of a department. The names of the systems used by these three team members are <filename>ferris</filename>, <filename>denham</filename>, and <filename>brown</filename>. To make this example more illustrative, notice that each team member will only be able to NFS mount their specific subdirectory, which has already been created for them and over which they have user and group permissions.
+		</para>
+		<para>
+			Use the <application>&RHCLUSTERTOOL;</application> as follows to configure this example NFS service:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Verify that the cluster daemons are running in the <application>&RHCLUSTERSTATTOOL;</application>; if not, choose <guimenu>Cluster</guimenu> =&gt; <guimenuitem>Start Local Cluster Daemons</guimenuitem>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose <guimenu>Cluster</guimenu> =&gt; <guimenuitem>Configure</guimenuitem> to display the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>Services</guilabel> tab and, if services have already been defined, select one and click <guibutton>New</guibutton>. (If no services are defined, just click <guibutton>New</guibutton>.)
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							Specify <userinput>nfs_engineering</userinput> in the <guilabel>Service Name</guilabel> field. This name was chosen as a reminder of the service&#39;s intended function to provide exports to the members of the engineering department.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							In this example, assume a failover domain named <filename>clu3_domain</filename> was previously created using the <application>&RHCLUSTERTOOL;</application>, consisting only of member <filename>clu3</filename> with both <guilabel>Restricted failover to only these members</guilabel> and <guilabel>Ordered Failover</guilabel> unchecked. In this way, <filename>clu3</filename> is designated as the preferred member for this service. (Note that the <filename>nfs_accounting</filename> service is assigned to failover domain <filename>clu4_domain</filename>.) Choose <userinput>clu3_domain</userinput> from the <guilabel>Failover Domain</guilabel> list. (For more information on failover domains, refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" />.)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Specify a value of <userinput>30</userinput> in the <guilabel>Check Interval</guilabel> field to specify that the status of the NFS daemons should be checked every 30 seconds.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The cluster infrastructure includes support for NFS services. Consequently, there is no need to create or specify a value for <guilabel>User Script</guilabel> when configuring an NFS service. Accept the default value of <userinput>None</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Click <guibutton>OK</guibutton> to complete this portion of the service configuration.
+						</para>
+					</listitem>
+				</orderedlist>
+			</listitem>
+			<listitem>
+				<para>
+					In the <application>&RHCLUSTERTOOL;</application>, select the service you just created, and click <guibutton>Add Child</guibutton>. On the <guilabel>Add Device or IP Address</guilabel> dialog box, choose <guilabel>Add Service IP Address</guilabel> and click <guibutton>OK</guibutton>.
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							In the <guilabel>Service IP Address</guilabel> field, enter <userinput>10.0.0.11</userinput>. This example assumes a hostname of <filename>clunfseng</filename> is associated with this IP address, by which NFS clients mount the file system. Note that this IP address must be distinct from that of any cluster member.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The default netmask address will be used, so accept the default of <userinput>None</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The default broadcast address will be used, so accept the default of <userinput>None</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Click <guibutton>OK</guibutton> to complete the service IP address configuration.
+						</para>
+					</listitem>
+				</orderedlist>
+			</listitem>
+			<listitem>
+				<para>
+					In the <application>&RHCLUSTERTOOL;</application>, select the <filename>nfs_engineering</filename> service and click <guibutton>Add Child</guibutton>. On the <guilabel>Add Device or IP Address</guilabel> dialog box, choose <guilabel>Add Device</guilabel> and click <guibutton>OK</guibutton>.
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							In the <guilabel>Device Special File</guilabel> field, enter <userinput>/dev/sdb11</userinput> which refers to the partition on the shared storage RAID box on which the file system will be physically stored.
+						</para>
+						<para>
+							Leave the <guilabel>Samba Share Name</guilabel> field blank.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							In the <guilabel>Mount Point</guilabel> field, enter <userinput>/mnt/users/engineering</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							From the <guilabel>FS Type</guilabel> menu, choose <userinput>ext3</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							In the <guilabel>Options</guilabel> field, enter <userinput>rw,nosuid,sync</userinput>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Leave the <guilabel>Force Unmount</guilabel> checkbox checked.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Click <guibutton>OK</guibutton> to complete this portion of the device configuration.
+						</para>
+					</listitem>
+				</orderedlist>
+			</listitem>
+			<listitem>
+				<para>
+					In the <application>&RHCLUSTERTOOL;</application>, select the device you just created, and click <guibutton>Add Child</guibutton>.
+				</para>
+				<para>
+					Enter <userinput>/mnt/users/engineering/ferris</userinput> in the <guilabel>NFS Export Directory Name</guilabel> field and click <guibutton>OK</guibutton>.
+				</para>
+				<para>
+					Repeat this step twice, adding NFS export directories named <userinput>/mnt/users/engineering/denham</userinput> and <userinput>/mnt/users/engineering/brown</userinput>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					In the <application>&RHCLUSTERTOOL;</application>, select the NFS export for <filename>ferris</filename> and click <guilabel>Add Child</guilabel>. The <guilabel>NFS Export Client</guilabel> dialog box is displayed.
+				</para>
+				<para>
+					In the <guilabel>Client Name</guilabel> field, type <userinput>ferris</userinput>.
+				</para>
+				<para>
+					In the <guilabel>Options</guilabel> field, type <userinput>rw</userinput>.
+				</para>
+				<para>
+					Click <guibutton>OK</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Repeat step <xref linkend="" /> twice, specifying clients named <userinput>denham</userinput> and <userinput>brown</userinput>, respectively, each with the same permissions options (<userinput>rw</userinput>).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Save the service by selecting <guilabel>File</guilabel> =&gt; <guilabel>Save</guilabel> in the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Start the service from the <application>&RHCLUSTERSTATTOOL;</application> by highlighting the service and clicking <guibutton>Start</guibutton>.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-Setting_Up_a_Samba_Service">
+		<title>Setting Up a Samba Service</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary>Samba service, setting up</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Samba</primary>
+			<secondary>setting up service</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>file services</primary>
+			<secondary>Samba</secondary>
+			<tertiary>setting up</tertiary>
+		</indexterm>
+		<para>
+			Highly available network file services are one of the key strengths of the clustering infrastructure. Advantages of high availibility Samba services include:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Heterogeneous file serving capabilities to Microsoft&reg; Windows&trade; clients using the CIFS/SMB protocol.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Allows the same set of file systems to be simultaneously network served to both NFS and Windows based clients.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Ensures that Windows-based clients maintain access to key data, and can quickly reestablish connection in the event of server failure.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Facilitates planned maintenance by allowing the transparent relocation of Samba services to one cluster member, enabling you to fix or upgrade the other cluster member.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Allows the setup of an active-active configuration to maximize equipment utilization.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<note>
+			<title>Note</title>
+			<para>
+				A complete explanation of Samba configuration is beyond the scope of this document. Rather, this documentation highlights aspects which are crucial for clustered operation. Refer to <citetitle>&RHELSAG;</citetitle> for more details on Samba configuration.
+			</para>
+		</note>
+		<section id="Cluster_Administration-Setting_Up_a_Samba_Service-Samba_Server_Requirements">
+			<title>Samba Server Requirements</title>
+			<indexterm>
+				<primary>cluster services</primary>
+				<secondary>Samba server requirements</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>Samba</primary>
+				<secondary>server requirements</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>file services</primary>
+				<secondary>Samba</secondary>
+				<tertiary>server requirements</tertiary>
+			</indexterm>
+			<para>
+				If you intend to create highly available Samba services, each cluster member on which the services will run must meet the following requirements:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						The Samba RPM packages must be installed. Note that there have been no modifications to the Samba RPMs to support high availability.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The Samba daemons will be started and stopped by the cluster infrastructure on a per-service basis. Consequently, the Samba configuration information should <emphasis>not</emphasis> be specified in the conventional <filename>/etc/samba/smb.conf</filename> file. The <application>&RHCLUSTERTOOL;</application> writes a <filename>smb.conf.<replaceable>sharename</replaceable></filename> file to the <filename>/etc/samba/</filename> directory for each Samba share (where <replaceable>sharename</replaceable> is the name you specified for the Samba share).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The automated system startup of the Samba daemons <command>smbd</command> and <command>nmbd</command> should be disabled in <filename>init.d</filename> runlevels. For example: <command>chkconfig --del smb</command>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Since the cluster infrastructure stops the cluster-related Samba daemons appropriately, do not manually run the conventional Samba stop script (<command>service smb stop</command>) as this will terminate all cluster-related samba daemons.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						File system mounts for clustered Samba services should not be included in <filename>/etc/fstab</filename>. Rather, for clustered services, the parameters describing mounts are entered via the <application>&RHCLUSTERTOOL;</application>.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Failover of Samba printer shares is not currently supported.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		
+		<section id="Cluster_Administration-Setting_Up_a_Samba_Service-Samba_Operating_Model">
+			<title>Samba Operating Model</title>
+			<indexterm>
+				<primary>cluster services</primary>
+				<secondary>Samba operating model</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>Samba</primary>
+				<secondary>operating model</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>file services</primary>
+				<secondary>Samba</secondary>
+				<tertiary>operating model</tertiary>
+			</indexterm>
+			<para>
+				This section provides background information describing the implementation model in support of Samba high availability services. Knowledge of this information will provide the context for understanding the configuration requirements of clustered Samba services.
+			</para>
+			<para>
+				The conventional, non-clustered Samba configuration model consists of editing the <filename>/etc/samba/smb.conf</filename> file to designate which file systems are to be made network accessible to the specified clients. It also designates access permissions and other mapping capabilities. In the single system model, a single instance of each of the <command>smbd</command> and <command>nmbd</command> daemons are automatically started up by the <filename>/etc/rc.d/init.d/smb</filename> runlevel script.
+			</para>
+			<para>
+				To implement high availibility Samba services, rather than having a single <filename>/etc/samba/smb.conf</filename> file, each service has its own Samba configuration file. These files are named <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename>, where <replaceable>sharename</replaceable> is the specific name of the individual configuration file associated with a Samba service. For example, if you created a share called <replaceable>mktg</replaceable>, the corresponding Samba configuration file would be <filename>/etc/samba/smb.conf.<replaceable>mktg</replaceable></filename>.
+			</para>
+			<note>
+				<title>Note</title>
+				<para>
+					A Samba share must be in a service with <emphasis>at least one</emphasis> IP address.
+				</para>
+			</note>
+			<para>
+				The format of the <filename>smb.conf.<replaceable>sharename</replaceable></filename> file is identical to the conventional <filename>smb.conf</filename> format. No additional fields have been created for clustered operation. There are several fields within the <filename>smb.conf.<replaceable>sharename</replaceable></filename> file which are required for correct cluster operation; these fields will be described in <xref linkend="Cluster_Administration-Network_File_Sharing_Services-Fields_in_the_smb.conf.sharename__File" />. When a new Samba service is created using the <application>&RHCLUSTERTOOL;</application>, the corresponding <filename>smb.conf.<replaceable>sharename</replaceable></filename> file is created based on the service-specific parameters, including appropriate client systems, specific directories to share, and read-write permissions.
+			</para>
+			<para>
+				Copy the <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename> files onto all members in the cluster (or all members in an unrestricted failover domain, if used); refer to <xref linkend="Cluster_Administration-Installing_and_Configuring_RHCS_Software_With__system_config_cluster-Configuring_a_Failover_Domain" /> for more information. After the initial configuration, should any changes be made to any <filename>smb.conf.<replaceable>sharename</replaceable></filename> file, you must also copy the updated version to the other members.
+			</para>
+			<para>
+				To facilitate high-availability Samba functionality, each individual Samba service configured within the cluster (through the <application>&RHCLUSTERTOOL;</application>) will have its own individual pair of <command>smbd</command> and <command>nmbd</command> daemons. Consequently, if there are more than one Samba services configured with the cluster, you may see multiple instances of these daemon pairs running on an individual cluster server. These Samba daemons <command>smbd</command> and <command>nmbd</command> are not initiated via the conventional <filename>init.d</filename> run level scripts; rather they are initiated by the cluster infrastructure based on whichever member is the active service provider.
+			</para>
+			<para>
+				To allow a single system to run multiple instances of the Samba daemons, every pair of daemons is required to have both its own locking directory and its own process ID (pid) directory. Consequently, there will be a separate per-service Samba daemon locking and running process directory. These directories are given the name <filename>/var/cache/samba/<replaceable>sharename</replaceable>/</filename> for lock files and <filename>/var/run/samba/<replaceable>sharename</replaceable>/</filename> for pid files (where <replaceable>sharename</replaceable> is replaced by the Samba share name specified within the service configuration information set using the <application>&RHCLUSTERTOOL;</application>). Continuing the prior example, the corresponding directories for our <replaceable>mktg</replaceable> share would be <filename>/var/cache/samba/<replaceable>mktg</replaceable>/</filename> and <filename>/var/run/samba/<replaceable>mktg</replaceable>/</filename>.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-Using_the_Samba_Druid">
+		<title>Using the Samba Druid</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary><application>Samba Druid</application></secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Samba</primary>
+			<secondary><application>Samba Druid</application></secondary>
+		</indexterm>
+		<indexterm>
+			<primary>file services</primary>
+			<secondary>Samba</secondary>
+			<tertiary><application>Samba Druid</application></tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>examples</primary>
+			<secondary><application>Samba Druid</application></secondary>
+		</indexterm>
+		<para>
+			This section describes how to use the <application>Samba Druid</application> to quickly configure an Samba share for client access.
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Start the <application>&RHCLUSTERSTATTOOL;</application>. Verify that the cluster daemons are running; if not, choose <guimenu>Cluster</guimenu> =&gt; <guimenuitem>Start Cluster Service</guimenuitem> to start the cluster daemons.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					In the <application>&RHCLUSTERSTATTOOL;</application>, choose <guimenu>Cluster</guimenu> =&gt; <guimenuitem>Configure</guimenuitem> to display the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Start the <application>Samba Druid</application> by choosing <guimenu>Add Exports</guimenu> =&gt; <guimenuitem>Samba...</guimenuitem> and click <guibutton>Forward</guibutton> to continue.
+				</para>
+				<figure id="Cluster_Administration-Using_the_Samba_Druid-Samba_Druid">
+					<title><application>Samba Druid</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/samba1.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								Samba druid welcome screen
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					Choose to create a new service with a new floating IP address.
+				</para>
+				<para>
+					Enter a <guilabel>Service Name</guilabel> &mdash; A name used to uniquely identify this service within the cluster.
+				</para>
+				<para>
+					Enter a <guilabel>Service IP Address</guilabel> &mdash; Clients access file shares from a server as designated by its IP address (or associated hostname). To abstract clients from knowing which specific cluster member is the acting Samba server, the client systems should not use the cluster member&#39;s hostname as the IP address by which a service is accessed. Rather, clustered Samba services are assigned floating IP addresses which are distinct from the cluster server&#39;s IP addresses. This floating IP address is then configured on which ever cluster member is actively serving the share. Following this approach, the clients are only aware of the floating IP address and are unaware of the fact that clustered Samba services have been deployed.
+				</para>
+				<figure id="Cluster_Administration-Using_the_Samba_Druid-Select_Service_for_Export">
+					<title><application>Select Service for Export</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/samba2.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								select service
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					Enter the device special filename and mount point for the service.
+				</para>
+				<para>
+					<guilabel>Mount information</guilabel> &mdash; For non-clustered file systems, the mount information is typically placed in <filename>/etc/fstab</filename>. In contrast, clustered file systems must not be placed in <filename>/etc/fstab</filename>. This is necessary to ensure that only one cluster member at a time has the file system mounted. Failure to do so will result in file system corruption and potential system crashes.
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guilabel>Device Special File</guilabel> &mdash; The mount information designates the disk&#39;s device special file and the directory on which the file system will be mounted.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guilabel>Device Mount point</guilabel> &mdash; A Samba service can include more than one file system mount. In this manner, the file systems will be grouped together as a single failover unit.
+						</para>
+					</listitem>
+				</itemizedlist>
+				<figure id="Cluster_Administration-Using_the_Samba_Druid-Select_Device_for_Export">
+					<title><application>Select Device for Export</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/samba3.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								export device
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					Enter a <guilabel>Share Name</guilabel> &mdash; Specifies the name by which clients refer to the mount point. Based on the name you specify, a corresponding <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename> file and lock directory <filename>/var/cache/samba/<replaceable>sharename</replaceable></filename> will be created. By convention the actual Windows share name specified within the <filename>smb.conf.<replaceable>sharename</replaceable></filename> will be set in accordance with this parameter. In practice, you can designate more than one Samba share within an individual <filename>smb.conf.<replaceable>sharename</replaceable></filename> file. There can be at most one samba configuration specified per service, which must be specified with the first device. For example, if you have multiple disk devices (and corresponding file system mounts) within a single service, then specify a single <replaceable>sharename</replaceable> for the service. Then within the <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename> file, designate multiple individual Samba shares to share directories from the multiple devices. To disable Samba sharing of a service, the share name should be set to <guilabel>None</guilabel>.
+				</para>
+				<figure id="Cluster_Administration-Using_the_Samba_Druid-Samba_Share_Name">
+					<title><application>Samba Share Name</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/samba4.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								share name
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					Click <guibutton>Apply</guibutton> to save the configurationg file (<filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename>) to the cluster member.
+				</para>
+				<figure id="Cluster_Administration-Using_the_Samba_Druid-Samba_Share_Completion">
+					<title><application>Samba Share Completion</application></title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/samba5.png" />
+						</imageobject>
+						<textobject>
+							<para>
+								Samba druid completion
+							</para>
+						</textobject>
+					</mediaobject>
+				</figure>
+			</listitem>
+			<listitem>
+				<para>
+					Save the configuration for the Samba service by choosing <guimenu>File</guimenu> =&gt; <guimenuitem>Save</guimenuitem> from the <application>&RHCLUSTERTOOL;</application>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Copy <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename> over to the other cluster members.
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			To modify your Samba service configuration, click the <guilabel>Services</guilabel> tab in the <application>&RHCLUSTERTOOL;</application> and click the triangular icon <inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/triangle.png" />
+				</imageobject>
+			</inlinemediaobject>
+			 next to the Samba service to display the full child tree for the service. Double-click each child to modify options.
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Highlight the <guilabel>&lt;service&gt;</guilabel> and click <guibutton>Properties</guibutton> to configure the following options:
+				</para>
+				<para>
+					<guilabel>Service Name</guilabel> &mdash; A name used to uniquely identify this service within the cluster.
+				</para>
+				<para>
+					<guilabel>Failover Domain</guilabel> &mdash; Defines which systems are eligible to be the Samba server for this service when more than one cluster member is operational.
+				</para>
+				<para>
+					<guilabel>Check Interval</guilabel> &mdash; Specifies how often (in seconds) the cluster subsystem should verify that the Samba daemons (<command>smbd</command> and <command>nmbd</command>) associated with this service are running. In the event that either of these daemons have unexpectedly exited, they will be automatically restarted to resume services. If a value of 0 is specified, then no monitoring will be performed. For example, designating an interval of 90 seconds will result in monitoring at that interval.
+				</para>
+				<para>
+					For the <guilabel>User Script</guilabel>, leave the field as <guilabel>None</guilabel>, as the cluster infrastructure handles NFS service control and status checking.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>&lt;service ip address&gt;</guilabel> child to change the <guilabel>Service IP Address</guilabel> and to enter a <guilabel>Netmask</guilabel> and <guilabel>Broadcast</guilabel> address, which are both set as <guilabel>None</guilabel> by default. If these fields are left as <guilabel>None</guilabel>, then the cluster infrastructure will use the netmask and broadcast IP address configured on the network device of the member running the service.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Choose the <guilabel>&lt;device&gt;</guilabel> child to modify the <guilabel>Device Special File</guilabel> and <guilabel>Samba Share Name</guilabel>, <guilabel>Mount Point</guilabel>, <guilabel>FS Type</guilabel>, and <guilabel>Mount Options</guilabel>.
+				</para>
+				<para>
+					You can also check or uncheck the <guilabel>Force Unmount</guilabel> button. As part of the mount information, you can specify whether forced unmount should be enabled or not. When forced unmount is enabled, if any applications running on the cluster server have the designated file system mounted when the service is being disabled or relocated, then that application will be killed to allow the unmount to proceed.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<section id="Cluster_Administration-Using_the_Samba_Druid-Samba_Considerations">
+			<title>Samba Considerations</title>
+			<para>
+				When running the <application>&RHCLUSTERTOOL;</application> to configure Samba services:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Correctly enter the service parameters, as the validation logic associated with Samba parameters is not robust.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						After configuring a Samba service via the <application>&RHCLUSTERTOOL;</application>, remember to tune the <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename> file for each service in accordance with the clients and authorization scheme you desire.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Remember to copy the <filename>smb.conf.<replaceable>sharename</replaceable></filename> file over to other cluster members.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Note that the cluster infrastructure creates Samba lock directories when it starts the service.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						If you delete a Samba service, the <application>&RHCLUSTERTOOL;</application> automatically deletes this file to preserve your site-specific configuration parameters for possible later use.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Network_File_Sharing_Services-Fields_in_the_smb.conf.sharename__File">
+		<title>Fields in the <filename>smb.conf.<replaceable>sharename</replaceable></filename> File</title>
+		<indexterm>
+			<primary>cluster services</primary>
+			<secondary><filename>smb.conf.<replaceable>sharename</replaceable></filename> file fields</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Samba</primary>
+			<secondary><filename>smb.conf.<replaceable>sharename</replaceable></filename> file fields</secondary>
+		</indexterm>
+		<para>
+			This section describes the fields within the <filename>smb.conf.<replaceable>sharename</replaceable></filename> file which are most relevant to the correct operation of highly available Samba services. It is beyond the scope of this document to completely describe all of the fields within a Samba configuration file. There have been no additional field names added in support of clustering, and the file format follows the normal Samba conventions.
+		</para>
+		<para>
+			The following is an example <filename>smb.conf.<replaceable>sharename</replaceable></filename> file which is automatically generated by the <application>&RHCLUSTERTOOL;</application>. The example shows a share named <computeroutput>mktg</computeroutput>. The name of the file is <filename>/etc/samba/smb.conf.mktg</filename>.
+		</para>
+<screen><computeroutput> # Template samba service configuration file - please modify # to specify subdirectories and client access permissions. # Remember to copy this file over to *ALL* other cluster # members. # # From a cluster perspective, the key fields are: # lock directory - must be unique per samba service. # bind interfaces only - must be present set to yes. # interfaces - must be set to service floating IP address. # path - must be the service mountpoint or subdirectory thereof. # Refer to the cluster documentation for details. [global] workgroup = RHCLUSTER pid directory = /var/run/samba/mktg lock directory = /var/cache/samba/mktg log file = /var/log/samba/%m.log encrypt passwords = yes bind interfaces only = yes interfaces = 192.168.26.11 [mktg] comment = High Availability Samba Service browsable = yes writable = no public = yes path = /share </computeroutput></screen>
+		<para>
+			The following are descriptions of the most relevant fields, from a clustering perspective, in the <filename>/etc/samba/smb.conf.<replaceable>sharename</replaceable></filename> file. In this example, the file is named <filename>/etc/samba/smb.conf.mktg</filename> in accordance with the share name that was specified (<userinput>mktg</userinput>) while running the <application>&RHCLUSTERTOOL;</application>. Only the cluster-specific fields are described below. The remaining fields follow standard Samba syntax.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term>Global Parameters</term>
+				<listitem>
+					<para>
+						These parameters pertain to all shares which are specified in the <filename>smb.conf.<replaceable>sharename</replaceable></filename> file. It is possible to designate more than one share within this file, provided that the directories described within it are within the service&#39;s file system mounts.
+					</para>
+					<variablelist>
+						<varlistentry>
+							<term><parameter>lock directory</parameter></term>
+							<listitem>
+								<para>
+									Dictates the name of the directory in which the Samba daemons (<command>smbd</command> and <command>nmbd</command>) will place their locking files. This must be set to <filename>/var/cache/samba/<replaceable>sharename</replaceable></filename>, where <replaceable>sharename</replaceable> varies based on the parameter specified in the <application>&RHCLUSTERTOOL;</application>. Specification of a lock directory is required to allow a separate per-service instance of <command>smbd</command> and <command>nmbd</command>.
+								</para>
+							</listitem>
+						</varlistentry>
+						<varlistentry>
+							<term><parameter>pid directory</parameter></term>
+							<listitem>
+								<para>
+									Dictates the name of the directory in which the Samba daemons (<command>smbd</command> and <command>nmbd</command>) will place their processor ID (pid) files. This must be set to <filename>/var/run/samba/<replaceable>sharename</replaceable>/</filename>, where <replaceable>sharename</replaceable> varies based on the parameter specified in the <application>&RHCLUSTERTOOL;</application> tool. Specification of a pid directory is required to allow a separate per-service instance of <command>smbd</command> and <command>nmbd</command>.
+								</para>
+							</listitem>
+						</varlistentry>
+						<varlistentry>
+							<term><parameter>bind interfaces only</parameter></term>
+							<listitem>
+								<para>
+									This parameter must be set to <parameter>yes</parameter> to allow each <command>smbd</command> and <command>nmbd</command> pair to bind to the floating IP address associated with this clustered Samba service.
+								</para>
+							</listitem>
+						</varlistentry>
+						<varlistentry>
+							<term><parameter>interfaces</parameter></term>
+							<listitem>
+								<para>
+									Specifies the IP address associated with the Samba service. If a netmask is specified within the service, this field appears like the following example: <parameter>interfaces = 10.0.0.10/255.255.254.0</parameter>
+								</para>
+							</listitem>
+						</varlistentry>
+					</variablelist>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Share-specific parameters</term>
+				<listitem>
+					<para>
+						These parameters pertain to a specific Samba share.
+					</para>
+					<variablelist>
+						<varlistentry>
+							<term><parameter>writable</parameter></term>
+							<listitem>
+								<para>
+									By default, the share access permissions are conservatively set as non-writable. Tune this parameter according to your site-specific preferences.
+								</para>
+							</listitem>
+						</varlistentry>
+						<varlistentry>
+							<term><parameter>path</parameter></term>
+							<listitem>
+								<para>
+									Defaults to the first file system mount point specified within the service configuration. This should be adjusted to match the specific directory or subdirectory intended to be available as a share to clients.
+								</para>
+							</listitem>
+						</varlistentry>
+					</variablelist>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+
+</chapter>
+

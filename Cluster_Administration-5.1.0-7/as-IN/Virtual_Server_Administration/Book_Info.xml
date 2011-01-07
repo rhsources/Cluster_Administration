@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<!DOCTYPE bookinfo PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<bookinfo id="Virtual_Server_Administration-Linux_Virtual_Server_Administration">
+	<title>Linux Virtual Server Administration</title>
+	<subtitle>Linux Virtual Server (LVS)</subtitle>
+	<issuenum>5.1.0</issuenum>
+	<productnumber>1</productnumber>
+	<abstract><para>Building a Linux Virtual Server (LVS) system offers
+highly-available and scalable solution for production services
+using specialized routing and load-balancing techniques configured
+through the <application>PIRANHA</application>. This book discusses the configuration of high-performance systems
+and services with &PROD; and LVS.</para></abstract>
+	<isbn>N/A</isbn>
+	<mediaobject>
+		<imageobject>
+			<imagedata fileref="Common_Content/images/rhlogo-chapter-title.png" />
+		</imageobject>
+	</mediaobject>
+	<publisher>
+		<publishername>
+			<inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="Common_Content/images/rhlogo-title.png" />
+				</imageobject>
+			</inlinemediaobject>
+		</publishername>
+	</publisher>
+	<copyright>
+		<year>&YEAR;</year>
+		<holder>&FORMAL-RHI;</holder>
+	</copyright>
+	<xi:include href="Common_Content/Boilerplate.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+</bookinfo>
+

@@ -1,0 +1,534 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview">
+	<title>&RH; Cluster Configuration and Management Overview</title>
+	<para>
+		&RH; Cluster allows you to connect a group of computers (called <firstterm>nodes</firstterm> or <firstterm>members</firstterm>) to work together as a cluster. You can use &RH; Cluster to suit your clustering needs (for example, setting up a cluster for sharing files on a GFS file system or setting up service failover).
+	</para>
+	<section id="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Configuration_Basics">
+		<title>Configuration Basics</title>
+		<para>
+			To set up a cluster, you must connect the nodes to certain cluster hardware and configure the nodes into the cluster environment. This chapter provides an overview of cluster configuration and management, and tools available for configuring and managing a &RH; Cluster.
+		</para>
+		<para>
+			Configuring and managing a &RH; Cluster consists of the following basic steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					Setting up hardware. Refer to <xref linkend="Cluster_Administration-Configuration_Basics-Setting_Up_Hardware" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Installing &RH; Cluster software. Refer to <xref linkend="Cluster_Administration-Configuration_Basics-Installing_RH_Cluster_software" />.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Configuring &RH; Cluster Software. Refer to <xref linkend="Cluster_Administration-Configuration_Basics-Configuring_RH_Cluster_Software" />.
+				</para>
+			</listitem>
+		</orderedlist>
+		<section id="Cluster_Administration-Configuration_Basics-Setting_Up_Hardware">
+			<title>Setting Up Hardware</title>
+			<para>
+				Setting up hardware consists of connecting cluster nodes to other hardware required to run a &RH; Cluster. The amount and type of hardware varies according to the purpose and availability requirements of the cluster. Typically, an enterprise-level cluster requires the following type of hardware (refer to <xref linkend="Cluster_Administration-Setting_Up_Hardware-RH_Cluster_Hardware_Overview" />). For considerations about hardware and other cluster configuration concerns, refer to <xref linkend="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Configuration_Considerations" /> or check with an authorized &RH; representative.
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Cluster nodes &mdash; Computers that are capable of running &RHEL; 5 software, with at least 1GB of RAM.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Ethernet switch or hub for public network &mdash; This is required for client access to the cluster.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Ethernet switch or hub for private network &mdash; This is required for communication among the cluster nodes and other cluster hardware such as network power switches and Fibre Channel switches.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Network power switch &mdash; A network power switch is recommended to perform fencing in an enterprise-level cluster.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Fibre Channel switch &mdash; A Fibre Channel switch provides access to Fibre Channel storage. Other options are available for storage according to the type of storage interface; for example, iSCSI or GNBD. A Fibre Channel switch can be configured to perform fencing.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Storage &mdash; Some type of storage is required for a cluster. The type required depends on the purpose of the cluster.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<figure id="Cluster_Administration-Setting_Up_Hardware-RH_Cluster_Hardware_Overview">
+				<title>&RH; Cluster Hardware Overview</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/9159.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster hardware
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+		</section>
+		
+		<section id="Cluster_Administration-Configuration_Basics-Installing_RH_Cluster_software">
+			<title>Installing &RH; Cluster software</title>
+			<para>
+				To install &RH; Cluster software, you must have entitlements for the software. If you are using the <application>Conga</application> configuration GUI, you can let it install the cluster software. If you are using other tools to configure the cluster, secure and install the software as you would with &RHEL; software.
+			</para>
+		</section>
+		
+		<section id="Cluster_Administration-Configuration_Basics-Configuring_RH_Cluster_Software">
+			<title>Configuring &RH; Cluster Software</title>
+			<indexterm>
+				<primary><application>Conga</application></primary>
+				<secondary>accessing</secondary>
+			</indexterm>
+			<para>
+				Configuring &RH; Cluster software consists of using configuration tools to specify the relationship among the cluster components. <xref linkend="Cluster_Administration-Configuring_RH_Cluster_Software-Cluster_Configuration_Structure" /> shows an example of the hierarchical relationship among cluster nodes, high-availability services, and resources. The cluster nodes are connected to one or more fencing devices. Nodes can be grouped into a failover domain for a cluster service. The services comprise resources such as NFS exports, IP addresses, and shared GFS partitions.
+			</para>
+			<figure id="Cluster_Administration-Configuring_RH_Cluster_Software-Cluster_Configuration_Structure">
+				<title>Cluster Configuration Structure</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/clust-config-struct.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster config flowchart
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The following cluster configuration tools are available with &RH; Cluster:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<application>Conga</application> &mdash; This is a comprehensive user interface for installing, configuring, and managing &RH; clusters, computers, and storage attached to clusters and computers.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<command>system-config-cluster</command> &mdash; This is a user interface for configuring and managing a &RH; cluster.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Command line tools &mdash; This is a set of command line tools for configuring and managing a &RH; cluster.
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				A brief overview of each configuration tool is provided in the following sections:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<xref linkend="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Conga" />
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<xref linkend="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-system_config_cluster_Cluster_Administration_GUI" />
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<xref linkend="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Command_Line_Administration_Tools" />
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				In addition, information about using <application>Conga</application> and <command>system-config-cluster</command> is provided in subsequent chapters of this document. Information about the command line tools is available in the man pages for the tools.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Conga">
+		<title>Conga</title>
+		<indexterm>
+			<primary>Conga</primary>
+			<secondary>overview</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Conga overview</primary>
+		</indexterm>
+		<para>
+			<application>Conga</application> is an integrated set of software components that provides centralized configuration and management of &RH; clusters and storage. <application>Conga</application> provides the following major features:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					One Web interface for managing cluster and storage
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Automated Deployment of Cluster Data and Supporting Packages
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Easy Integration with Existing Clusters
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					No Need to Re-Authenticate
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Integration of Cluster Status and Logs
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Fine-Grained Control over User Permissions
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			The primary components in <application>Conga</application> are <application>luci</application> and <application>ricci</application>, which are separately installable. <application>luci</application> is a server that runs on one computer and communicates with multiple clusters and computers via <application>ricci</application>. <application>ricci</application> is an agent that runs on each computer (either a cluster member or a standalone computer) managed by <application>Conga</application>.
+		</para>
+		<para>
+			<application>luci</application> is accessible through a Web browser and provides three major functions that are accessible through the following tabs:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<guimenu>homebase</guimenu> &mdash; Provides tools for adding and deleting computers, adding and deleting users, and configuring user privileges. Only a system administrator is allowed to access this tab.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guimenu>cluster</guimenu> &mdash; Provides tools for creating and configuring clusters. Each instance of <application>luci</application> lists clusters that have been set up with that <application>luci</application>. A system administrator can administer all clusters listed on this tab. Other users can administer only clusters that the user has permission to manage (granted by an administrator).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<guimenu>storage</guimenu> &mdash; Provides tools for remote administration of storage. With the tools on this tab, you can manage storage on computers whether they belong to a cluster or not.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			To administer a cluster or storage, an administrator adds (or <firstterm>registers</firstterm>) a cluster or a computer to a <application>luci</application> server. When a cluster or a computer is registered with <application>luci</application>, the FQDN hostname or IP address of each computer is stored in a <application>luci</application> database.
+		</para>
+		<para>
+			You can populate the database of one <application>luci</application> instance from another <application>luci</application>instance. That capability provides a means of replicating a <application>luci</application> server instance and provides an efficient upgrade and testing path. When you install an instance of <application>luci</application>, its database is empty. However, you can import part or all of a <application>luci</application> database from an existing <application>luci</application> server when deploying a new <application>luci</application> server.
+		</para>
+		<para>
+			Each <application>luci</application> instance has one user at initial installation &mdash; admin. Only the admin user may add systems to a <application>luci</application> server. Also, the admin user can create additional user accounts and determine which users are allowed to access clusters and computers registered in the <application>luci</application> database. It is possible to import users as a batch operation in a new <application>luci</application> server, just as it is possible to import clusters and computers.
+		</para>
+		<para>
+			When a computer is added to a <application>luci</application> server to be administered, authentication is done once. No authentication is necessary from then on (unless the certificate used is revoked by a CA). After that, you can remotely configure and manage clusters and storage through the <application>luci</application> user interface. <application>luci</application> and <application>ricci</application> communicate with each other via XML.
+		</para>
+		<para>
+			The following figures show sample displays of the three major <application>luci</application> tabs: <guimenu>homebase</guimenu>, <guimenu>cluster</guimenu>, and <guimenu>storage</guimenu>.
+		</para>
+		<para>
+			For more information about <application>Conga</application>, refer to <xref linkend="Cluster_Administration-Configuring_RH_Cluster_With_Conga" />, <xref linkend="Cluster_Administration-Managing_RH_Cluster_With_Conga" />, and the online help available with the <application>luci</application> server.
+		</para>
+		<figure id="Cluster_Administration-Conga-luci__homebase_Tab">
+			<title><application>luci </application><guimenu>homebase</guimenu> Tab</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/luci-homebase-tab.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						luci homebase tab
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<figure id="Cluster_Administration-Conga-luci__cluster______Tab">
+			<title><application>luci </application><guimenu>cluster</guimenu> Tab</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/luci-cluster-tab.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						luci cluster tab
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<figure id="Cluster_Administration-Conga-luci__storage______Tab">
+			<title><application>luci </application><guimenu>storage</guimenu> Tab</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="./images/luci-storage-tab.png" />
+				</imageobject>
+				<textobject>
+					<para>
+						luci storage tab
+					</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+	</section>
+	
+	<section id="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-system_config_cluster_Cluster_Administration_GUI">
+		<title><command>system-config-cluster</command> Cluster Administration GUI</title>
+		<para>
+			This section provides an overview of the cluster administration graphical user interface (GUI) available with &RHCS; &mdash; <command>system-config-cluster</command>. The GUI is for use with the cluster infrastructure and the high-availability service management components. The GUI consists of two major functions: the <application>&RHCLUSTERTOOL;</application> and the <application>&RHCLUSTERSTATTOOL;</application>. The <application>&RHCLUSTERTOOL;</application> provides the capability to create, edit, and propagate the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>). The <application>&RHCLUSTERSTATTOOL;</application> provides the capability to manage high-availability services. The following sections summarize those functions.
+		</para>
+		<section id="Cluster_Administration-system_config_cluster_Cluster_Administration_GUI-RHCLUSTERTOOL">
+			<title><application>&RHCLUSTERTOOL;</application></title>
+			<para>
+				You can access the <application>&RHCLUSTERTOOL;</application> (<xref linkend="Cluster_Administration-RHCLUSTERTOOL-RHCLUSTERTOOL" />) through the <guilabel>Cluster Configuration</guilabel> tab in the Cluster Administration GUI.
+			</para>
+			<figure id="Cluster_Administration-RHCLUSTERTOOL-RHCLUSTERTOOL">
+				<title><application>&RHCLUSTERTOOL;</application></title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/clustertoolgui.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster tool
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The <application>&RHCLUSTERTOOL;</application> represents cluster configuration components in the configuration file (<filename>/etc/cluster/cluster.conf</filename>) with a hierarchical graphical display in the left panel. A triangle icon to the left of a component name indicates that the component has one or more subordinate components assigned to it. Clicking the triangle icon expands and collapses the portion of the tree below a component. The components displayed in the GUI are summarized as follows:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<guilabel>Cluster Nodes</guilabel> &mdash; Displays cluster nodes. Nodes are represented by name as subordinate elements under <guilabel>Cluster Nodes</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can add nodes, delete nodes, edit node properties, and configure fencing methods for each node.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<guilabel>Fence Devices</guilabel> &mdash; Displays fence devices. Fence devices are represented as subordinate elements under <guilabel>Fence Devices</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can add fence devices, delete fence devices, and edit fence-device properties. Fence devices must be defined before you can configure fencing (with the <guibutton>Manage Fencing For This Node</guibutton> button) for each node.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<guilabel>Managed Resources</guilabel> &mdash; Displays failover domains, resources, and services.
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								<guilabel>Failover Domains</guilabel> &mdash; For configuring one or more subsets of cluster nodes used to run a high-availability service in the event of a node failure. Failover domains are represented as subordinate elements under <guilabel>Failover Domains</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create failover domains (when <guilabel>Failover Domains</guilabel> is selected) or edit failover domain properties (when a failover domain is selected).
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<guilabel>Resources</guilabel> &mdash; For configuring shared resources to be used by high-availability services. Shared resources consist of file systems, IP addresses, NFS mounts and exports, and user-created scripts that are available to any high-availability service in the cluster. Resources are represented as subordinate elements under <guilabel>Resources</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create resources (when <guilabel>Resources</guilabel> is selected) or edit resource properties (when a resource is selected).
+							</para>
+							<note>
+								<title>Note</title>
+								<para>
+									The <application>&RHCLUSTERTOOL;</application> provides the capability to configure private resources, also. A private resource is a resource that is configured for use with only one service. You can configure a private resource within a <application>Service</application> component in the GUI.
+								</para>
+							</note>
+						</listitem>
+						<listitem>
+							<para>
+								<guilabel>Services</guilabel> &mdash; For creating and configuring high-availability services. A service is configured by assigning resources (shared or private), assigning a failover domain, and defining a recovery policy for the service. Services are represented as subordinate elements under <guilabel>Services</guilabel>. Using configuration buttons at the bottom of the right frame (below <guilabel>Properties</guilabel>), you can create services (when <guilabel>Services</guilabel> is selected) or edit service properties (when a service is selected).
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+			<indexterm>
+				<primary><application>&RHCLUSTERTOOL;</application></primary>
+				<secondary>accessing</secondary>
+			</indexterm>
+		</section>
+		
+		<section id="Cluster_Administration-system_config_cluster_Cluster_Administration_GUI-RHCLUSTERSTATTOOL">
+			<title><application>&RHCLUSTERSTATTOOL;</application></title>
+			<para>
+				You can access the <application>&RHCLUSTERSTATTOOL;</application> (<xref linkend="Cluster_Administration-RHCLUSTERSTATTOOL-RHCLUSTERSTATTOOL" />) through the <guimenu>Cluster Management</guimenu> tab in Cluster Administration GUI.
+			</para>
+			<figure id="Cluster_Administration-RHCLUSTERSTATTOOL-RHCLUSTERSTATTOOL">
+				<title><application>&RHCLUSTERSTATTOOL;</application></title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="./images/clustatus.png" />
+					</imageobject>
+					<textobject>
+						<para>
+							cluster status tool
+						</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				The nodes and services displayed in the <application>&RHCLUSTERSTATTOOL;</application> are determined by the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>). You can use the <application>&RHCLUSTERSTATTOOL;</application> to enable, disable, restart, or relocate a high-availability service.
+			</para>
+			<indexterm>
+				<primary>cluster administration</primary>
+				<secondary>displaying cluster and service status</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>cluster</primary>
+				<secondary>displaying status</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>cluster service</primary>
+				<secondary>displaying status</secondary>
+			</indexterm>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Command_Line_Administration_Tools">
+		<title>Command Line Administration Tools</title>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>command line tools</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>command line tools table</primary>
+		</indexterm>
+		<para>
+			In addition to <application>Conga</application> and the <command>system-config-cluster</command> Cluster Administration GUI, command line tools are available for administering the cluster infrastructure and the high-availability service management components. The command line tools are used by the Cluster Administration GUI and init scripts supplied by &RH;. <xref linkend="Cluster_Administration-Command_Line_Administration_Tools-Command_Line_Tools" /> summarizes the command line tools.
+		</para>
+		<table id="Cluster_Administration-Command_Line_Administration_Tools-Command_Line_Tools">
+			<title>Command Line Tools</title>
+			<tgroup cols="3">
+				<colspec colname="Command_Line_Tool" colnum="1" colwidth="3*"></colspec>
+				<colspec colname="Used_With" colnum="2" colwidth="3*"></colspec>
+				<colspec colname="Purpose" colnum="3" colwidth="9*"></colspec>
+				<thead>
+					<row>
+						<entry>
+							Command Line Tool
+						</entry>
+						<entry>
+							Used With
+						</entry>
+						<entry>
+							Purpose
+						</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>
+							<command>ccs_tool</command> &mdash; Cluster Configuration System Tool
+						</entry>
+						<entry>
+							Cluster Infrastructure
+						</entry>
+						<entry>
+							<command>ccs_tool</command> is a program for making online updates to the cluster configuration file. It provides the capability to create and modify cluster infrastructure components (for example, creating a cluster, adding and removing a node). For more information about this tool, refer to the ccs_tool(8) man page.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<command>cman_tool</command> &mdash; Cluster Management Tool
+						</entry>
+						<entry>
+							Cluster Infrastructure
+						</entry>
+						<entry>
+							<command>cman_tool</command> is a program that manages the CMAN cluster manager. It provides the capability to join a cluster, leave a cluster, kill a node, or change the expected quorum votes of a node in a cluster. For more information about this tool, refer to the cman_tool(8) man page.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<command>fence_tool</command> &mdash; Fence Tool
+						</entry>
+						<entry>
+							Cluster Infrastructure
+						</entry>
+						<entry>
+							<command>fence_tool</command> is a program used to join or leave the default fence domain. Specifically, it starts the fence daemon (<command>fenced</command>) to join the domain and kills <command>fenced</command> to leave the domain. For more information about this tool, refer to the fence_tool(8) man page.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<command>clustat</command> &mdash; Cluster Status Utility
+						</entry>
+						<entry>
+							High-availability Service Management Components
+						</entry>
+						<entry>
+							The <command>clustat</command> command displays the status of the cluster. It shows membership information, quorum view, and the state of all configured user services. For more information about this tool, refer to the clustat(8) man page.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<command>clusvcadm</command> &mdash; Cluster User Service Administration Utility
+						</entry>
+						<entry>
+							High-availability Service Management Components
+						</entry>
+						<entry>
+							The <command>clusvcadm</command> command allows you to enable, disable, relocate, and restart high-availability services in a cluster. For more information about this tool, refer to the clusvcadm(8) man page.
+						</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</section>
+	
+	<section id="Cluster_Administration-RH_Cluster_Configuration_and_Management_Overview-Configuration_Considerations">
+		<title>Configuration Considerations</title>
+		<para>
+			You can configure a &RH; Cluster in a variety of ways to suit your needs. Take into account the following considerations when you plan, configure, and implement your &RH; Cluster.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term> No-single-point-of-failure hardware configuration </term>
+				<listitem>
+					<para>
+						Clusters can include a dual-controller RAID array, multiple bonded network channels, multiple paths between cluster members and storage, and redundant un-interruptible power supply (UPS) systems to ensure that no single failure results in application down time or loss of data.
+					</para>
+					<para>
+						Alternatively, a low-cost cluster can be set up to provide less availability than a no-single-point-of-failure cluster. For example, you can set up a cluster with a single-controller RAID array and only a single Ethernet channel.
+					</para>
+					<para>
+						Certain low-cost alternatives, such as host RAID controllers, software RAID without cluster support, and multi-initiator parallel SCSI configurations are not compatible or appropriate for use as shared cluster storage.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term> Data integrity assurance </term>
+				<listitem>
+					<para>
+						To ensure data integrity, only one node can run a cluster service and access cluster-service data at a time. The use of power switches in the cluster hardware configuration enables a node to power-cycle another node before restarting that node&#39;s cluster services during a failover process. This prevents two nodes from simultaneously accessing the same data and corrupting it. It is strongly recommended that <firstterm>fence devices</firstterm> (hardware or software solutions that remotely power, shutdown, and reboot cluster nodes) are used to guarantee data integrity under all failure conditions. Watchdog timers provide an alternative way to to ensure correct operation of cluster service failover.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term> Ethernet channel bonding </term>
+				<listitem>
+					<para>
+						Cluster quorum and node health is determined by communication of messages among cluster nodes via Ethernet. In addition, cluster nodes use Ethernet for a variety of other critical cluster functions (for example, fencing). With Ethernet channel bonding, multiple Ethernet interfaces are configured to behave as one, reducing the risk of a single-point-of-failure in the typical switched Ethernet connection among cluster nodes and other cluster hardware.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+
+</chapter>
+

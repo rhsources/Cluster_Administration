@@ -1,0 +1,1102 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Suite_Overview-RHCS_Component_Summary">
+	<title>&RHCS; Component Summary</title>
+	<para>
+		This chapter provides a summary of &RHCS; components and consists of the following sections:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Component_Summary-Cluster_Components" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Suite_Overview-RHCS_Component_Summary-Man_Pages" />
+			</para>
+		</listitem>
+	</itemizedlist>
+	<section id="Cluster_Suite_Overview-RHCS_Component_Summary-Cluster_Components">
+		<title>Cluster Components</title>
+		<indexterm>
+			<primary>&RHCM;</primary>
+			<secondary>components</secondary>
+		</indexterm>
+		<para>
+			<xref linkend="Cluster_Suite_Overview-Cluster_Components-RHCM_Software_Subsystem_Components" /> summarizes &RHCS; components.
+		</para>
+		<indexterm>
+			<primary>tables</primary>
+			<secondary>cluster components</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster components table</primary>
+		</indexterm>
+		<table id="Cluster_Suite_Overview-Cluster_Components-RHCM_Software_Subsystem_Components">
+			<title>&RHCM; Software Subsystem Components</title>
+			<tgroup cols="3">
+				<colspec colname="Function" colnum="1" colwidth="3*"></colspec>
+				<colspec colname="Component" colnum="2" colwidth="4*"></colspec>
+				<colspec colname="Description" colnum="3" colwidth="5*"></colspec>
+				<thead>
+					<row>
+						<entry>
+							Function
+						</entry>
+						<entry>
+							Components
+						</entry>
+						<entry>
+							Description
+						</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>
+							<application>Conga</application>
+						</entry>
+						<entry>
+							<command>luci</command>
+						</entry>
+						<entry>
+							Remote Management System - Management Station
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<application></application>
+						</entry>
+						<entry>
+							<command>ricci</command>
+						</entry>
+						<entry>
+							Remote Management System - Managed Station
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<application>&RHCLUSTERTOOL;</application>
+						</entry>
+						<entry>
+							<command>system-config-cluster</command>
+						</entry>
+						<entry>
+							Command used to manage cluster configuration in a graphical setting.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							Cluster Logical Volume Manager (CLVM)
+						</entry>
+						<entry>
+							<command>clvmd</command>
+						</entry>
+						<entry>
+							The daemon that distributes LVM metadata updates around a cluster. It must be running on all nodes in the cluster and will give an error if a node in the cluster does not have this daemon running.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>lvm</command>
+						</entry>
+						<entry>
+							LVM2 tools. Provides the command-line tools for LVM2..
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>system-config-lvm</command>
+						</entry>
+						<entry>
+							Provides graphical user interface for LVM2.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<filename>lvm.conf</filename>
+						</entry>
+						<entry>
+							The LVM configuration file. The full path is <filename>/etc/lvm/lvm.conf.</filename>.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							Cluster Configuration System (CCS)
+						</entry>
+						<entry>
+							<command>ccs_tool</command>
+						</entry>
+						<entry>
+							<command>ccs_tool</command> is part of the Cluster Configuration System (CCS). It is used to make online updates of CCS configuration files. Additionally, it can be used to upgrade cluster configuration files from CCS archives created with GFS 6.0 (and earlier) to the XML format configuration format used with this release of &RHCS;.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>ccs_test</command>
+						</entry>
+						<entry>
+							Diagnostic and testing command that is used to retrieve information from configuration files through <command>ccsd</command>.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>ccsd</command>
+						</entry>
+						<entry>
+							CCS daemon that runs on all cluster nodes and provides configuration file data to cluster software.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<filename>cluster.conf</filename>
+						</entry>
+						<entry>
+							This is the cluster configuration file. The full path is <filename>/etc/cluster/cluster.conf</filename>.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							Cluster Manager (CMAN)
+						</entry>
+						<entry>
+							<filename>cman.ko</filename>
+						</entry>
+						<entry>
+							The kernel module for CMAN.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>cman_tool</command>
+						</entry>
+						<entry>
+							This is the administrative front end to CMAN. It starts and stops CMAN and can change some internal parameters such as votes.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>dlm_controld</command>
+						</entry>
+						<entry>
+							Daemon started by <command>cman</command> init script to manage <command>dlm</command> in kernel; not used by user.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_controld</command>
+						</entry>
+						<entry>
+							Daemon started by <command>cman</command> init script to manage <command>gfs</command> in kernel; not used by user.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>group_tool</command>
+						</entry>
+						<entry>
+							Used to get a list of groups related to fencing, DLM, GFS, and getting debug information; includes what <command>cman_tool services</command> provided in RHEL 4.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>groupd</command>
+						</entry>
+						<entry>
+							Daemon started by <command>cman</command> init script to interface between <command>openais</command>/<command>cman</command> and <command>dlm_controld</command>/<command>gfs_controld</command>/<command>fenced</command>; not used by user.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<filename>libcman.so.&lt;<replaceable>version number</replaceable>&gt;</filename>
+						</entry>
+						<entry>
+							Library for programs that need to interact with <filename>cman.ko</filename>.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							Resource Group Manager (rgmanager)
+						</entry>
+						<entry>
+							<command>clusvcadm</command>
+						</entry>
+						<entry>
+							Command used to manually enable, disable, relocate, and restart user services in a cluster
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>clustat</command>
+						</entry>
+						<entry>
+							Command used to display the status of the cluster, including node membership and services running.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>clurgmgrd</command>
+						</entry>
+						<entry>
+							Daemon used to handle user service requests including service start, service disable, service relocate, and service restart
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>clurmtabd</command>
+						</entry>
+						<entry>
+							Daemon used to handle Clustered NFS mount tables
+						</entry>
+					</row>
+					<row>
+						<entry>
+							Fence
+						</entry>
+						<entry>
+							<command>fence_apc</command>
+						</entry>
+						<entry>
+							Fence agent for APC power switch.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_bladecenter</command>
+						</entry>
+						<entry>
+							Fence agent for for IBM Bladecenters with Telnet interface.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_bullpap</command>
+						</entry>
+						<entry>
+							Fence agent for Bull Novascale Platform Administration Processor (PAP) Interface.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_drac</command>
+						</entry>
+						<entry>
+							Fencing agent for Dell Remote Access Card
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_ipmilan</command>
+						</entry>
+						<entry>
+							Fence agent for Bull Novascale Intelligent Platform Management Interface (IPMI).
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_wti</command>
+						</entry>
+						<entry>
+							Fence agent for WTI power switch.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_brocade</command>
+						</entry>
+						<entry>
+							Fence agent for Brocade Fibre Channel switch.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_mcdata</command>
+						</entry>
+						<entry>
+							Fence agent for McData Fibre Channel switch.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_vixel</command>
+						</entry>
+						<entry>
+							Fence agent for Vixel Fibre Channel switch.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_sanbox2</command>
+						</entry>
+						<entry>
+							Fence agent for SANBox2 Fibre Channel switch.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_ilo</command>
+						</entry>
+						<entry>
+							Fence agent for HP ILO interfaces (formerly fence_rib).
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_rsa</command>
+						</entry>
+						<entry>
+							I/O Fencing agent for IBM RSA II.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_gnbd</command>
+						</entry>
+						<entry>
+							Fence agent used with GNBD storage.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_scsi</command>
+						</entry>
+						<entry>
+							I/O fencing agent for SCSI persistent reservations
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_egenera</command>
+						</entry>
+						<entry>
+							Fence agent used with Egenera BladeFrame system.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_manual</command>
+						</entry>
+						<entry>
+							Fence agent for manual interaction. <emphasis>NOTE</emphasis> This component is not supported for production environments.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_ack_manual</command>
+						</entry>
+						<entry>
+							User interface for <command>fence_manual</command> agent.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_node</command>
+						</entry>
+						<entry>
+							A program which performs I/O fencing on a single node.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_xvm</command>
+						</entry>
+						<entry>
+							I/O Fencing agent for Xen virtual machines.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_xvmd</command>
+						</entry>
+						<entry>
+							I/O Fencing agent host for Xen virtual machines.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fence_tool</command>
+						</entry>
+						<entry>
+							A program to join and leave the fence domain.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>fenced</command>
+						</entry>
+						<entry>
+							The I/O Fencing daemon.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							DLM
+						</entry>
+						<entry>
+							<command>libdlm.so.&lt;<replaceable>version number</replaceable>&gt;</command>
+						</entry>
+						<entry>
+							Library for Distributed Lock Manager (DLM) support.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							GFS
+						</entry>
+						<entry>
+							<command>gfs.ko</command>
+						</entry>
+						<entry>
+							Kernel module that implements the GFS file system and is loaded on GFS cluster nodes.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_fsck</command>
+						</entry>
+						<entry>
+							Command that repairs an unmounted GFS file system.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_grow</command>
+						</entry>
+						<entry>
+							Command that grows a mounted GFS file system.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_jadd</command>
+						</entry>
+						<entry>
+							Command that adds journals to a mounted GFS file system.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_mkfs</command>
+						</entry>
+						<entry>
+							Command that creates a GFS file system on a storage device.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_quota</command>
+						</entry>
+						<entry>
+							Command that manages quotas on a mounted GFS file system.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gfs_tool</command>
+						</entry>
+						<entry>
+							Command that configures or tunes a GFS file system. This command can also gather a variety of information about the file system.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>mount.gfs</command>
+						</entry>
+						<entry>
+							Mount helper called by <command>mount(8)</command>; not used by user.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							GNBD
+						</entry>
+						<entry>
+							<command>gnbd.ko</command>
+						</entry>
+						<entry>
+							Kernel module that implements the GNBD device driver on clients.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gnbd_export</command>
+						</entry>
+						<entry>
+							Command to create, export and manage GNBDs on a GNBD server.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gnbd_import</command>
+						</entry>
+						<entry>
+							Command to import and manage GNBDs on a GNBD client.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>gnbd_serv</command>
+						</entry>
+						<entry>
+							A server daemon that allows a node to export local storage over the network.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							LVS
+						</entry>
+						<entry>
+							<command>pulse</command>
+						</entry>
+						<entry>
+							This is the controlling process which starts all other daemons related to LVS routers. At boot time, the daemon is started by the <filename>/etc/rc.d/init.d/pulse</filename> script. It then reads the configuration file <filename>/etc/sysconfig/ha/lvs.cf</filename>. On the active LVS router, <command>pulse</command> starts the LVS daemon. On the backup router, <command>pulse</command> determines the health of the active router by executing a simple heartbeat at a user-configurable interval. If the active LVS router fails to respond after a user-configurable interval, it initiates failover. During failover, <command>pulse</command> on the backup LVS router instructs the <command>pulse</command> daemon on the active LVS router to shut down all LVS services, starts the <command>send_arp</command> program to reassign the floating IP addresses to the backup LVS router&#39;s MAC address, and starts the <command>lvs</command> daemon.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>lvsd</command>
+						</entry>
+						<entry>
+							The <command>lvs</command> daemon runs on the active LVS router once called by <command>pulse</command>. It reads the configuration file <filename>/etc/sysconfig/ha/lvs.cf</filename>, calls the <command>ipvsadm</command> utility to build and maintain the IPVS routing table, and assigns a <command>nanny</command> process for each configured LVS service. If <command>nanny</command> reports a real server is down, <command>lvs</command> instructs the <command>ipvsadm</command> utility to remove the real server from the IPVS routing table.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>ipvsadm</command>
+						</entry>
+						<entry>
+							This service updates the IPVS routing table in the kernel. The <command>lvs</command> daemon sets up and administers LVS by calling <command>ipvsadm</command> to add, change, or delete entries in the IPVS routing table.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>nanny</command>
+						</entry>
+						<entry>
+							The <command>nanny</command> monitoring daemon runs on the active LVS router. Through this daemon, the active LVS router determines the health of each real server and, optionally, monitors its workload. A separate process runs for each service defined on each real server.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<filename>lvs.cf</filename>
+						</entry>
+						<entry>
+							This is the LVS configuration file. The full path for the file is <filename>/etc/sysconfig/ha/lvs.cf</filename>. Directly or indirectly, all daemons get their configuration information from this file.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<application>&PIRANHA;</application>
+						</entry>
+						<entry>
+							This is the Web-based tool for monitoring, configuring, and administering LVS. This is the default tool to maintain the <filename>/etc/sysconfig/ha/lvs.cf</filename> LVS configuration file.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>send_arp</command>
+						</entry>
+						<entry>
+							This program sends out ARP broadcasts when the floating IP address changes from one node to another during failover.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							Quorum Disk
+						</entry>
+						<entry>
+							<command>qdisk</command>
+						</entry>
+						<entry>
+							A disk-based quorum daemon for CMAN / Linux-Cluster.
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>mkqdisk</command>
+						</entry>
+						<entry>
+							Cluster Quorum Disk Utility
+						</entry>
+					</row>
+					<row>
+						<entry>
+						</entry>
+						<entry>
+							<command>qdiskd</command>
+						</entry>
+						<entry>
+							Cluster Quorum Disk Daemon
+						</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</section>
+	
+	<section id="Cluster_Suite_Overview-RHCS_Component_Summary-Man_Pages">
+		<title>Man Pages</title>
+		<para>
+			This section lists man pages that are relevant to &RHCS;, as an additional resource.
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Cluster Infrastructure
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							ccs_tool (8) - The tool used to make online updates of CCS config files
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							ccs_test (8) - The diagnostic tool for a running Cluster Configuration System
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							ccsd (8) - The daemon used to access CCS cluster configuration files
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							ccs (7) - Cluster Configuration System
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							cman_tool (8) - Cluster Management Tool
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							cluster.conf [cluster] (5) - The configuration file for cluster products
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							qdisk (5) - a disk-based quorum daemon for CMAN / Linux-Cluster
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							mkqdisk (8) - Cluster Quorum Disk Utility
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							qdiskd (8) - Cluster Quorum Disk Daemon
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_ack_manual (8) - program run by an operator as a part of manual I/O Fencing
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_apc (8) - I/O Fencing agent for APC MasterSwitch
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_bladecenter (8) - I/O Fencing agent for IBM Bladecenter
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_brocade (8) - I/O Fencing agent for Brocade FC switches
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_bullpap (8) - I/O Fencing agent for Bull FAME architecture controlled by a PAP management console
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_drac (8) - fencing agent for Dell Remote Access Card
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_egenera (8) - I/O Fencing agent for the Egenera BladeFrame
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_gnbd (8) - I/O Fencing agent for GNBD-based GFS clusters
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_ilo (8) - I/O Fencing agent for HP Integrated Lights Out card
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_ipmilan (8) - I/O Fencing agent for machines controlled by IPMI over LAN
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_manual (8) - program run by fenced as a part of manual I/O Fencing
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_mcdata (8) - I/O Fencing agent for McData FC switches
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_node (8) - A program which performs I/O fencing on a single node
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_rib (8) - I/O Fencing agent for Compaq Remote Insight Lights Out card
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_rsa (8) - I/O Fencing agent for IBM RSA II
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_sanbox2 (8) - I/O Fencing agent for QLogic SANBox2 FC switches
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_scsi (8) - I/O fencing agent for SCSI persistent reservations
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_tool (8) - A program to join and leave the fence domain
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_vixel (8) - I/O Fencing agent for Vixel FC switches
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_wti (8) - I/O Fencing agent for WTI Network Power Switch
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_xvm (8) - I/O Fencing agent for Xen virtual machines
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fence_xvmd (8) - I/O Fencing agent host for Xen virtual machines
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							fenced (8) - the I/O Fencing daemon
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					High-availability Service Management
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							clusvcadm (8) - Cluster User Service Administration Utility
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							clustat (8) - Cluster Status Utility
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Clurgmgrd [clurgmgrd] (8) - Resource Group (Cluster Service) Manager Daemon
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							clurmtabd (8) - Cluster NFS Remote Mount Table Daemon
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					GFS
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							gfs_fsck (8) - Offline GFS file system checker
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gfs_grow (8) - Expand a GFS filesystem
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gfs_jadd (8) - Add journals to a GFS filesystem
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gfs_mount (8) - GFS mount options
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gfs_quota (8) - Manipulate GFS disk quotas
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gfs_tool (8) - interface to gfs ioctl calls
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Cluster Logical Volume Manager
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							clvmd (8) - cluster LVM daemon
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvm (8) - LVM2 tools
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvm.conf [lvm] (5) - Configuration file for LVM2
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvmchange (8) - change attributes of the logical volume manager
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							pvcreate (8) - initialize a disk or partition for use by LVM
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvs (8) - report information about logical volumes
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Global Network Block Device
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							gnbd_export (8) - the interface to export GNBDs
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gnbd_import (8) - manipulate GNBD block devices on a client
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							gnbd_serv (8) - gnbd server daemon
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					LVS
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							pulse (8) - heartbeating daemon for monitoring the health of cluster nodes
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvs.cf [lvs] (5) - configuration file for lvs
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvscan (8) - scan (all disks) for logical volumes
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							lvsd (8) - daemon to control the Red Hat clustering services
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							ipvsadm (8) - Linux Virtual Server administration
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							ipvsadm-restore (8) - restore the IPVS table from stdin
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							ipvsadm-save (8) - save the IPVS table to stdout
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							nanny (8) - tool to monitor status of services in a cluster
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							send_arp (8) - tool to notify network of a new IP address / MAC address mapping
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+		</itemizedlist>
+	</section>
+
+</chapter>
+

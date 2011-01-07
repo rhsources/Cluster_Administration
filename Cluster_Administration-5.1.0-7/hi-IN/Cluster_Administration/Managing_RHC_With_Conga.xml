@@ -1,0 +1,337 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-Managing_RH_Cluster_With_Conga">
+	<title>Managing &RH; Cluster With <application>Conga</application></title>
+	<indexterm>
+		<primary>cluster administration</primary>
+	</indexterm>
+	<indexterm>
+		<primary>cluster</primary>
+		<secondary>administration</secondary>
+	</indexterm>
+	<para>
+		This chapter describes various administrative tasks for managing a &RH; Cluster and consists of the following sections:
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Managing_RH_Cluster_With_Conga-Starting_Stopping_and_Deleting_Clusters" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Managing_RH_Cluster_With_Conga-Managing_Cluster_Nodes" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Managing_RH_Cluster_With_Conga-Managing_High_Availability_Services" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="Cluster_Administration-Managing_RH_Cluster_With_Conga-Diagnosing_and_Correcting_Problems_in_a_Cluster" />
+			</para>
+		</listitem>
+	</itemizedlist>
+	<section id="Cluster_Administration-Managing_RH_Cluster_With_Conga-Starting_Stopping_and_Deleting_Clusters">
+		<title>Starting, Stopping, and Deleting Clusters</title>
+		<indexterm>
+			<primary>cluster administration</primary>
+			<secondary>starting, stopping, restarting, and deleting a cluster</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster </primary>
+			<secondary>starting, stopping, restarting, and deleting</secondary>
+		</indexterm>
+		<para>
+			You can perform the following cluster-management functions through the <application>luci</application> server component of <application>Conga</application>:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Restart a cluster.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Start a cluster.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Stop a cluster.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Delete a cluster.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			To perform one of the functions in the preceding list, follow the steps in this section. The starting point of the procedure is at the <guimenu>cluster</guimenu> tab (at the <guilabel>Choose a cluster to administer</guilabel> page).
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					At the right of the <guimenu>Cluster Name</guimenu> for each cluster listed on the <guilabel>Choose a cluster to administer</guilabel> page is a drop-down box. By default, the drop-down box is set to <guimenu>Restart this cluster</guimenu>. Clicking the drop-down box box reveals all the selections available: <guimenu>Restart this cluster</guimenu>, <guimenu>Stop this cluster</guimenu>/<guimenu>Start this cluster</guimenu>, and <guimenu>Delete this cluster</guimenu>. The actions of each function are summarized as follows:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guimenu>Restart this cluster</guimenu> &mdash; Selecting this action causes the cluster to be restarted. You can select this action for any state the cluster is in.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Stop this cluster</guimenu>/<guimenu>Start this cluster</guimenu> &mdash; <guimenu>Stop this cluster</guimenu> is available when a cluster is running. <guimenu>Start this cluster</guimenu> is available when a cluster is stopped.
+						</para>
+						<para>
+							Selecting <guimenu>Stop this cluster</guimenu> shuts down cluster software in all cluster nodes.
+						</para>
+						<para>
+							Selecting <guimenu>Start this cluster</guimenu> starts cluster software.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Delete this cluster</guimenu> &mdash; Selecting this action halts a running cluster, disables cluster software from starting automatically, and removes the cluster configuration file from each node. You can select this action for any state the cluster is in. Deleting a cluster frees each node in the cluster for use in another cluster.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Select one of the functions and click <guibutton>Go</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Clicking <guibutton>Go</guibutton> causes a progress page to be displayed. When the action is complete, a page is displayed showing either of the following pages according to the action selected:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							For <guimenu>Restart this cluster</guimenu> and <guimenu>Stop this cluster</guimenu>/<guimenu>Start this cluster</guimenu> &mdash; Displays a page with the list of nodes for the cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							For <guimenu>Delete this cluster</guimenu> &mdash; Displays the <guilabel>Choose a cluster to administer</guilabel> page in the <guimenu>cluster</guimenu> tab, showing a list of clusters.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Managing_RH_Cluster_With_Conga-Managing_Cluster_Nodes">
+		<title>Managing Cluster Nodes</title>
+		<indexterm>
+			<primary>cluster administration</primary>
+			<secondary>managing cluster node</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster</primary>
+			<secondary>managing node</secondary>
+		</indexterm>
+		<para>
+			You can perform the following node-management functions through the <application>luci</application> server component of <application>Conga</application>:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Make a node leave or join a cluster.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Fence a node.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Reboot a node.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Delete a node.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			To perform one the functions in the preceding list, follow the steps in this section. The starting point of the procedure is at the cluster-specific page that you navigate to from <guilabel>Choose a cluster to administer</guilabel> displayed on the <guimenu>cluster</guimenu> tab.
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					At the detailed menu for the cluster (below the <guimenu>clusters</guimenu> menu), click <guimenu>Nodes</guimenu>. Clicking <guimenu>Nodes</guimenu> causes the display of nodes in the center of the page and causes the display of an <guimenu>Add a Node</guimenu> element and a <guimenu>Configure</guimenu> element with a list of the nodes already configured in the cluster.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the right of each node listed on the page displayed from the preceding step, click the <guimenu>Choose a task</guimenu> drop-down box. Clicking <guimenu>Choose a task</guimenu> drop-down box reveals the following selections: <guimenu>Have node leave cluster</guimenu>/<guimenu>Have node join cluster</guimenu>, <guimenu>Fence this node</guimenu>, <guimenu>Reboot this node</guimenu>, and <guimenu>Delete</guimenu>. The actions of each function are summarized as follows:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guimenu>Have node leave cluster</guimenu>/<guimenu>Have node join cluster</guimenu> &mdash; <guimenu>Have node leave cluster</guimenu> is available when a node has joined of a cluster. <guimenu>Have node join cluster</guimenu> is available when a node has left a cluster.
+						</para>
+						<para>
+							Selecting <guimenu>Have node leave cluster</guimenu> shuts down cluster software and makes the node leave the cluster. Making a node leave a cluster prevents the node from automatically joining the cluster when it is rebooted.
+						</para>
+						<para>
+							Selecting <guimenu>Have node join cluster</guimenu> starts cluster software and makes the node join the cluster. Making a node join a cluster allows the node to automatically join the cluster when it is rebooted.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Fence this node</guimenu> &mdash; Selecting this action causes the node to be fenced according to how the node is configured to be fenced.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Reboot this node</guimenu> &mdash; Selecting this action causes the node to be rebooted.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Delete</guimenu> &mdash; Selecting this action causes the node to be deleted from the cluster configuration. It also stops all cluster services on the node, and deletes the <filename>cluster.conf</filename> file from <filename>/etc/cluster/</filename>.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>
+					Select one of the functions and click <guibutton>Go</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Clicking <guibutton>Go</guibutton> causes a progress page to be displayed. When the action is complete, a page is displayed showing the list of nodes for the cluster.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Managing_RH_Cluster_With_Conga-Managing_High_Availability_Services">
+		<title>Managing High-Availability Services</title>
+		<indexterm>
+			<primary>cluster administration</primary>
+			<secondary>managing high-availability services</secondary>
+		</indexterm>
+		<para>
+			You can perform the following management functions for high-availability services through the <application>luci</application> server component of <application>Conga</application>:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					Configure a service.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Stop or start a service.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Restart a service.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Delete a service
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			To perform one the functions in the preceding list, follow the steps in this section. The starting point of the procedure is at the cluster-specific page that you navigate to from <guilabel>Choose a cluster to administer</guilabel> displayed on the <guimenu>cluster</guimenu> tab.
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					At the detailed menu for the cluster (below the <guimenu>clusters</guimenu> menu), click <guimenu>Services</guimenu>. Clicking <guimenu>Services</guimenu> causes the display of services for the cluster in the center of the page.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					At the right of each service listed on the page, click the <guimenu>Choose a task</guimenu> drop-down box. Clicking <guimenu>Choose a task</guimenu> drop-down box reveals the following selections depending on if the service is running:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							If service is running &mdash; <guimenu>Configure this service</guimenu>, <guimenu>Restart this service</guimenu>, and <guimenu>Stop this service</guimenu>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If service is not running &mdash; <guimenu>Configure this service</guimenu>, <guimenu>Start this service</guimenu>, and <guimenu>Delete this service</guimenu>.
+						</para>
+					</listitem>
+				</itemizedlist>
+				<para>
+					The actions of each function are summarized as follows:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<guimenu>Configure this service</guimenu> &mdash; <guimenu>Configure this service</guimenu> is available when the service is running or not running. Selecting <guimenu>Configure this service</guimenu> causes the services configuration page for the service to be displayed. On that page, you can change the configuration of the service. For example, you can add a resource to the service. (For more information about adding resources and services, refer to<xref linkend="Cluster_Administration-Configuring_RH_Cluster_With_Conga-Adding_Cluster_Resources" /> and <xref linkend="Cluster_Administration-Configuring_RH_Cluster_With_Conga-Adding_a_Cluster_Service_to_the_Cluster" />.) In addition, a drop-down box on the page provides other functions depending on if the service is running.
+						</para>
+						<para>
+							When a service is running, the drop-down box provides the following functions: restarting, disabling, and relocating the service.
+						</para>
+						<para>
+							When a service is not running, the drop-down box on the configuration page provides the following functions: enabling and deleting the service.
+						</para>
+						<para>
+							If you are making configuration changes, save the changes by clicking <guibutton>Save</guibutton>. Clicking <guibutton>Save</guibutton> causes a progress page to be displayed. When the change is complete, another page is displayed showing a list of services for the cluster.
+						</para>
+						<para>
+							If you have selected one of the functions in the drop-down box on the configuration page, click <guibutton>Go</guibutton>. Clicking <guibutton>Go</guibutton> causes a progress page to be displayed. When the change is complete, another page is displayed showing a list of services for the cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Restart this service</guimenu> and <guimenu>Stop this service</guimenu> &mdash; These selections are available when the service is running. Select either function and click <guibutton>Go</guibutton> to make the change take effect. Clicking <guibutton>Go</guibutton> causes a progress page to be displayed. When the change is complete, another page is displayed showing a list of services for the cluster.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<guimenu>Start this service</guimenu> and <guimenu>Delete this service</guimenu> &mdash; These selections are available when the service is not running. Select either function and click <guibutton>Go</guibutton> to make the change take effect. Clicking <guibutton>Go</guibutton> causes a progress page to be displayed. When the change is complete, another page is displayed showing a list of services for the cluster.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+		</orderedlist>
+	</section>
+	
+	<section id="Cluster_Administration-Managing_RH_Cluster_With_Conga-Diagnosing_and_Correcting_Problems_in_a_Cluster">
+		<title>Diagnosing and Correcting Problems in a Cluster</title>
+		<indexterm>
+			<primary>cluster administration</primary>
+			<secondary>diagnosing and correcting problems in a cluster</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>cluster</primary>
+			<secondary>diagnosing and correcting problems</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>troubleshooting</primary>
+			<secondary>diagnosing and correcting problems in a cluster</secondary>
+		</indexterm>
+		<para>
+			For information about diagnosing and correcting problems in a cluster, contact an authorized Red Hat support representative.
+		</para>
+	</section>
+
+</chapter>
+

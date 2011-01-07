@@ -1,0 +1,446 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "Common_Content/Entities.ent">
+%RH_ENTITIES;
+<!ENTITY % RH_TRANS_ENTITIES SYSTEM "Common_Content/Translatable-Entities.ent">
+%RH_TRANS_ENTITIES;
+]>
+
+<chapter id="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster">
+	<title>Setting Up a &PROD; LVS Cluster</title>
+	<para>
+		A &PROD; LVS cluster consists of two basic groups: the LVS routers and the real servers. To prevent a single point of failure, each groups should contain at least two member systems.
+	</para>
+	<para>
+		The LVS router group should consist of two identical or very similar systems running &PROD;. One will act as the active LVS router while the other stays in hot standby mode, so they need to have as close to the same capabilities as possible.
+	</para>
+	<para>
+		Before choosing and configuring the hardware for the real server group, you most decide what which of the three types of LVS topographies to use.
+	</para>
+	<section id="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-The_NAT_LVS_Cluster">
+		<title>The NAT LVS Cluster</title>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>NAT routing</secondary>
+			<tertiary>requirements, hardware</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>NAT routing</secondary>
+			<tertiary>requirements, network</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>NAT routing</secondary>
+			<tertiary>requirements, software</tertiary>
+		</indexterm>
+		<para>
+			The NAT topography allows for great latitude in utilizing existing hardware, but it is limited in its ability to handle large loads due to the fact that all packets going into and coming out of the cluster pass through the LVS router.
+		</para>
+		<variablelist>
+			<varlistentry>
+				<term>Network Layout</term>
+				<listitem>
+					<para>
+						The topography for an LVS cluster utilizing NAT routing is the easiest to configure from a network layout perspective because the cluster needs only one access point to the public network. The real servers pass all requests back through the LVS router so they are on their own private network.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Hardware</term>
+				<listitem>
+					<para>
+						The NAT topography is the most flexible in regards to cluster hardware because the real servers do not need to be Linux machines to function correctly in the cluster. In a NAT cluster, each real server only needs one NIC since it will only be responding to the LVS router. The LVS routers, on the other hand, need two NICs each to route traffic between the two networks. Because this topography creates a network bottleneck at the LVS router, gigabit Ethernet NICs can be employed on each LVS router to increase the bandwidth the LVS routers can handle. If gigabit Ethernet is employed on the LVS routers, any switch connecting the real servers to the LVS routers must have at least two gigabit Ethernet ports to handle the load efficiently.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Software</term>
+				<listitem>
+					<para>
+						Because the NAT topography requires the use of <command>iptables</command> for some configurations, there can be a fair amount of software configuration outside of <application>&PIRANHA;</application>. In particular, FTP services and the use of firewall marks requires extra manual configuration of the LVS routers to route requests properly.
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<section id="Cluster_Administration-The_NAT_LVS_Cluster-Configuring_Network_Interfaces_for_a_NAT_LVS_Cluster">
+			<title>Configuring Network Interfaces for a NAT LVS Cluster</title>
+			<indexterm>
+				<primary>LVS</primary>
+				<secondary>routing prerequisites</secondary>
+			</indexterm>
+			<indexterm>
+				<primary>routing</primary>
+				<secondary>prerequisites for LVS</secondary>
+			</indexterm>
+			<para>
+				To set up a NAT LVS cluster, the administrator must first configure the network interfaces for the public network and the private network on the LVS routers. In this example, the LVS routers&#39; public interfaces (<filename>eth0</filename>) will be on the 192.168.26/24 network (I know, I know, this is not a routable IP, but let us pretend there is a firewall in front of the LVS router for good measure) and the private interfaces which link to the real servers (<filename>eth1</filename>) will be on the 10.11.12/24 network.
+			</para>
+			<para>
+				So on the active or <firstterm>primary</firstterm> LVS router node, the public interface&#39;s network script, <filename>/etc/sysconfig/network-scripts/ifcfg-eth0</filename>, could look something like this:
+			</para>
+<screen><computeroutput> DEVICE=eth0 BOOTPROTO=static ONBOOT=yes IPADDR=192.168.26.9 NETMASK=255.255.255.0 GATEWAY=192.168.26.254 </computeroutput></screen>
+			<para>
+				The <filename>/etc/sysconfig/network-scripts/ifcfg-eth1</filename> for the private NAT interface on the LVS router could look something like this:
+			</para>
+<screen><computeroutput> DEVICE=eth1 BOOTPROTO=static ONBOOT=yes IPADDR=10.11.12.9 NETMASK=255.255.255.0 </computeroutput></screen>
+			<para>
+				In this example, the VIP for the LVS router&#39;s public interface will be 192.168.26.10 and the VIP for the NAT or private interface will be 10.11.12.10. So, it is essential that the real servers route requests back to the VIP for the NAT interface.
+			</para>
+			<important>
+				<title>Important</title>
+				<para>
+					The sample Ethernet interface configuration settings in this section are for the real IP addresses of an LVS router and <emphasis>not</emphasis> the floating IP addresses. To configure the public and private floating IP addresses the administrator should use the <application>&PIRANHA;</application>, as shown in <xref linkend="Cluster_Administration-Configuring_the_LVS_Routers_with_PIRANHA-GLOBAL_SETTINGS" /> and <xref linkend="Cluster_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection" />.
+				</para>
+			</important>
+			<para>
+				After configuring the primary LVS router node&#39;s network interfaces, configure the backup LVS router&#39;s real network interfaces &mdash; taking care that none of the IP address conflict with any other IP addresses on the network.
+			</para>
+			<important>
+				<title>Important</title>
+				<para>
+					Be sure each interface on the backup node services the same network as the interface on primary node. For instance, if eth0 connects to the public network on the primary node, it must also connect to the public network on the backup node as well.
+				</para>
+			</important>
+		</section>
+		
+		<section id="Cluster_Administration-The_NAT_LVS_Cluster-Routing_on_the_Real_Servers">
+			<title>Routing on the Real Servers</title>
+			<para>
+				The most important thing to remember when configuring the real servers network interfaces in a NAT cluster is to set the gateway for the NAT floating IP address of the LVS router. In this example, that address will be 10.11.12.10.
+			</para>
+			<note>
+				<title>Note</title>
+				<para>
+					Once the network interfaces are up on the real servers, the machines will be unable to ping or connect in other ways to the public network. This is normal. You will, however, be able to ping the real IP for the LVS router&#39;s private interface, in this case 10.11.12.8.
+				</para>
+			</note>
+			<para>
+				So the real server&#39;s <filename>/etc/sysconfig/network-scripts/ifcfg-eth0</filename> file could look similar to this:
+			</para>
+<screen><computeroutput> DEVICE=eth0 ONBOOT=yes BOOTPROTO=static IPADDR=10.11.12.1 NETMASK=255.255.255.0 GATEWAY=10.11.12.10 </computeroutput></screen>
+			<warning>
+				<title>Warning</title>
+				<para>
+					If a real server has more than one network interface configured with a <computeroutput>GATEWAY=</computeroutput> line, the first one to come up will get the gateway. Therefore if both <filename>eth0</filename> and <filename>eth1</filename> are configured and <filename>eth1</filename> is used for LVS clustering, the real servers may not route requests properly.
+				</para>
+				<para>
+					It is best to turn off extraneous network interfaces by setting <computeroutput>ONBOOT=<userinput>no</userinput></computeroutput> in their network scripts within the <filename>/etc/sysconfig/network-scripts/</filename> directory or by making sure the gateway is correctly set in the interface which comes up first.
+				</para>
+			</warning>
+		</section>
+		
+		<section id="Cluster_Administration-The_NAT_LVS_Cluster-Enabling_NAT_Routing_on_the_LVS_Routers">
+			<title>Enabling NAT Routing on the LVS Routers</title>
+			<indexterm>
+				<primary>LVS</primary>
+				<secondary>NAT routing</secondary>
+				<tertiary>enabling</tertiary>
+			</indexterm>
+			<indexterm>
+				<primary>NAT</primary>
+				<secondary>enabling</secondary>
+			</indexterm>
+			<para>
+				In a simple NAT LVS cluster where each clustered service uses only one port, like HTTP on port 80, the administrator needs only to enable packet forwarding on the LVS routers for the requests to be properly routed between the outside world and the real servers. See <xref linkend="Cluster_Administration-Initial_LVS_Configuration-Turning_on_Packet_Forwarding" /> for instructions on turning on packet forwarding. However, more configuration is necessary when the clustered services require more than one port to go to the same real server during a user session. For information on creating multi-port services using firewall marks, see <xref linkend="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-Multi_port_Services_and_LVS_Clustering" />.
+			</para>
+			<para>
+				Once forwarding is enabled on the LVS routers and the real servers are set up and have the clustered services running, use the <application>&PIRANHA;</application> to configure the cluster as shown in <xref linkend="Cluster_Administration-Configuring_the_LVS_Routers_with_PIRANHA" />.
+			</para>
+			<warning>
+				<title>Warning</title>
+				<para>
+					Do not configure the floating IP for <filename>eth0:1</filename> or <filename>eth1:1</filename> by manually editing network scripts or using a network configuration tool. Instead, use the <application>&PIRANHA;</application> as shown in <xref linkend="Cluster_Administration-Configuring_the_LVS_Routers_with_PIRANHA-GLOBAL_SETTINGS" /> and <xref linkend="Cluster_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection" /> to configure any cluster-related virtual interfaces.
+				</para>
+			</warning>
+			<para>
+				When finished, start the <command>pulse</command> service as shown in <xref linkend="Cluster_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Starting_the_Cluster" />. Once <command>pulse</command> is up and running, the active LVS router will begin routing requests to the pool of real servers.
+			</para>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-Putting_the_Cluster_Together">
+		<title>Putting the Cluster Together</title>
+		<para>
+			After determining which of the above routing methods to use, the hardware for the LVS cluster should be linked together on the network.
+		</para>
+		<important>
+			<title>Important</title>
+			<para>
+				The adapter devices on the LVS routers must be configured to access the same networks. For instance if <filename>eth0</filename> connects to public network and <filename>eth1</filename> connects to the private network, then these same devices on the backup LVS router must connect to the same networks.
+			</para>
+			<para>
+				Also the gateway listed in the first interface to come up at boot time is added to the routing table and subsequent gateways listed in other interfaces are ignored. This is especially important to consider when configuring the real servers.
+			</para>
+		</important>
+		<para>
+			After physically connecting together the cluster hardware, configure the network interfaces on the primary and backup LVS routers. This can be done using a graphical application such as <application>system-config-network</application> or by editing the network scripts manually. For more information about adding devices using <application>system-config-network</application>, see the chapter titled <citetitle>Network Configuration</citetitle> in the <citetitle>&RHELSAG;</citetitle>. For more information on editing network scripts by hand, see the chapter titled <citetitle>Network Scripts</citetitle> in the <citetitle>&RHELRG;</citetitle>. For the remainder of the chapter, example alterations to network interfaces are made either manually or through the <application>&PIRANHA;</application>.
+		</para>
+		<section id="Cluster_Administration-Putting_the_Cluster_Together-General_LVS_Networking_Tips">
+			<title>General LVS Networking Tips</title>
+			<para>
+				Configure the real IP addresses for both the public and private networks on the LVS routers before attempting to configure the cluster using the <application>&PIRANHA;</application>. The sections on each topography give example network addresses, but the actual network addresses are needed. Below are some useful commands for bringing up network interfaces or checking their status.
+			</para>
+			<variablelist>
+				<varlistentry>
+					<term>Bringing Up Real Network Interfaces</term>
+					<listitem>
+						<para>
+							The best way to bring up any real network interface is to use the following commands as root replacing <replaceable>N</replaceable> with the number corresponding to the interface (<filename>eth0</filename> and <filename>eth1</filename>):
+						</para>
+<screen><command>/sbin/ifup eth<replaceable>N</replaceable></command></screen>
+						<warning>
+							<title>Warning</title>
+							<para>
+								Do <emphasis>not</emphasis> use the <command>ifup</command> scripts to bring up any floating IP addresses you may configure using <application>&PIRANHA;</application> (<filename>eth0:1</filename> or <filename>eth1:1</filename>). Use the <command>service</command> command to start <command>pulse</command> instead (see <xref linkend="Cluster_Administration-Configuring_the_LVS_Routers_with_PIRANHA-Starting_the_Cluster" /> for details).
+							</para>
+						</warning>
+						<para>
+							To bring a network interface down, type the following command:
+						</para>
+<screen><command>/sbin/ifdown eth<replaceable>N</replaceable></command></screen>
+						<para>
+							Again, replace <replaceable>N</replaceable> in the above command with the number corresponding to the interface you wish to bring down.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>Checking the Status of Network Interfaces</term>
+					<listitem>
+						<para>
+							If you need to check which network interfaces are up at any given time, type the following:
+						</para>
+<screen><command>/sbin/ifconfig</command></screen>
+						<para>
+							To view the routing table for a machine, issue the following command:
+						</para>
+<screen><command>/sbin/route</command></screen>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-Multi_port_Services_and_LVS_Clustering">
+		<title>Multi-port Services and LVS Clustering</title>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>multi-port services</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>multi-port services, clustering</primary>
+			<seealso>LVS clustering</seealso>
+		</indexterm>
+		<para>
+			LVS routers under any topology require extra configuration when creating multi-port LVS services. Multi-port services can be created artificially by using firewall marks to bundle together different, but related protocols, such as HTTP (port 80) and HTTPS (port 443), or when LVS is used to cluster true multi-port protocols, such as FTP. In either case, the LVS router uses firewall marks to recognize that packets destined for different ports, but bearing the same firewall mark, should be handled identically. Also, when combined with persistence, firewall marks ensure connections from the client machine are routed to the same host, as long as the connections occur within the length of time specified by the persistence parameter. For more on assigning persistence to a virtual server, see <xref linkend="Cluster_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection" />.
+		</para>
+		<para>
+			Unfortunately, the mechanism used to balance the loads on the real servers &mdash; IPVS &mdash; can recognize the firewall marks assigned to a packet, but cannot itself assign firewall marks. The job of <emphasis>assigning</emphasis> firewall marks must be performed by the network packet filter, <command>iptables</command>, outside of <application>&PIRANHA;</application>.
+		</para>
+		<section id="Cluster_Administration-Multi_port_Services_and_LVS_Clustering-Assigning_Firewall_Marks">
+			<title>Assigning Firewall Marks</title>
+			<para>
+				To assign firewall marks to a packet destined for a particular port, the administrator must use <command>iptables</command>.
+			</para>
+			<para>
+				This section illustrates how to bundle HTTP and HTTPS as an example, however FTP is another commonly clustered multi-port protocol. If an LVS cluster is used for FTP services, see <xref linkend="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-FTP_In_an_LVS_Cluster" /> for details on how to best configure the cluster.
+			</para>
+			<para>
+				The basic rule to remember when using firewall marks is that for every protocol using a firewall mark in <application>&PIRANHA;</application> there must be a commensurate <command>iptables</command> rule to assign marks to the network packets.
+			</para>
+			<para>
+				Before creating network packet filter rules, make sure there are no rules already in place. To do this, open a shell prompt, login as root, and type:
+			</para>
+<screen><command>/sbin/service iptables status</command></screen>
+			<para>
+				If <command>iptables</command> is not running, the prompt will instantly reappear.
+			</para>
+			<para>
+				If <command>iptables</command> is active, it displays a set of rules. If rules are present, type the following command:
+			</para>
+<screen><command>/sbin/service iptables stop</command></screen>
+			<para>
+				If the rules already in place are important, check the contents of <filename>/etc/sysconfig/iptables</filename> and copy any rules worth keeping to a safe place before proceeding.
+			</para>
+			<para>
+				Below are rules which assign the same firewall mark, 80, to incoming traffic destined for the floating IP address, <replaceable>n.n.n.n</replaceable>, on ports 80 and 443. For instructions on assigning the VIP to the public network interface, see <xref linkend="Cluster_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection" />. Also note that you must log in as root and load the module for <command>iptables</command> before issuing rules for the first time.
+			</para>
+<screen><command>/sbin/modprobe ip_tables</command><command>/sbin/iptables -t mangle -A PREROUTING -p tcp \ -d <replaceable>n.n.n.n</replaceable>/32 --dport 80 -j MARK --set-mark 80</command><command>/sbin/iptables -t mangle-A PREROUTING -p tcp \ -d <replaceable>n.n.n.n</replaceable>/32 --dport 443 -j MARK --set-mark 80</command></screen>
+			<para>
+				In the above <command>iptables</command> commands, <replaceable>n.n.n.n</replaceable> should be replaced with the floating IP for your HTTP and HTTPS virtual servers. These commands have the net effect of assigning any traffic addressed to the VIP on the appropriate ports a firewall mark of 80, which in turn is recognized by IPVS and forwarded appropriately.
+			</para>
+			<warning>
+				<title>Warning</title>
+				<para>
+					The commands above will take effect immediately, but do not persist through a reboot of the system. To ensure network packet filter settings are restored upon reboot, refer to <xref linkend="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-Saving_Network_Packet_Filter_Settings" />
+				</para>
+			</warning>
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-FTP_In_an_LVS_Cluster">
+		<title>FTP In an LVS Cluster</title>
+		<indexterm>
+			<primary>LVS</primary>
+			<secondary>multi-port services</secondary>
+			<tertiary>FTP</tertiary>
+		</indexterm>
+		<indexterm>
+			<primary>FTP, clustering</primary>
+			<seealso>LVS clustering</seealso>
+		</indexterm>
+		<para>
+			File Transport Protocol (FTP) is an old and complex multi-port protocol that presents a distinct set of challenges to a clustered environment. To understand the nature of these challenges, you must first understand some key things about how FTP works.
+		</para>
+		<section id="Cluster_Administration-FTP_In_an_LVS_Cluster-How_FTP_Works">
+			<title>How FTP Works</title>
+			<para>
+				With most other server client relationships, the client machine opens up a connection to the server on a particular port and the server then responds to the client on that port. When an FTP client connects to an FTP server it opens a connection to the FTP control port 21. Then the <emphasis>client</emphasis> tells the FTP <emphasis>server</emphasis> whether to establish an <firstterm>active</firstterm> or <firstterm>passive</firstterm> connection. The type of connection chosen by the client determines how the server responds and on what ports transactions will occur.
+			</para>
+			<para>
+				The two types of data connections are:
+			</para>
+			<variablelist>
+				<varlistentry>
+					<term>Active Connections</term>
+					<listitem>
+						<para>
+							When an active connection is established, the <emphasis>server</emphasis> opens a data connection to the client from port 20 to a high range port on the client machine. All data from the server is then passed over this connection.
+						</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>Passive Connections</term>
+					<listitem>
+						<para>
+							When a passive connection is established, the <emphasis>client</emphasis> asks the FTP server to establish a passive connection port, which can be on any port higher than 10,000. The server then binds to this high-numbered port for this particular session and relays that port number back to the client. The client then opens the newly bound port for the data connection. Each data request the client makes results in a separate data connection. Most modern FTP clients attempt to establish a passive connection when requesting data from servers.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<para>
+				The two important things to note about all of this in regards to clustering is:
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						The <emphasis>client</emphasis> determines the type of connection, not the server. This means, to effectively cluster FTP, you must configure the LVS routers to handle both active and passive connections.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The FTP client/server relationship can potentially open a large number of ports that the <application>&PIRANHA;</application> and IPVS do not know about.
+					</para>
+				</listitem>
+			</orderedlist>
+		</section>
+		
+		<section id="Cluster_Administration-FTP_In_an_LVS_Cluster-How_This_Affects_LVS_Routing">
+			<title>How This Affects LVS Routing</title>
+			<para>
+				IPVS packet forwarding only allows connections in and out of the cluster based on it recognizing its port number or its firewall mark. If a client from outside the cluster attempts to open a port IPVS is not configured to handle, it drops the connection. Similarly, if the real server attempts to open a connection back out to the Internet on a port IPVS does not know about, it drops the connection. This means <emphasis>all</emphasis> connections from FTP clients on the Internet <emphasis>must</emphasis> have the same firewall mark assigned to them and all connections from the FTP server <emphasis>must</emphasis> be properly forwarded to the Internet using network packet filtering rules.
+			</para>
+		</section>
+		
+		<section id="Cluster_Administration-FTP_In_an_LVS_Cluster-Creating_Network_Packet_Filter_Rules">
+			<title>Creating Network Packet Filter Rules</title>
+			<para>
+				Before assigning any <command>iptables</command> rules for FTP service, review the information in <xref linkend="Cluster_Administration-Multi_port_Services_and_LVS_Clustering-Assigning_Firewall_Marks" /> concerning multi-port services and techniques for checking the existing network packet filtering rules.
+			</para>
+			<para>
+				Below are rules which assign the same firewall mark, 21, to FTP traffic. For these rules to work properly, you must also use the <guilabel>VIRTUAL SERVER</guilabel> subsection of <application>&PIRANHA;</application> to configure a virtual server for port 21 with a value of <userinput>21</userinput> in the <guilabel>Firewall Mark</guilabel> field. See <xref linkend="Cluster_Administration-VIRTUAL_SERVERS-The_VIRTUAL_SERVER_Subsection" /> for details.
+			</para>
+			<section id="Cluster_Administration-Creating_Network_Packet_Filter_Rules-Rules_for_Active_Connections">
+				<title>Rules for Active Connections</title>
+				<para>
+					The rules for active connections tell the kernel to accept and forward connections coming to the <emphasis>internal</emphasis> floating IP address on port 20 &mdash; the FTP data port.
+				</para>
+				<variablelist>
+					<varlistentry>
+						<term><command>iptables</command></term>
+						<listitem>
+<screen><command>/sbin/iptables -t nat -A POSTROUTING -p tcp \ -s <replaceable>n.n.n</replaceable>.0/24 --sport 20 -j MASQUERADE</command></screen>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+				<para>
+					In the above <command>iptables</command> commands, <replaceable>n.n.n</replaceable> should be replaced with the first three values for the floating IP for the NAT interface&#39;s internal network interface defined in the <guilabel>GLOBAL SETTINGS</guilabel> panel of <application>&PIRANHA;</application>. The command allows the LVS router to accept outgoing connections from the real servers that IPVS does not know about.
+				</para>
+			</section>
+			
+			<section id="Cluster_Administration-Creating_Network_Packet_Filter_Rules-Rules_for_Passive_Connections">
+				<title>Rules for Passive Connections</title>
+				<para>
+					The rules for passive connections assign the appropriate firewall mark to connections coming in from the Internet to the floating IP for the service on a wide range of ports &mdash; 10,000 to 20,000.
+				</para>
+				<warning>
+					<title>Warning</title>
+					<para>
+						If you are limiting the port range for passive connections, you must also configure the VSFTP server to use a matching port range. This can be accomplished by adding the following lines to <filename>/etc/vsftpd.conf</filename>:
+					</para>
+<screen><userinput> pasv_min_port=10000 pasv_max_port=20000 </userinput></screen>
+					<para>
+						You must also control the address that the server displays to the client for passive FTP connections. In a NAT routed LVS system, add the following line to <filename>/etc/vsftpd.conf</filename> to override the real server IP address to the VIP, which is what the client sees upon connection. For example:
+					</para>
+<screen><userinput> pasv_address=<replaceable>X.X.X.X</replaceable></userinput></screen>
+					<para>
+						Replace <replaceable>X.X.X.X</replaceable> with the VIP address of the LVS system.
+					</para>
+					<para>
+						For configuration of other FTP servers, consult the respective documentation.
+					</para>
+				</warning>
+				<para>
+					This range should be a wide enough for most situations; however, you can increase this number to include all available non-secured ports by changing <computeroutput>10000:20000</computeroutput> in the commands below to <computeroutput>1024:65535</computeroutput>.
+				</para>
+				<variablelist>
+					<varlistentry>
+						<term><command>iptables</command></term>
+						<listitem>
+<screen><command>/sbin/iptables -t mangle -A PREROUTING -p tcp \ -d <replaceable>n.n.n.n</replaceable>/32 \ --dport 21 -j MARK --set-mark 21</command><command>/sbin/iptables -t mangle -A PREROUTING -p tcp \ -d <replaceable>n.n.n.n</replaceable>/32 \ --dport 10000:20000 -j MARK --set-mark 21</command></screen>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+				<para>
+					In the above <command>iptables</command> commands, <replaceable>n.n.n.n</replaceable> should be replaced with the floating IP for the FTP virtual server defined in the <guilabel>VIRTUAL SERVER</guilabel> subsection of <application>&PIRANHA;</application>. These commands have the net effect of assigning any traffic addressed to the floating IP on the appropriate ports a firewall mark of 21, which is in turn recognized by IPVS and forwarded appropriately.
+				</para>
+				<warning>
+					<title>Warning</title>
+					<para>
+						The commands above take effect immediately, but do not persist through a reboot of the system. To ensure network packet filter settings are restored after a reboot, see <xref linkend="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-Saving_Network_Packet_Filter_Settings" />
+					</para>
+				</warning>
+				<para>
+					Finally, you need to be sure that the appropriate service is set to activate on the proper runlevels. For more on this, refer to <xref linkend="Cluster_Administration-Initial_LVS_Configuration-Configuring_Services_on_the_LVS_Routers" />.
+				</para>
+			</section>
+
+		</section>
+
+	</section>
+	
+	<section id="Cluster_Administration-Setting_Up_a_PROD_LVS_Cluster-Saving_Network_Packet_Filter_Settings">
+		<title>Saving Network Packet Filter Settings</title>
+		<para>
+			After configuring the appropriate network packet filters for your situation, save the settings so they get restored after a reboot. For <command>iptables</command>, type the following command:
+		</para>
+<screen><command>/sbin/service iptables save</command></screen>
+		<para>
+			This saves the settings in <filename>/etc/sysconfig/iptables</filename> so they can be recalled at boot time.
+		</para>
+		<para>
+			Once this file is written, you are able to use the <command>/sbin/service</command> command to start, stop, and check the status (using the status switch) of <command>iptables</command>. The <command>/sbin/service</command> will automatically load the appropriate module for you. For an example of how to use the <command>/sbin/service</command> command, see <xref linkend="Cluster_Administration-Initial_LVS_Configuration-Starting_the_PIRANHA_Service" />.
+		</para>
+		<para>
+			Finally, you need to be sure the appropriate service is set to activate on the proper runlevels. For more on this, see <xref linkend="Cluster_Administration-Initial_LVS_Configuration-Configuring_Services_on_the_LVS_Routers" />.
+		</para>
+		<para>
+			The next chapter explains how to use the <application>&PIRANHA;</application> to configure the LVS router and describe the steps necessary to active an LVS cluster.
+		</para>
+	</section>
+
+</chapter>
+
