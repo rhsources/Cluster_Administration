@@ -1,0 +1,78 @@
+<?xml version='1.0'?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<preface id="ch-intro"><title>Introduction</title>
+<indexterm>
+	
+	<primary>introduction</primary>
+</indexterm>
+<para>
+	 This document provides information about installing, configuring and managing &RH; Cluster components. &RH; Cluster components are part of &RHCS; and allow you to connect a group of computers (called <firstterm>nodes</firstterm> or <firstterm>members</firstterm>) to work together as a cluster. This document does not include information about installing, configuring, and managing Linux Virtual Server (LVS) software. Information about that is in a separate document. 
+</para>
+<para>
+	 The audience of this document should have advanced working knowledge of &PROD; and understand the concepts of clusters, storage, and server computing. 
+</para>
+<section id="s1-cluster-howtouse">
+	<title>How To Use This Manual</title>
+	<indexterm>
+		
+		<primary>introduction</primary>
+		<secondary>how to use this manual</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>how to use this manual</primary>
+	</indexterm>
+	<para>
+		 This manual contains information about setting up a &RH; Cluster. These tasks are described in the following chapters: 
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="ch-overview" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="ch-config-scc" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="ch-mgmt-scc" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="ch-httpd-service" />
+			</para>
+		</listitem>
+	</itemizedlist>
+</section>
+<xi:include href="Common_Content/Conventions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+<section id="s1-intro-more-to-come">
+	<title>More to Come</title>
+	<section id="s2-intro-feedback">
+		<title>Send in Your Feedback</title>
+		<indexterm>
+			
+			<primary>feedback</primary>
+		</indexterm>
+		<para>
+			 If you spot a typo, or if you have thought of a way to make this manual better, we would love to hear from you. Please submit a report in Bugzilla (<ulink url="http://bugzilla.redhat.com/bugzilla/">http://bugzilla.redhat.com/bugzilla/</ulink>) against the component <computeroutput>&RHCSGS;</computeroutput>. 
+		</para>
+		<para>
+			 Be sure to mention the manual's identifier: 
+		</para>
+		<screen>rh-cs(EN)-5 (2007-01-23T09:05)</screen><para>
+			 By mentioning this manual's identifier, we know exactly which version of the guide you have. 
+		</para>
+		<para>
+			 If you have a suggestion for improving the documentation, try to be as specific as possible. If you have found an error, please include the section number and some of the surrounding text so we can find it easily. 
+		</para>
+	</section>
+</section>
+</preface>

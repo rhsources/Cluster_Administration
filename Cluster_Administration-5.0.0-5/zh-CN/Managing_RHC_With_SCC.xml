@@ -1,0 +1,428 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<chapter id="ch-mgmt-scc">
+	<title>Managing &RH; Cluster With <command>system-config-cluster</command></title>
+	<indexterm>
+		
+		<primary>cluster administration</primary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>cluster</primary>
+		<secondary>administration</secondary>
+	</indexterm>
+	<para>
+		 This chapter describes various administrative tasks for managing a &RH; Cluster and consists of the following sections: 
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				<xref linkend="s1-admin-modify" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="s1-admin-backup" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="s1-admin-update" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="s1-admin-name" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="s1-admin-disable" />
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				<xref linkend="s1-admin-problems" />
+			</para>
+		</listitem>
+	</itemizedlist>
+	<section id="s1-admin-start">
+		<title>Starting and Stopping the Cluster Software</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>starting and stopping the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster software</primary>
+			<secondary>starting and stopping</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>System V <filename>init</filename></primary>
+		</indexterm>
+		<para>
+			 To start the cluster software on a member, type the following commands in this order: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service ccsd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service cman start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs start</command>					, if you are using &RHGFS; 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service rgmanager start</command>
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			 To stop the cluster software on a member, type the following commands in this order: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service rgmanager stop</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs stop</command>					, if you are using &RHGFS; 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd stop</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced stop</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service cman stop</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service ccsd stop</command>
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			 Stopping the cluster services on a member causes its services to fail over to an active member. 
+		</para>
+	</section>
+	<section id="s1-admin-modify">
+		<title>Modifying the Cluster Configuration</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>modifying the cluster configuration</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster configuration</primary>
+			<secondary>modifying</secondary>
+		</indexterm>
+		<para>
+			 To modify the cluster configuration (the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>), use the <application>&RHCLUSTERTOOL;</application>. For more information about using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="ch-config-scc" />. 
+		</para>
+		<warning><title>Warning</title>
+		<para>
+			 Do not manually edit the contents of the <filename>/etc/cluster/cluster.conf</filename> file without guidance from an authorized &RH; representative or unless you fully understand the consequences of editing the <filename>/etc/cluster/cluster.conf</filename> file manually. 
+		</para>
+		</warning><important><title>Important</title>
+		<para>
+			 Although the <application>&RHCLUSTERTOOL;</application> provides a <guilabel>Quorum Votes</guilabel> parameter in the <guilabel>Properties</guilabel> dialog box of each cluster member, that parameter is intended <emphasis>only</emphasis> for use during initial cluster configuration. Furthermore, it is recommended that you retain the default <guilabel>Quorum Votes</guilabel> value of 
+			<userinput>1</userinput>. For more information about using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="ch-config-scc" />. 
+		</para>
+		</important>
+		<para>
+			 To edit the cluster configuration file, click the <guilabel>Cluster Configuration</guilabel> tab in the cluster configuration GUI. Clicking the <guilabel>Cluster Configuration</guilabel> tab displays a graphical representation of the cluster configuration. Change the configuration file according the the following steps: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 Make changes to cluster elements (for example, create a service). 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Propagate the updated configuration file throughout the cluster by clicking <guibutton>Send to Cluster</guibutton>. 
+				</para>
+				<note>
+					<title>Note</title>
+					<para>
+						 The <application>&RHCLUSTERTOOL;</application> does not display the <guibutton>Send to Cluster</guibutton> button if the cluster is new and has not been started yet, or if the node from which you are running the <application>&RHCLUSTERTOOL;</application> is not a member of the cluster. If the <guibutton>Send to Cluster</guibutton> button is not displayed, you can still use the <application>&RHCLUSTERTOOL;</application>; however, you cannot propagate the configuration. You can still <emphasis>save</emphasis> the configuration file. For information about using the <application>&RHCLUSTERTOOL;</application> for a new cluster configuration, refer to <xref linkend="ch-config-scc" />. 
+					</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>Send to Cluster</guibutton> causes a <guilabel>Warning</guilabel> dialog box to be displayed. Click <guibutton>Yes</guibutton> to save and propagate the configuration. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>Yes</guibutton> causes an <guilabel>Information</guilabel> dialog box to be displayed, confirming that the current configuration has been propagated to the cluster. Click <guibutton>OK</guibutton>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Click the <guilabel>Cluster Management</guilabel> tab and verify that the changes have been propagated to the cluster members. 
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-admin-backup">
+		<title>Backing Up and Restoring the Cluster Database</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>backing up the cluster database</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster database</primary>
+			<secondary>backing up</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>restoring the cluster database</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster database</primary>
+			<secondary>restoring</secondary>
+		</indexterm>
+		<para>
+			 The <application>&RHCLUSTERTOOL;</application> automatically retains backup copies of the three most recently used configuration files (besides the currently used configuration file). Retaining the backup copies is useful if the cluster does not function correctly because of misconfiguration and you need to return to a previous working configuration. 
+		</para>
+		<para>
+			 Each time you save a configuration file, the <application>&RHCLUSTERTOOL;</application> saves backup copies of the three most recently used configuration files as <filename>/etc/cluster/cluster.conf.bak.1</filename>, <filename>/etc/cluster/cluster.conf.bak.2</filename>, and <filename>/etc/cluster/cluster.conf.bak.3</filename>. The backup file <filename>/etc/cluster/cluster.conf.bak.1</filename> is the newest backup, <filename>/etc/cluster/cluster.conf.bak.2</filename> is the second newest backup, and <filename>/etc/cluster/cluster.conf.bak.3</filename> is the third newest backup. 
+		</para>
+		<para>
+			 If a cluster member becomes inoperable because of misconfiguration, restore the configuration file according to the following steps: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 At the <application>&RHCLUSTERTOOL;</application> tab of the &RHCS; management GUI, click <guimenu>File</guimenu>= &gt; <guimenuitem>Open</guimenuitem>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guilabel>File = &gt; Open</guilabel> causes the <guilabel>system-config-cluster</guilabel> dialog box to be displayed. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 At the the <guilabel>system-config-cluster</guilabel> dialog box, select a backup file (for example, <filename>/etc/cluster/cluster.conf.bak.1</filename>). Verify the file selection in the <guilabel>Selection</guilabel> box and click <guibutton>OK</guibutton>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Increment the configuration version beyond the current working version number as follows: 
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							 Click <guilabel>Cluster</guilabel>= &gt; <guilabel>Edit Cluster Properties</guilabel>. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							 At the <guilabel>Cluster Properties</guilabel> dialog box, change the <guilabel>Config Version</guilabel> value and click <guibutton>OK</guibutton>. 
+						</para>
+					</listitem>
+				</orderedlist>
+			</listitem>
+			<listitem>
+				<para>
+					 Click <guimenu>File</guimenu>= &gt; <guimenuitem>Save As</guimenuitem>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guimenu>File</guimenu>= &gt; <guimenuitem>Save As</guimenuitem> causes the <guilabel>system-config-cluster</guilabel> dialog box to be displayed. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 At the the <guilabel>system-config-cluster</guilabel> dialog box, select <filename>/etc/cluster/cluster.conf</filename> and click <guibutton>OK</guibutton>. (Verify the file selection in the <guilabel>Selection</guilabel> box.) 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>OK</guibutton> causes an <guilabel>Information</guilabel> dialog box to be displayed. At that dialog box, click <guibutton>OK</guibutton>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Propagate the updated configuration file throughout the cluster by clicking <guibutton>Send to Cluster</guibutton>. 
+				</para>
+				<note>
+					<title>Note</title>
+					<para>
+						 The <application>&RHCLUSTERTOOL;</application> does not display the <guibutton>Send to Cluster</guibutton> button if the cluster is new and has not been started yet, or if the node from which you are running the <application>&RHCLUSTERTOOL;</application> is not a member of the cluster. If the <guibutton>Send to Cluster</guibutton> button is not displayed, you can still use the <application>&RHCLUSTERTOOL;</application>; however, you cannot propagate the configuration. You can still <emphasis>save</emphasis> the configuration file. For information about using the <application>&RHCLUSTERTOOL;</application> for a new cluster configuration, refer to <xref linkend="ch-config-scc" />. 
+					</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>Send to Cluster</guibutton> causes a <guilabel>Warning</guilabel> dialog box to be displayed. Click <guibutton>Yes</guibutton> to propagate the configuration. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Click the <guilabel>Cluster Management</guilabel> tab and verify that the changes have been propagated to the cluster members. 
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-admin-update">
+		<title>Updating the Cluster Software</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>updating the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster software</primary>
+			<secondary>updating</secondary>
+		</indexterm>
+		<para>
+			 For information about updating the cluster software, contact an authorized Red Hat support representative. 
+		</para>
+	</section>
+	<section id="s1-admin-name">
+		<title>Changing the Cluster Name</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>changing the cluster name</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>name, changing</secondary>
+		</indexterm>
+		<para>
+			 Although the <application>&RHCLUSTERTOOL;</application> provides a <guilabel>Cluster Properties</guilabel> dialog box with a cluster <guilabel>Name</guilabel> parameter, the parameter is intended <emphasis>only</emphasis> for use during initial cluster configuration. The only way to change the name of a &RH; cluster is to create a new cluster with the new name. For more information about using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="ch-config-scc" />. 
+		</para>
+	</section>
+	<section id="s1-admin-disable">
+		<title>Disabling the Cluster Software</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>disabling the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>disabling the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster software</primary>
+			<secondary>disabling</secondary>
+		</indexterm>
+		<para>
+			 It may become necessary to temporarily disable the cluster software on a cluster member. For example, if a cluster member experiences a hardware failure, you may want to reboot that member, but prevent it from rejoining the cluster to perform maintenance on the system. 
+		</para>
+		<para>
+			 Use the <command>/sbin/chkconfig</command> command to stop the member from joining the cluster at boot-up as follows: 
+		</para>
+		<screen><command>chkconfig --level 2345 rgmanager off</command><command>chkconfig --level 2345 gfs off</command><command>chkconfig --level 2345 clvmd off</command><command>chkconfig --level 2345 fenced off</command><command>chkconfig --level 2345 cman off</command><command>chkconfig --level 2345 ccsd off</command></screen><para>
+			 Once the problems with the disabled cluster member have been resolved, use the following commands to allow the member to rejoin the cluster: 
+		</para>
+		<screen><command>chkconfig --level 2345 rgmanager on</command><command>chkconfig --level 2345 gfs on</command><command>chkconfig --level 2345 clvmd on</command><command>chkconfig --level 2345 fenced on</command><command>chkconfig --level 2345 cman on</command><command>chkconfig --level 2345 ccsd on</command></screen><para>
+			 You can then reboot the member for the changes to take effect or run the following commands in the order shown to restart cluster software: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service ccsd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service cman start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs start</command>					, if you are using &RHGFS; 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service rgmanager start</command>
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-admin-problems">
+		<title>Diagnosing and Correcting Problems in a Cluster</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>diagnosing and correcting problems in a cluster</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>diagnosing and correcting problems</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>troubleshooting</primary>
+			<secondary>diagnosing and correcting problems in a cluster</secondary>
+		</indexterm>
+		<para>
+			 For information about diagnosing and correcting problems in a cluster, contact an authorized Red Hat support representative. 
+		</para>
+	</section>
+</chapter>
+

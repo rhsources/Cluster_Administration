@@ -1,0 +1,79 @@
+<!-- $Id: rhn-entities.ent,v 1.5 2006/11/09 00:38:18 jfearn Exp $ -->
+
+<!-- This is the entities file unique to the RHN service line. -->
+<!-- It supplements the regular rh-sgml/rh-entities.sgml file. -->
+
+<!-- *************** General Service Name and Version *************** -->
+<!ENTITY RHN "Red Hat Network"> <!-- the Red Hat Network service -->
+<!ENTITY RHNVER "4.1.5"> <!-- the Red Hat Network service version -->
+<!ENTITY RHNX "RHN"> <!-- the abbreviation -->
+
+<!-- *************** General Entities *************** -->
+<!ENTITY BC "Update"> <!-- the Update entitlement level -->
+<!ENTITY ENT "Management"> <!-- the Management entitlement level -->
+<!ENTITY ENONLY "Management RHN"> <!-- To be used on exclusive screenshots -->
+<!ENTITY PRO "Provisioning"> <!-- the Provisioning entitlement level -->
+<!ENTITY MON "Monitoring"> <!-- the Monitoring entitlement level -->
+<!ENTITY OA "Organization Administrator"> <!-- master RHN administrator role -->
+<!ENTITY CA "Channel Administrator"> <!-- Channel Administrator role -->
+<!ENTITY AKA "Activation Key Administrator"> <!-- Activation Key Administrator role -->
+<!ENTITY SGA "System Group Administrator"> <!-- System Group Administrator account -->
+<!ENTITY CFA "Configuration Administrator"> <!-- Configuration Administrator account -->
+<!ENTITY MA "&MON; Administrator"> <!-- Monitoring Administrator account -->
+<!ENTITY SSM "System Set Manager"> <!-- the multi-system management interface -->
+<!ENTITY RHELAS "&RHEL; AS"> <!-- The "unbreakable" operating system -->
+<!ENTITY RHLAS "&RH; Linux Advanced Server"> <!-- The Advanced Server os -->
+<!ENTITY RHELAS21 "&RHEL; AS 2.1 Update 5"> <!-- supported base OS version -->
+<!ENTITY RHELAS3 "&RHEL; AS 3 Update 5"> <!-- supported base OS version -->
+<!ENTITY RHELAS4 "&RHEL; AS 4"> <!-- supported base OS version -->
+<!ENTITY RHLASVER "2.1"> <!-- RHELAS version -->
+<!ENTITY APACHE "Apache HTTP Server"> <!-- the server used by Proxy and Satellite -->
+<!ENTITY CA "certificate authority"> <!-- the SSL certificate authority -->
+<!ENTITY UNIX "UNIX Support"> <!-- UNIX Support documentation -->
+
+<!-- *************** RHN Applications *************** -->
+<!ENTITY RHNRC "<application>Red Hat Network Registration Client</application>"> <!-- the original reg. client -->
+<!ENTITY RHUA "<application>Red Hat Update Agent</application>"> <!-- the update and reg. client -->
+<!ENTITY RHNCC "<application>Red Hat Network Configuration Client</application>"> <!-- the client config tool -->
+<!ENTITY RHNCM "<application>Red Hat Network Configuration Manager</application>"> <!-- the central config management tool -->
+<!ENTITY RHNAC "<application>Red Hat Network Actions Control</application>"> <!-- enabling and disabling config management per system... tool -->
+<!ENTITY RHNAPPLET "<application>RHN Alert Notification Tool</application>"> <!-- the RHN applet -->
+<!ENTITY RHND "<application>Red Hat Network Daemon</application>"> <!-- the RHN service daemon -->
+<!ENTITY RHNMD "<application>Red Hat Network Monitoring Daemon</application>"> <!-- the RHN monitoring daemon -->
+
+<!-- *************** RHN Satellite Server Entities *************** -->
+<!ENTITY SAT "RHN Satellite Server"> <!-- the RHN Satellite Server product -->
+<!ENTITY SATX "Satellite"> <!-- the Satellite abbreviation -->
+<!ENTITY EMB "Embedded Database"> <!-- the Embedded DB RHN Satellite Server product -->
+<!ENTITY STAN "Stand-Alone Database"> <!-- the standard RHN Satellite Server product -->
+<!ENTITY SATVER "4.1.5"> <!-- Satellite version -->
+<!ENTITY RHNPUSH "RHN Push"> <!-- the Satellite package loader -->
+<!ENTITY RHNSST "RHN Satellite Synchronization Tool"> <!-- RHN sat sync -->
+<!ENTITY RHNSE "RHN Satellite Exporter"> <!-- rhn-satellite-exporter -->
+<!ENTITY RHNTE "RHN Task Engine"> <!-- the RHN Task Engine (taskomatic) -->
+<!ENTITY RHNDB "RHN DB Control"> <!-- the RHN DB tool (db-control) -->
+<!ENTITY RHNSA "RHN Satellite Activate"> <!-- the RHN Satellite cert. activate tool -->
+<!ENTITY RHNSMT "RHN SSL Maintenance Tool"> <!-- RHN SSL keys and certs. -->
+<!ENTITY RHNBT "RHN Bootstrap"> <!-- RHN Bootstrap script generator -->
+<!ENTITY SMPM "<command>solaris2mpm</command>"> <!-- The solaris2mpm command -->
+<!ENTITY SIG "<citetitle>&SAT; &SATVER; Installation Guide</citetitle>">
+
+<!-- *************** RHN Proxy Server Entities *************** -->
+<!ENTITY PROXY "RHN Proxy Server"> <!-- the RHN Proxy Server product -->
+<!ENTITY PROXYX "Proxy"> <!-- the Proxy abbreviation -->
+<!ENTITY PROXYVER "4.1.5"> <!-- Proxy version -->
+<!ENTITY BROKER "RHN Proxy Broker Server"> <!-- the Broker component of Proxy -->
+<!ENTITY REDIRECT "RHN SSL Redirect Server"> <!-- the Redirect component of Proxy -->
+<!ENTITY CACHE "HTTP Proxy Caching Server"> <!-- the caching component of Proxy -->
+<!ENTITY RHNAUTHD "RHN Authentication Daemon"> <!-- the auth daemon of Proxy -->
+<!ENTITY RHNPM "RHN Package Manager"> <!-- the Proxy package loader -->
+
+<!-- ********************** RHN Books ************************ -->
+<!ENTITY PROXYG "&RHN; &PROXYVER; &PROXYX; Guide"> <!-- Proxy Guide -->
+<!ENTITY PROXYIG "&RHN; &PROXYVER; &PROXYX; &IG;"> <!-- Proxy Guide + Installation -->
+<!-- if Installation is deprecated, make PROXYIG point at PROXYG, then refactor -->
+<!ENTITY SATG "&RHN; &SATVER; &SATX; Guide"> <!-- Satellite Guide -->
+<!ENTITY SATIG "&RHN; &SATVER; &SATX; &IG;"> <!-- Satellite Guide + Installation -->
+<!-- if Installation is deprecated, make SATIG point at SATG, then refactor -->
+<!ENTITY RHNCLIENTCONF "&RHN; Client Configuration Guide">
+<!ENTITY RHNRG "&RHN; &RG;"> <!-- RHN Reference Guide -->

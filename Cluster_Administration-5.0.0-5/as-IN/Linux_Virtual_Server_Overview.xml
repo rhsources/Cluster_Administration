@@ -1,0 +1,495 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<chapter id="ch-lvs-overview">
+	<title>Linux Virtual Server Overview</title>
+	<indexterm>
+		
+		<primary>LVS</primary>
+		<secondary>overview of</secondary>
+	</indexterm>
+	<para>
+		&PROD; LVS clustering uses a Linux machine called the <firstterm>active router</firstterm> to send requests from the Internet to a pool of servers. To accomplish this, LVS clusters consist of two basic machine classifications &amp;mdash; the LVS routers (one active and one backup) and a pool of real servers which provide the critical services. 
+	</para>
+	<para>
+		 The active router serves two roles in the cluster: 
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				 To balance the load on the real servers. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 To check the integrity of the services on each of the real servers. 
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		 The backup router's job is to monitor the active router and assume its role in the event of failure. 
+	</para>
+	<section id="s1-lvs-basic">
+		<title>A Basic LVS Configuration</title>
+		<para>
+			<xref linkend="gr-lvs-basic" />			shows a simple LVS cluster consisting of two layers. On the first layer are two LVS routers &amp;mdash; one active and one backup. Each of the LVS routers has two network interfaces, one interface on the Internet and one on the private network, enabling them to regulate traffic between the two networks. For this example the active router is using <firstterm>Network Address Translation</firstterm> or <firstterm>NAT</firstterm> to direct traffic from the Internet to a variable number of real servers on the second layer, which in turn provide the necessary services. Therefore, the real servers in this example are connected to a dedicated private network segment and pass all public traffic back and forth through the active LVS router. To the outside world, the server cluster appears as one entity. 
+		</para>
+		<figure id="gr-lvs-basic">
+			<title>A Basic LVS Configuration</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/typical-lvs.png" />
+				</imageobject>
+				<textobject><para>
+					 A Basic LVS Configuration 
+				</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			 Service requests arriving at the LVS cluster are addressed to a <firstterm>virtual IP</firstterm> address or VIP. This is a publicly-routable address the administrator of the site associates with a fully-qualified domain name, such as www.example.com, and which is assigned to one or more <firstterm>virtual server</firstterm><footnote><para>
+				 A virtual server is a service configured to listen on a specific virtual IP. Refer to <xref linkend="s1-piranha-virtservs" /> for more on configuring a virtual server using the <application>&PIRANHA;</application>. 
+			</para>
+			</footnote>. Note that a VIP address migrates from one LVS router to the other during a failover, thus maintaining a presence at that IP address, also known as <emphasis>floating IP addresses</emphasis>. 
+		</para>
+		<para>
+			 VIP addresses may be aliased to the same device which connects the LVS router to the Internet. For instance, if eth0 is connected to the Internet, than multiple virtual servers can be aliased to <filename>eth0:1</filename>. Alternatively, each virtual server can be associated with a separate device per service. For example, HTTP traffic can be handled on <filename>eth0:1</filename>, and FTP traffic can be handled on <filename>eth0:2</filename>. 
+		</para>
+		<para>
+			 Only one LVS router is active at a time. The role of the active router is to redirect service requests from virtual IP addresses to the real servers. The redirection is based on one of eight supported load-balancing algorithms described further in <xref linkend="s1-lvs-scheduling" />. 
+		</para>
+		<para>
+			 The active router also dynamically monitors the overall health of the specific services on the real servers through simple <firstterm>send/expect scripts</firstterm>. To aid in detecting the health of services that require dynamic data, such as HTTPS or SSL, the administrator can also call external executables. If a service on a real server malfunctions, the active router stops sending jobs to that server until it returns to normal operation. 
+		</para>
+		<para>
+			 The backup router performs the role of a standby system. Periodically, the LVS routers exchange heartbeat messages through the primary external public interface and, in a failover situation, the private interface. Should the backup node fail to receive a heartbeat message within an expected interval, it initiates a failover and assumes the role of the active router. During failover, the backup router takes over the VIP addresses serviced by the failed router using a technique known as <firstterm>ARP spoofing</firstterm>&amp;mdash; where the backup LVS router announces itself as the destination for IP packets addressed to the failed node. When the failed node returns to active service, the backup node assumes its hot-backup role again. 
+		</para>
+		<para>
+			 The simple, two-layered configuration used in <xref linkend="gr-lvs-basic" /> is best for clusters serving data which does not change very frequently &amp;mdash; such as static webpages &amp;mdash; because the individual real servers do not automatically sync data between each node. 
+		</para>
+		<section id="s2-lvs-rsync">
+			<title>Data Replication and Data Sharing Between Real Servers</title>
+			<indexterm>
+				
+				<primary>LVS</primary>
+				<secondary>date replication, real servers</secondary>
+			</indexterm>
+			<indexterm>
+				
+				<primary>LVS</primary>
+				<secondary>shared data</secondary>
+			</indexterm>
+			<para>
+				 Since there is no built-in component in LVS clustering to share the same data between the real servers, the administrator has two basic options: 
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						 Synchronize the data across the real server pool 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 Add a third layer to the topology for shared data access 
+					</para>
+				</listitem>
+			</itemizedlist>
+			<para>
+				 The first option is preferred for servers that do not allow large numbers of users to upload or change data on the real servers. If the cluster allows large numbers of users to modify data, such as an e-commerce website, adding a third layer is preferable. 
+			</para>
+			<section id="s3-lvs-rsync">
+				<title>Configuring Real Servers to Synchronize Data</title>
+				<para>
+					 There are many ways an administrator can choose to synchronize data across the pool of real servers. For instance, shell scripts can be employed so that if a Web engineer updates a page, the page is posted to all of the servers simultaneously. Also, the cluster administrator can use programs such as <command>rsync</command> to replicate changed data across all nodes at a set interval. 
+				</para>
+				<para>
+					 However, this type of data synchronization does not optimally function if the cluster is overloaded with users constantly uploading files or issuing database transactions. For a cluster with a high load, a <firstterm>three-tiered topology</firstterm> is the ideal solution. 
+				</para>
+			</section>
+		</section>
+	</section>
+	<section id="s1-lvs-cm">
+		<title>A Three Tiered LVS Configuration</title>
+		<indexterm>
+			
+			<primary>LVS</primary>
+			<secondary>three tiered</secondary>
+			<tertiary>&RHCM;</tertiary>
+		</indexterm>
+		<para>
+			<xref linkend="gr-lvs-cm" />			shows a typical three tiered LVS cluster topology. In this example, the active LVS router routes the requests from the Internet to the pool of real servers. Each of the real servers then accesses a shared data source over the network. 
+		</para>
+		<figure id="gr-lvs-cm">
+			<title>A Three Tiered LVS Configuration</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/lvs-three-layer.png" />
+				</imageobject>
+				<textobject><para>
+					 A Three Tiered LVS Configuration 
+				</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			 This configuration is ideal for busy FTP servers, where accessible data is stored on a central, highly available server and accessed by each real server via an exported NFS directory or Samba share. This topography is also recommended for websites that access a central, highly available database for transactions. Additionally, using an active-active configuration with &RHCM;, administrators can configure one high-availability cluster to serve both of these roles simultaneously. 
+		</para>
+		<para>
+			 The third tier in the above example does not have to use &RHCM;, but failing to use a highly available solution would introduce a critical single point of failure. 
+		</para>
+	</section>
+	<section id="s1-lvs-scheduling">
+		<title>LVS Scheduling Overview</title>
+		<indexterm>
+			
+			<primary>LVS</primary>
+			<secondary>job scheduling</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>LVS</primary>
+			<secondary>scheduling, job</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>job scheduling, LVS</primary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>scheduling, job (LVS)</primary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>round robin</primary><see>job scheduling, LVS</see>
+		</indexterm>
+		<indexterm>
+			
+			<primary>weighted round robin</primary><see>job scheduling, LVS</see>
+		</indexterm>
+		<indexterm>
+			
+			<primary>least connections</primary><see>job scheduling, LVS</see>
+		</indexterm>
+		<indexterm>
+			
+			<primary>weighted least connections</primary><see>job scheduling, LVS</see>
+		</indexterm>
+		<para>
+			 One of the advantages of using an LVS cluster is its ability to perform flexible, IP-level load balancing on the real server pool. This flexibility is due to the variety of scheduling algorithms an administrator can choose from when configuring a cluster. LVS load balancing is superior to less flexible methods, such as <firstterm>Round-Robin DNS</firstterm> where the hierarchical nature of DNS and the caching by client machines can lead to load imbalances. Additionally, the low-level filtering employed by the LVS router has advantages over application-level request forwarding because balancing loads at the network packet level causes minimal computational overhead and allows for greater scalability. 
+		</para>
+		<para>
+			 Using scheduling, the active router can take into account the real servers' activity and, optionally, an administrator-assigned <firstterm>weight</firstterm> factor when routing service requests. Using assigned weights gives arbitrary priorities to individual machines. Using this form of scheduling, it is possible to create a group of real servers using a variety of hardware and software combinations and the active router can evenly load each real server. 
+		</para>
+		<para>
+			 The scheduling mechanism for an LVS cluster is provided by a collection of kernel patches called <firstterm>IP Virtual Server</firstterm> or <firstterm>IPVS</firstterm> modules. These modules enable <firstterm>layer 4</firstterm>(<firstterm>L4</firstterm>) transport layer switching, which is designed to work well with multiple servers on a single IP address. 
+		</para>
+		<para>
+			 To track and route packets to the real servers efficiently, IPVS builds an <firstterm>IPVS table</firstterm> in the kernel. This table is used by the active LVS router to redirect requests from a virtual server address to and returning from real servers in the pool. The IPVS table is constantly updated by a utility called <firstterm>ipvsadm</firstterm>&amp;mdash; adding and removing cluster members depending on their availability. 
+		</para>
+		<section id="s2-lvs-sched">
+			<title>Scheduling Algorithms</title>
+			<para>
+				 The structure that the IPVS table takes depends on the scheduling algorithm that the administrator chooses for any given virtual server. To allow for maximum flexibility in the types of services you can cluster and how these services are scheduled, &PROD; provides the following scheduling algorithms listed below. For instructions on how to assign scheduling algorithms refer to <xref linkend="s2-piranha-virtserv-sub" />. 
+			</para>
+			<variablelist>
+				<varlistentry><term><emphasis>Round-Robin Scheduling</emphasis></term><listitem>
+					<para>
+						 Distributes each request sequentially around the pool of real servers. Using this algorithm, all the real servers are treated as equals without regard to capacity or load. This scheduling model resembles round-robin DNS but is more granular due to the fact that it is network-connection based and not host-based. LVS round-robin scheduling also does not suffer the imbalances caused by cached DNS queries. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Weighted Round-Robin Scheduling</emphasis></term><listitem>
+					<para>
+						 Distributes each request sequentially around the pool of real servers but gives more jobs to servers with greater capacity. Capacity is indicated by a user-assigned weight factor, which is then adjusted upward or downward by dynamic load information. Refer to <xref linkend="s2-lvs-sched-weight" /> for more on weighting real servers. 
+					</para>
+					<para>
+						 Weighted round-robin scheduling is a preferred choice if there are significant differences in the capacity of real servers in the pool. However, if the request load varies dramatically, the more heavily weighted server may answer more than its share of requests. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Least-Connection</emphasis></term><listitem>
+					<para>
+						 Distributes more requests to real servers with fewer active connections. Because it keeps track of live connections to the real servers through the IPVS table, least-connection is a type of dynamic scheduling algorithm, making it a better choice if there is a high degree of variation in the request load. It is best suited for a real server pool where each member node has roughly the same capacity. If a group of servers have different capabilities, weighted least-connection scheduling is a better choice. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Weighted Least-Connections (default)</emphasis></term><listitem>
+					<para>
+						 Distributes more requests to servers with fewer active connections relative to their capacities. Capacity is indicated by a user-assigned weight, which is then adjusted upward or downward by dynamic load information. The addition of weighting makes this algorithm ideal when the real server pool contains hardware of varying capacity. Refer to <xref linkend="s2-lvs-sched-weight" /> for more on weighting real servers. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Locality-Based Least-Connection Scheduling</emphasis></term><listitem>
+					<para>
+						 Distributes more requests to servers with fewer active connections relative to their destination IPs. This algorithm is designed for use in a proxy-cache server cluster. It routes the packets for an IP address to the server for that address unless that server is above its capacity and has a server in its half load, in which case it assigns the IP address to the least loaded real server. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Locality-Based Least-Connection Scheduling with Replication Scheduling</emphasis></term><listitem>
+					<para>
+						 Distributes more requests to servers with fewer active connections relative to their destination IPs. This algorithm is also designed for use in a proxy-cache server cluster. It differs from Locality-Based Least-Connection Scheduling by mapping the target IP address to a subset of real server nodes. Requests are then routed to the server in this subset with the lowest number of connections. If all the nodes for the destination IP are above capacity, it replicates a new server for that destination IP address by adding the real server with the least connections from the overall pool of real servers to the subset of real servers for that destination IP. The most loaded node is then dropped from the real server subset to prevent over-replication. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Destination Hash Scheduling</emphasis></term><listitem>
+					<para>
+						 Distributes requests to the pool of real servers by looking up the destination IP in a static hash table. This algorithm is designed for use in a proxy-cache server cluster. 
+					</para>
+				</listitem>
+				</varlistentry><varlistentry><term><emphasis>Source Hash Scheduling</emphasis></term><listitem>
+					<para>
+						 Distributes requests to the pool of real servers by looking up the source IP in a static hash table. This algorithm is designed for LVS routers with multiple firewalls. 
+					</para>
+				</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+		<section id="s2-lvs-sched-weight">
+			<title>Server Weight and Scheduling</title>
+			<para>
+				 The administrator of an LVS cluster can assign a <firstterm>weight</firstterm> to each node in the real server pool. This weight is an integer value which is factored into any <emphasis>weight-aware</emphasis> scheduling algorithms (such as weighted least-connections) and helps the LVS router more evenly load hardware with different capabilities. 
+			</para>
+			<para>
+				 Weights work as a ratio relative to one another. For instance, if one real server has a weight of 1 and the other server has a weight of 5, then the server with a weight of 5 gets 5 connections for every 1 connection the other server gets. The default value for a real server weight is 1. 
+			</para>
+			<para>
+				 Although adding weight to varying hardware configurations in a real server pool can help load-balance the cluster more efficiently, it can cause temporary imbalances when a real server is introduced to the real server pool and the virtual server is scheduled using weighted least-connections. For example, suppose there are three servers in the real server pool. Servers A and B are weighted at 1 and the third, server C, is weighted at 2. If server C goes down for any reason, servers A and B evenly distributes the abandoned load. However, once server C comes back online, the LVS router sees it has zero connections and floods the server with all incoming requests until it is on par with servers A and B. 
+			</para>
+			<para>
+				 To prevent this phenomenon, administrators can make the virtual server a <firstterm>quiesce</firstterm> server &amp;mdash; anytime a new real server node comes online, the least-connections table is reset to zero and the LVS router routes requests as if all the real servers were newly added to the cluster. 
+			</para>
+		</section>
+	</section>
+	<section id="s1-lvs-routing">
+		<title>Routing Methods</title>
+		<indexterm>
+			
+			<primary>LVS</primary>
+			<secondary>routing methods</secondary>
+			<tertiary>NAT</tertiary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>network address translation</primary><see>NAT</see>
+		</indexterm>
+		<indexterm>
+			
+			<primary>NAT</primary>
+			<secondary>routing methods, LVS</secondary>
+		</indexterm>
+		<para>
+			&PROD; uses <firstterm>Network Address Translation</firstterm> or <firstterm>NAT routing</firstterm> for LVS clustering, which allows the administrator tremendous flexibility when utilizing available hardware and integrating the cluster into an existing network. 
+		</para>
+		<section id="s2-lvs-nat">
+			<title>NAT Routing</title>
+			<para>
+				<xref linkend="gr-lvs-nat" />				, illustrates an LVS cluster utilizing NAT routing to move requests between the Internet and a private network. 
+			</para>
+			<figure id="gr-lvs-nat">
+				<title>An LVS Cluster Implemented with NAT Routing</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/nat-routing.png" />
+					</imageobject>
+					<textobject><para>
+						 An LVS Cluster Implemented with NAT Routing 
+					</para>
+					</textobject>
+				</mediaobject>
+			</figure>
+			<para>
+				 In the example, there are two NICs in the active LVS router. The NIC for the Internet has a <firstterm>real IP address</firstterm> on eth0 and has a floating IP address aliased to eth0:1. The NIC for the private network interface has a real IP address on eth1 and has a floating IP address aliased to eth1:1. In the event of failover, the virtual interface facing the Internet and the private facing virtual interface are taken-over by the backup LVS router simultaneously. All of the cluster's real servers located on the private network use the floating IP for the NAT router as their default route to communicate with the active LVS router so that their abilities to respond to requests from the Internet is not impaired. 
+			</para>
+			<para>
+				 In this example, the LVS router's public LVS floating IP address and private NAT floating IP address are aliased to two physical NICs. While it is possible to associate each floating IP address to its own physical device on the LVS router nodes, having more than two NICs is not a requirement. 
+			</para>
+			<para>
+				 Using this topography, the active LVS router receives the request and routes it to the appropriate server. The real server then processes the request and returns the packets to the LVS router which uses network address translation to replace the address of the real server in the packets with the LVS routers public VIP address. This process is called <firstterm>IP masquerading</firstterm> because the actual IP addresses of the real servers is hidden from the requesting clients. 
+			</para>
+			<para>
+				 Using this NAT routing, the real servers may be any kind of machine running various operating systems. The main disadvantage is that the LVS router may become a bottleneck in large cluster deployments because it must process outgoing as well as incoming requests. 
+			</para>
+		</section>
+	</section>
+	<section id="s1-lvs-persistance">
+		<title>Persistence and Firewall Marks</title>
+		<para>
+			 In certain situations, it may be desirable for a client to reconnect repeatedly to the same real server, rather than have an LVS load balancing algorithm send that request to the best available server. Examples of such situations include multi-screen web forms, cookies, SSL, and FTP connections. In these cases, a client may not work properly unless the transactions are being handled by the same server to retain context. LVS provides two different features to handle this: <firstterm>persistence</firstterm> and <firstterm>firewall marks</firstterm>. 
+		</para>
+		<section id="s2-lvs-persitence">
+			<title>Persistence</title>
+			<para>
+				 When enabled, persistence acts like a timer. When a client connects to a service, LVS remembers the last connection for a specified period of time. If that same client IP address connects again within that period, it is sent to the same server it connected to previously &amp;mdash; bypassing the load-balancing mechanisms. When a connection occurs outside the time window, it is handled according to the scheduling rules in place. 
+			</para>
+			<para>
+				 Persistence also allows the administrator to specify a subnet mask to apply to the client IP address test as a tool for controlling what addresses have a higher level of persistence, thereby grouping connections to that subnet. 
+			</para>
+			<para>
+				 Grouping connections destined for different ports can be important for protocols which use more than one port to communicate, such as FTP. However, persistence is not the most efficient way to deal with the problem of grouping together connections destined for different ports. For these situations, it is best to use <firstterm>firewall marks</firstterm>. 
+			</para>
+		</section>
+		<section id="s2-lve-fwmarks">
+			<title>Firewall Marks</title>
+			<para>
+				 Firewall marks are an easy and efficient way to a group ports used for a protocol or group of related protocols. For instance, if an LVS cluster is deployed to run an e-commerce site, firewall marks can be used to bundle HTTP connections on port 80 and secure, HTTPS connections on port 443. By assigning the same firewall mark to the virtual server for each protocol, state information for the transaction can be preserved because the LVS router forwards all requests to the same real server after a connection is opened. 
+			</para>
+			<para>
+				 Because of its efficiency and ease-of-use, administrators of LVS clusters should use firewall marks instead of persistence whenever possible for grouping connections. However, administrators should still add persistence to the virtual servers in conjunction with firewall marks to ensure the clients are reconnected to the same server for an adequate period of time. 
+			</para>
+		</section>
+	</section>
+	<section id="s1-lvs-block-diagram">
+		<title>LVS Cluster &amp;mdash; A Block Diagram</title>
+		<para>
+			 LVS routers use a collection of programs to monitor cluster members and cluster services. <xref linkend="gr-lvs-components" /> illustrates how these various programs on both the active and backup LVS routers work together to manage the cluster. 
+		</para>
+		<figure id="gr-lvs-components">
+			<title>Components of a Running LVS Cluster</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/components.png" />
+				</imageobject>
+				<textobject><para>
+					 Components of a Running LVS Cluster 
+				</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<para>
+			 The <command>pulse</command> daemon runs on both the active and passive LVS routers. On the backup router, <command>pulse</command> sends a <firstterm>heartbeat</firstterm> to the public interface of the active router to make sure the active router is still properly functioning. On the active router, <command>pulse</command> starts the <command>lvs</command> daemon and responds to <firstterm>heartbeat</firstterm> queries from the backup LVS router. 
+		</para>
+		<para>
+			 Once started, the <command>lvs</command> daemon calls the <command>ipvsadm</command> utility to configure and maintain the IPVS routing table in the kernel and starts a <command>nanny</command> process for each configured virtual server on each real server. Each <command>nanny</command> process checks the state of one configured service on one real server, and tells the <command>lvs</command> daemon if the service on that real server is malfunctioning. If a malfunction is detected, the <command>lvs</command> daemon instructs <command>ipvsadm</command> to remove that real server from the IPVS routing table. 
+		</para>
+		<para>
+			 If the backup router does not receive a response from the active router, it initiates failover by calling <command>send_arp</command> to reassign all virtual IP addresses to the NIC hardware addresses (<firstterm>MAC</firstterm> address) of the backup node, sends a command to the active router via both the public and private network interfaces to shut down the <command>lvs</command> daemon on the active router, and starts the <command>lvs</command> daemon on the backup node to accept requests for the configured virtual servers. 
+		</para>
+		<section id="s2-lvs-components">
+			<title>Components of an LVS Cluster</title>
+			<indexterm>
+				
+				<primary>LVS</primary>
+				<secondary>components of</secondary>
+			</indexterm>
+			<indexterm>
+				
+				<primary>components</primary>
+				<secondary>of LVS cluster</secondary>
+			</indexterm>
+			<para>
+				<xref linkend="s3-lvs-pulse" />				shows a detailed list of each software component in an LVS router. 
+			</para>
+			<section id="s3-lvs-pulse">
+				<title><command>pulse</command></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><command>pulse</command>daemon</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><command>pulse</command>daemon</primary>
+				</indexterm>
+				<para>
+					 This is the controlling process which starts all other daemons related to LVS routers. At boot time, the daemon is started by the <filename>/etc/rc.d/init.d/pulse</filename> script. It then reads the configuration file <filename>/etc/sysconfig/ha/lvs.cf</filename>. On the active router, <command>pulse</command> starts the LVS daemon. On the backup router, <command>pulse</command> determines the health of the active router by executing a simple heartbeat at a user-configurable interval. If the active router fails to respond after a user-configurable interval, it initiates failover. During failover, <command>pulse</command> on the backup router instructs the <command>pulse</command> daemon on the active router to shut down all LVS services, starts the <command>send_arp</command> program to reassign the floating IP addresses to the backup router's MAC address, and starts the <command>lvs</command> daemon. 
+				</para>
+			</section>
+			<section id="s3-lvs-lvs">
+				<title><command>lvs</command></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><command>lvs</command>daemon</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><command>lvs</command>daemon</primary>
+				</indexterm>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary>daemon</secondary>
+				</indexterm>
+				<para>
+					 The <command>lvs</command> daemon runs on the active LVS router once called by <command>pulse</command>. It reads the configuration file <filename>/etc/sysconfig/ha/lvs.cf</filename>, calls the <command>ipvsadm</command> utility to build and maintain the IPVS routing table, and assigns a <command>nanny</command> process for each configured LVS service. If <command>nanny</command> reports a real server is down, <command>lvs</command> instructs the <command>ipvsadm</command> utility to remove the real server from the IPVS routing table. 
+				</para>
+			</section>
+			<section id="s3-lvs-ipvsadm">
+				<title><command>ipvsadm</command></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><command>ipvsadm</command>program</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><command>ipvsadm</command>program</primary>
+				</indexterm>
+				<para>
+					 This service updates the IPVS routing table in the kernel. The <command>lvs</command> daemon sets up and administers an LVS cluster by calling <command>ipvsadm</command> to add, change, or delete entries in the IPVS routing table. 
+				</para>
+			</section>
+			<section>
+				<title><command>nanny</command></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><command>nanny</command>daemon</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><command>nanny</command>daemon</primary>
+				</indexterm>
+				<para>
+					 The <command>nanny</command> monitoring daemon runs on the active LVS router. Through this daemon, the active router determines the health of each real server and, optionally, monitors its workload. A separate process runs for each service defined on each real server. 
+				</para>
+			</section>
+			<section id="s3-lvs-cf">
+				<title><filename>/etc/sysconfig/ha/lvs.cf</filename></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><filename>/etc/sysconfig/ha/lvs.cf</filename>file</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><filename>/etc/sysconfig/ha/lvs.cf</filename>file</primary>
+				</indexterm>
+				<para>
+					 This is the LVS cluster configuration file. Directly or indirectly, all daemons get their configuration information from this file. 
+				</para>
+			</section>
+			<section id="s3-lvs-piranha-gui">
+				<title><application>&PIRANHA;</application></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><application>&PIRANHA;</application></secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><application>&PIRANHA;</application></primary>
+				</indexterm>
+				<para>
+					 This is the Web-based tool for monitoring, configuring, and administering an LVS cluster. This is the default tool to maintain the <filename>/etc/sysconfig/ha/lvs.cf</filename> LVS cluster configuration file. 
+				</para>
+			</section>
+			<section id="s3-lvs-send_arp">
+				<title><command>send_arp</command></title>
+				<indexterm>
+					
+					<primary>LVS</primary>
+					<secondary><command>send_arp</command>program</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary><command>send_arp</command>program</primary>
+				</indexterm>
+				<para>
+					 This program sends out ARP broadcasts when the floating IP address changes from one node to another during failover. 
+				</para>
+				<para>
+					<xref linkend="ch-initial-setup" />					reviews important post-installation configuration steps you should take before configuring &PROD; to be an LVS router. 
+				</para>
+			</section>
+		</section>
+	</section>
+</chapter>
+

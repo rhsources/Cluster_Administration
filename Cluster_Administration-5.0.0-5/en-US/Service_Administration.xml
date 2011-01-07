@@ -1,0 +1,598 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<chapter id="ch-service">
+	<title>Service Administration</title>
+	<indexterm>
+		
+		<primary>cluster services</primary>
+		<secondary>administration</secondary>
+	</indexterm>
+	<para>
+		 The following sections describe how to display, enable, disable, modify, relocate, and delete a service, and how to handle services that fail to start. Examples of setting up specific types of services are provided.
+	</para>
+	<section id="s1-service-config">
+		<title>Configuring a Service</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>configuration</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>service configuration</primary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>configuring a service</primary>
+		</indexterm>
+		<para>
+			 After setting up disk storage and installing applications to be managed by the cluster, you can configure services to manage these applications and resources by using the <application>&RHCLUSTERTOOL;</application>.
+		</para>
+		<para>
+			 To configure a service, follow these steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 If applicable, create a script to start, stop, and check the status of the application used in the service. Refer to <xref linkend="s2-service-scripts" /> for information.
+				</para>
+			</listitem>
+			<listitem id="step-gather-info">
+				<para>
+					 Gather information about service resources and properties. Refer to <xref linkend="s2-services-info" /> for information.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Set up the file systems or raw devices that the service uses. Refer to <xref linkend="s2-service-storage" /> for information.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Ensure that the application software can run on each member (in either the associated failover domain, if used, or in the cluster) and that the service script, if any, can start and stop the service application. Refer to <xref linkend="s2-service-apps" /> for upgrade instructions.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Start the <application>&RHCLUSTERTOOL;</application> and add services, specifying the information about the service resources and properties obtained in step <xref linkend="step-gather-info" />. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Save your configuration. Saving the settings on one cluster member propogates to other cluster members automatically. 
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			 For more information about adding a cluster service, refer to the following:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<xref linkend="s1-service-oracle" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="s1-service-mysql" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="s1-service-nfs" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="s1-service-samba" />
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<xref linkend="ch-httpd-service" />
+				</para>
+			</listitem>
+		</itemizedlist>
+		<section id="s2-services-info">
+			<title>Gathering Service Information</title>
+			<indexterm>
+				
+				<primary>cluster services</primary>
+				<secondary>gathering service information</secondary>
+			</indexterm>
+			<para>
+				 Before configuring a service, gather all available information about the service resources and properties. In some cases, it is possible to specify multiple resources for a service (for example, multiple IP addresses and disk devices).
+			</para>
+			<para>
+				 The service properties and resources that you can specify using the <application>&RHCLUSTERTOOL;</application> are described in <xref linkend="tb-service-info" />.
+			</para>
+			<table id="tb-service-info">
+				<title>Service Property and Resource Information</title>
+				<indexterm>
+					
+					<primary>tables</primary>
+					<secondary>service property and resource information</secondary>
+				</indexterm>
+				<indexterm>
+					
+					<primary>service property and resource information table</primary>
+				</indexterm>
+				<tgroup cols="2">
+					<colspec colname="Service" colnum="1" colwidth="1*"></colspec><colspec colname="Description" colnum="2" colwidth="6*"></colspec><thead>
+						<row>
+							<entry>
+								 Property
+							</entry>
+							<entry>
+								 Description
+							</entry>
+						</row>
+					</thead>
+					<tbody>
+						<row>
+							<entry>
+								 Service name
+							</entry>
+							<entry>
+								 Each service must have a unique name. A service name can consist of one to 63 characters and must consist of a combination of letters (either uppercase or lowercase), integers, underscores, periods, and dashes (hyphens). A service name <emphasis>must</emphasis> begin with a letter or an underscore.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								 Failover domain
+							</entry>
+							<entry>
+								<simplelist>
+									<member>Identify the members on which to run the service by associating the service with an existing failover domain.</member>
+									<member>When ordered failover is enabled, if the member on which the service is running fails, the service is automatically relocated to the next member on the ordered member list. (Order of preference is established by the sequence of member names in the failover domain list). Refer to <xref linkend="s1-config-failover-domain" />for more information.</member>
+								</simplelist>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								 Check interval
+							</entry>
+							<entry>
+								 Specifies the frequency (in seconds) that the member checks the health of the application associated with the service. For example, when you specify a nonzero check interval for an NFS or Samba service, &RHCM; verifies that the necessary NFS or Samba daemons are running. For other types of services, &RHCM; checks the return status after calling the <filename>status</filename> clause of the application service script. By default, check interval is 0, indicating that service monitoring is disabled. 
+							</entry>
+						</row>
+						<row>
+							<entry>
+								 User script
+							</entry>
+							<entry>
+								 If applicable, specify the full path name for the script that is used to start and stop the service. Refer to <xref linkend="s2-service-scripts" /> for more information.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								 IP address
+							</entry>
+							<entry>
+								<simplelist>
+									<member>One or more Internet protocol (IP) addresses may be assigned to a service. This IP address (sometimes called a &#34;floating&#34; IP address) is different from the IP address associated with the host name Ethernet interface for a member, because it is automatically relocated along with the service resources when failover occurs. If clients use this IP address to access the service, they do not know which member is running the service, and failover is transparent to the clients.</member>
+									<member>Note that cluster members must have network interface cards configured in the IP subnet of each IP address used in a service.</member>
+									<member>Netmask and broadcast addresses for each IP address can also be specified; if they are not, then the cluster uses the netmask and broadcast addresses from the network interconnect in the subnet.</member>
+								</simplelist>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								 Device special file
+							</entry>
+							<entry>
+								 Specify each shared disk partition used in a service.
+							</entry>
+						</row>
+						<row>
+							<entry>
+								 File system and sharing options
+							</entry>
+							<entry>
+								<simplelist>
+									<member>If the service uses a file system, specify the type of file system, the mount point, and any mount options. You can specify any of the standard file system mount options as described in the <citerefentry><refentrytitle>mount</refentrytitle><manvolnum>8</manvolnum></citerefentry>man page. It is not necessary to provide mount information for raw devices (if used in a service). ext2 and ext3 file systems are supported for a cluster.</member>
+									<member>Specify whether to enable forced unmount for a file system. Forced unmount allows the cluster service management infrastructure to unmount a file system prior to relocation or failover, even if the file system is busy. This is accomplished by terminating any applications that are accessing the file system.</member>
+									<member>You can also specify whether to export the file system via NFS set access permissions. Refer to <xref linkend="s1-service-nfs" />for details.</member>
+									<member>Specify whether or not to make the file system accessible to SMB clients via Samba by providing a Samba share name.</member>
+								</simplelist>
+							</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</section>
+		<section id="s2-service-scripts">
+			<title>Creating Service Scripts</title>
+			<indexterm>
+				
+				<primary>cluster services</primary>
+				<secondary>scripts, creating</secondary>
+			</indexterm>
+			<indexterm>
+				
+				<primary>scripts</primary>
+				<secondary>creating service scripts</secondary>
+			</indexterm>
+			<para>
+				 The cluster infrastructure starts and stops specified applications by running service-specific scripts. For both NFS and Samba services, the associated scripts are built into the cluster services infrastructure. Consequently, when running the <application>&RHCLUSTERTOOL;</application> to configure NFS and Samba services, leave the <guilabel>User Script</guilabel> field blank. For other application types it is necessary to designate a service script. For example, when configuring a database application, specify the fully-qualified pathname of the corresponding database start script. 
+			</para>
+			<para>
+				 The format of the service scripts conforms to the conventions followed by the System V <filename>init</filename> scripts. This convention dictates that the scripts have a <command>start</command>, <command>stop</command>, and <command>status</command> clause. These scripts should return an exit status of <computeroutput>0</computeroutput> upon successful completion. 
+			</para>
+			<para>
+				 When a service fails to start on one cluster member, &RHCM; will attempt to start the service on other cluster members. If the other cluster members fail to start the service, &RHCM; attempts to stop the service on all members. If it fails to stop the service for any reason, the cluster infrastructure will place the service in the <guilabel>Failed</guilabel> state. Administrators must then start the <application>&RHCLUSTERSTATTOOL;</application>, highlight the failed service, and click <guibutton>Disable</guibutton> before they can enable the service. 
+			</para>
+			<para>
+				 In addition to performing the stop and start functions, the script is also used for monitoring the status of an application service. This is performed by calling the <command>status</command> clause of the service script. To enable service monitoring, specify a nonzero value in the <guilabel>Check Interval</guilabel> field when specifying service properties with the <application>&RHCLUSTERTOOL;</application>. If a nonzero exit is returned by a status check request to the service script, then the cluster infrastructure first attempts to restart the application on the member it was previously running on. Status functions do not have to be fully implemented in service scripts. If no real monitoring is performed by the script, then a stub <command>status</command> clause should be present which returns success. 
+			</para>
+			<para>
+				 The operations performed within the status clause of an application can be tailored to best meet the application's needs as well as site-specific parameters. For example, a simple status check for a database would consist of verifying that the database process is still running. A more comprehensive check would consist of a database table query. 
+			</para>
+			<para>
+				 The <filename>/usr/share/cluster/doc/services/examples/</filename> directory contains a template that can be used to create service scripts, in addition to examples of scripts. Refer to <xref linkend="s1-service-oracle" />, <xref linkend="s1-service-mysql" />, <xref linkend="ch-httpd-service" />, for sample scripts. 
+			</para>
+		</section>
+		<section id="s2-service-storage">
+			<title>Configuring Service Disk Storage</title>
+			<indexterm>
+				
+				<primary>cluster services</primary>
+				<secondary>configuring service disk storage</secondary>
+			</indexterm>
+			<indexterm>
+				
+				<primary>disk storage</primary>
+				<secondary>configuring service disk storage</secondary>
+			</indexterm>
+			<para>
+				 Prior to creating a service, set up the shared file systems and raw devices that the service is to use. Refer to <xref linkend="s2-hardware-shddisk" /> for more information.
+			</para>
+			<para>
+				 If employing raw devices in a cluster service, it is possible to use the <filename>/etc/sysconfig/rawdevices</filename> file to bind the devices at boot time. Edit the file and specify the raw character devices and block devices that are to be bound each time the member boots. 
+			</para>
+			<para>
+				 Note that software RAID and host-based RAID cannot be used for shared disk storage. Only certified SCSI adapter-based RAID cards can be used for shared disk storage.
+			</para>
+			<para>
+				 You should adhere to the following <emphasis>service disk storage recommendations</emphasis>:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						 For optimal performance, use a 4 KB block size when creating file systems. Note that some of the <command>mkfs</command> file system build utilities default to a 1 KB block size, which can cause long <command>fsck</command> times.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 To facilitate quicker failover times, it is recommended that the ext3 file system be used. Refer to <xref linkend="s3-hardware-createfs" /> for more information. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 For large file systems, use the <option>nocheck</option> option to bypass code that checks all the block groups on the partition. Specifying the <option>nocheck</option> option can significantly decrease the time required to mount a large file system.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section id="s2-service-apps">
+			<title>Verifying Application Software and Service Scripts</title>
+			<indexterm>
+				
+				<primary>cluster services</primary>
+				<secondary>verifying application software and service scripts</secondary>
+			</indexterm>
+			<indexterm>
+				
+				<primary>scripts</primary>
+				<secondary>verifying application software and service scripts</secondary>
+			</indexterm>
+			<para>
+				 Prior to setting up a service, install any applications that are used in the service on each member in the cluster (or each member in the failover domain, if used). After installing the application on these members, verify that the application runs and can access shared disk storage. To prevent data corruption, do not run the application simultaneously on more than one member.
+			</para>
+			<para>
+				 If using a script to start and stop the service application, install and test the script on all cluster members, and verify that it can be used to start and stop the application. Refer to <xref linkend="s2-service-scripts" /> for more information.
+			</para>
+		</section>
+	</section>
+	<section id="s1-service-display">
+		<title>Displaying a Service Configuration</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>displaying a service configuration</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>displaying a service configuration</primary>
+		</indexterm>
+		<para>
+			 In the <application>&RHCLUSTERTOOL;</application>, the following information for a given <guilabel>&lt;service&gt;</guilabel> element is viewable directly on the <guilabel>Services</guilabel> tab (when the service configuration is fully expanded):
+		</para>
+		<figure id="fig-service-disp">
+			<title>The <guilabel>Services</guilabel>Tab</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/displayservice.png" />
+				</imageobject>
+				<textobject><para>
+					 services tab
+				</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<itemizedlist>
+			<listitem>
+				<para>
+					 Service name
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Device special file name
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Service IP address
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 NFS export and clients (if specified) for the device
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			 You can display the failover domain, check interval, and user script name for a <guilabel>&lt;service&gt;</guilabel> by accessing its properties dialog box.
+		</para>
+		<para>
+			 The Samba share name, mount point, file system type, and mount options for a service are displayed as the properties for a <guilabel>&lt;device&gt;</guilabel>. 
+		</para>
+		<para>
+			 You can view the permissions for NFS client access by displaying <guilabel>&lt;client&gt;</guilabel> properties.
+		</para>
+		<para>
+			 To display the properties for an element in the cluster configuration, use any of the following methods:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					 Double-click the element name.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Select the element name and click <guibutton>Properties</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Select the element name and choose <guimenu>File</guimenu>=&gt; <guimenuitem>Properties</guimenuitem>.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			 For instructions on configuring a service using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="s1-add-service" />.
+		</para>
+		<para>
+			 To display cluster service status, refer to <xref linkend="s1-admin-display" />.
+		</para>
+	</section>
+	<section id="s1-service-disable">
+		<title>Disabling a Service</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>disabling a service</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>disabling a service</primary>
+		</indexterm>
+		<para>
+			 A running service can be disabled to stop the service and make it unavailable. Once disabled, a service can then be re-enabled. Refer to <xref linkend="s1-service-enable" /> for information.
+		</para>
+		<para>
+			 There are several situations in which a running service may need to be disabled:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					 To modify a service&amp;mdash;A running service must be disabled before it can be modified. Refer to <xref linkend="s1-service-modify" /> for more information.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 To temporarily stop a service&amp;mdash;A running service can be disabled, making it unavailable to clients without having to completely delete the service.
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			 To disable a running service, invoke the <command>system-config-cluster</command> command to display the <application>&RHCLUSTERSTATTOOL;</application>. In the <guilabel>Services</guilabel> tab, select the service you want to disable and click <guibutton>Disable</guibutton>.
+		</para>
+	</section>
+	<section id="s1-service-enable">
+		<title>Enabling a Service</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>enabling a service</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>enabling a service</primary>
+		</indexterm>
+		<para>
+			 When you enable a disabled service, that service is started and becomes available on the specified cluster member. (You can start the service on another member by dragging the service icon <inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/up.png" />
+				</imageobject>
+			</inlinemediaobject>
+			 into the <guilabel>Members</guilabel> tab of the <application>&RHCLUSTERSTATTOOL;</application> and dropping the icon on the member icon <inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/node_up.png" />
+				</imageobject>
+			</inlinemediaobject>
+			.)
+		</para>
+		<para>
+			 To enable a stopped service, invoke the <command>system-config-cluster</command> command to display the <application>&RHCLUSTERTOOL;</application>. In the <guilabel>Services</guilabel> tab, select the service you want to enable and click <guibutton>Enable</guibutton>.
+		</para>
+	</section>
+	<section id="s1-service-modify">
+		<title>Modifying a Service</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>modifying a service</secondary>
+		</indexterm>
+		<para>
+			 You can modify the properties for a service any time after creating the service. For example, you can change the IP address or location of the user script. You can also add more resources (for example, additional file systems or IP addresses) to an existing service. Refer to <xref linkend="s2-services-info" /> for information.
+		</para>
+		<para>
+			 Using the <application>&RHCLUSTERSTATTOOL;</application>, first disable, or stop, the service before modifying its properties. If an administrator attempts to modify a running service, a warning dialog displays prompting to stop the service. Refer to <xref linkend="s1-service-disable" /> for instructions on disabling a service.
+		</para>
+		<para>
+			 Because a service is unavailable while being modified, be sure to gather all the necessary service information before disabling it to minimize service down time. In addition, back up the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>) before modifying a service; refer to <xref linkend="s1-admin-backup" />.
+		</para>
+		<para>
+			 Use the <application>&RHCLUSTERTOOL;</application> to modify the service properties, then save the configuration by choosing <guimenu>File</guimenu>=&gt; <guimenuitem>Save</guimenuitem>. After the modifications to the service have been saved, you can restart the service using the <application>&RHCLUSTERSTATTOOL;</application> to enable the modifications.
+		</para>
+	</section>
+	<section id="s1-service-relocate">
+		<title>Relocating a Service</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>relocating a service</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>relocating a service</primary>
+		</indexterm>
+		<para>
+			 In addition to providing automatic service failover, a cluster enables you to cleanly stop a service on one member and restart it on another member. This service relocation functionality allows you to perform maintenance on a cluster member while maintaining application and data availability.
+		</para>
+		<para>
+			 To relocate a service by using the <application>&RHCLUSTERSTATTOOL;</application>, drag the service icon <inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/up.png" />
+				</imageobject>
+			</inlinemediaobject>
+			 from the <guilabel>Services</guilabel> tab onto the member icon <inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="images/node_up.png" />
+				</imageobject>
+			</inlinemediaobject>
+			 in the <guilabel>Members</guilabel> tab. The &RHCM; stops the service on the member on which it was running and restarts it on the new member.
+		</para>
+	</section>
+	<section id="s1-service-delete">
+		<title>Deleting a Service</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>deleting a service</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>deleting a service</primary>
+		</indexterm>
+		<para>
+			 A cluster service can be deleted. Note that the cluster configuration file should be backed up before deleting a service. Refer to <xref linkend="s1-admin-backup" /> for information. To delete a service from the cluster, follow these steps:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 If the service is running, disable the service using the <application>&RHCLUSTERSTATTOOL;</application>(refer to <xref linkend="s1-service-disable" />).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 On the <guilabel>Services</guilabel> tab in the <application>&RHCLUSTERTOOL;</application>, select the name of the service you want to remove and click <guibutton>Delete</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 You are prompted to confirm the deletion. To remove the service, click <guibutton>OK</guibutton>.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Choose <guimenu>File</guimenu>=&gt; <guimenuitem>Save</guimenuitem> to save the change to the <filename>/etc/cluster/cluster.conf</filename> configuration file.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-service-errorstate">
+		<title>Handling Failed Services</title>
+		<indexterm>
+			
+			<primary>cluster services</primary>
+			<secondary>handling a service that fails to start</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>handling a service that fails to start</primary>
+		</indexterm>
+		<para>
+			 The cluster puts a service into the <guilabel>Failed</guilabel> state if it is unable to successfully start the service across all members and then cannot cleanly stop the service. A <guilabel>Failed</guilabel> state can be caused by various problems, such as a misconfiguration as the service is running or a service hang or crash. The <application>&RHCLUSTERSTATTOOL;</application> displays the service as being <guilabel>Failed</guilabel>.
+		</para>
+		<figure id="fig-service-failed">
+			<title>Service in <guilabel>Failed</guilabel>State</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/failedstate.png" />
+				</imageobject>
+				<textobject><para>
+					 services tab
+				</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+		<note>
+			<title>Note</title>
+			<para>
+				 You must disable a <guilabel>Failed</guilabel> service before you can modify or re-enable the service.
+			</para>
+		</note>
+		<para>
+			 Be sure to carefully handle failed services. If service resources are still configured on the owner member, starting the service on another member may cause significant problems. For example, if a file system remains mounted on the owner member, and you start the service on another member, the file system is mounted on both members, which can cause data corruption. If the enable fails, the service remains in the <guilabel>Disabled</guilabel> state.
+		</para>
+		<para>
+			 After highlighting the service and clicking <guibutton>Disable</guibutton>, you can attempt to correct the problem that caused the <guilabel>Failed</guilabel> state. After you modify the service, the cluster software enables the service on the owner member, if possible; otherwise, the service remains in the <guilabel>Disabled</guilabel> state. The following list details steps to follow in the event of service failure:
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 Modify cluster event logging to log debugging messages. Viewing the logs can help determine problem areas. Refer to <xref linkend="s1-admin-log" /> for more information.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Use the <application>&RHCLUSTERSTATTOOL;</application> to attempt to enable or disable the service on one of the cluster or failover domain members. Refer to <xref linkend="s1-service-disable" /> and <xref linkend="s1-service-enable" /> for more information.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 If the service does not start or stop on the member, examine the <filename>/var/log/messages</filename> and (if configured to log separately) <filename>/var/log/cluster</filename> log files, and diagnose and correct the problem. You may need to modify the service to fix incorrect information in the cluster configuration file (for example, an incorrect start script), or you may need to perform manual tasks on the owner member (for example, unmounting file systems).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Repeat the attempt to enable or disable the service on the member. If repeated attempts fail to correct the problem and enable or disable the service, reboot the member.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 If still unable to successfully start the service, verify that the service can be manually restarted outside of the cluster framework. For example, this may include manually mounting the file systems and manually running the service start script.
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+</chapter>
+

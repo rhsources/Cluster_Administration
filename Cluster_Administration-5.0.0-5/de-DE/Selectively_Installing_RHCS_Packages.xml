@@ -1,0 +1,11 @@
+<?xml version='1.0'?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<appendix id="ap-rhcs-sw-inst-cust"><title>Selectively Installing &RHCS; Packages</title>
+<para>
+	 SOFTWARE-PKG-CUST should go here :( 
+</para>
+</appendix>

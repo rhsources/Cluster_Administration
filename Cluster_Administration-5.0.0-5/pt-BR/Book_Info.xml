@@ -1,0 +1,70 @@
+<?xml version='1.0'?>
+<!DOCTYPE bookinfo PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<bookinfo>
+	<title>Configuring and Managing a &RH; Cluster</title>
+	<subtitle>Red Hat Cluster Suite</subtitle>
+	<issuenum>5.0.0</issuenum>
+	<productnumber>5</productnumber>
+	<abstract>
+		<para>
+			 Clustered systems provide reliability, scalability, and availability to critical production services. Using a &RH; Cluster, you can create high-availability clusters for file sharing, Web servers, and more. This document describes the configuration and management of &RH; cluster systems. It does not include information about &RH; Linux Virtual Servers (LVS). Information about installing and configuring LVS is in a separate document. 
+		</para>
+	</abstract>
+	<isbn>N/A</isbn>
+	<mediaobject>
+		<imageobject>
+			<imagedata fileref="Common_Content/images/rhlogo-chapter-title.png" />
+		</imageobject>
+	</mediaobject>
+	<publisher>
+		<publishername>
+			<inlinemediaobject>
+				<imageobject>
+					<imagedata fileref="Common_Content/images/rhlogo-title.png" />
+				</imageobject>
+			</inlinemediaobject>
+		</publishername>
+	</publisher>
+	<copyright>
+		<year>&YEAR;</year>
+		<holder>&FORMAL-RHI;</holder>
+	</copyright>
+	<xi:include href="Common_Content/Boilerplate.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<revhistory>
+		<revision>
+			<revnumber>5.0.0-4</revnumber>
+			<date>Thu Jan 24 2007</date>
+			<author>
+				<firstname>Michael Hideo</firstname>
+				<surname>Smith</surname>
+				<email>mhideo@redhat.com</email>
+			</author>
+			<revdescription>
+				<simplelist>
+					<member>Resolves: #221246</member>
+					<member>Fix to broken rpm</member>
+				</simplelist>
+			</revdescription>
+		</revision>
+		<revision>
+			<revnumber>5.0.0-3</revnumber>
+			<date>Thu Jan 11 2007</date>
+			<author>
+				<firstname>Michael Hideo</firstname>
+				<surname>Smith</surname>
+				<email>mhideo@redhat.com</email>
+			</author>
+			<revdescription>
+				<simplelist>
+					<member>Resolves: #221246</member>
+					<member>Fix to broken rpm</member>
+				</simplelist>
+			</revdescription>
+		</revision>
+	</revhistory>
+</bookinfo>
+

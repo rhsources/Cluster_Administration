@@ -1,0 +1,364 @@
+<?xml version='1.0'?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<appendix id="ap-cmdline"><title>Cluster Command-line Utilities</title>
+<indexterm>
+	
+	<primary>cluster command-line utilities</primary>
+</indexterm>
+<indexterm>
+	
+	<primary>cluster software</primary>
+	<secondary>command-line utilities</secondary>
+</indexterm>
+<indexterm>
+	
+	<primary>&RHCM;</primary>
+	<secondary>command-line utilities</secondary>
+</indexterm>
+<para>
+	 This appendix provides reference information on the following command-line utilities provided with &RHCS;: 
+</para>
+<itemizedlist>
+	<listitem>
+		<para>
+			<command>system-config-cluster-cmd</command>			&amp;mdash;Provides command-line access to the configuration features of the <application>&RHCLUSTERTOOL;</application> utility 
+		</para>
+	</listitem>
+	<listitem>
+		<para>
+			<command>shutil</command>			&amp;mdash;Checks status of the quorum partitions 
+		</para>
+	</listitem>
+	<listitem>
+		<para>
+			<command>clufence</command>			&amp;mdash;Tests and controls the connections to network and serial-attached power switches 
+		</para>
+	</listitem>
+</itemizedlist>
+<section id="s1-cmdline-cluconfig">
+	<title>Using <command>system-config-cluster-cmd</command></title>
+	<indexterm>
+		
+		<primary>utilities</primary>
+		<secondary>system-config-cluster-cmd</secondary>
+	</indexterm>
+	<para>
+		 This section details an example of the <application>system-config-cluster-cmd</application> utility, which allows you to configure all aspects of the cluster, and stores the information in the <filename>/etc/cluster/cluster.conf</filename> file. 
+	</para>
+	<para>
+		 Usage, options, and examples of using the <command>system-config-cluster-cmd</command> command can be found in its man page. To access the manpage from a shell-prompt, type <command>man system-config-cluster-cmd</command>. 
+	</para>
+	<para>
+		 The following describes an example cluster system that is configured using only the <command>system-config-cluster-cmd</command> utility. 
+	</para>
+	<para>
+		 Suppose a system administrator wants to create a cluster system that will serve highly available NFS services to the engineering department of a small organization. The NFS export should only be accessible to the three members of the department (Bob, Jane, and Tom). 
+	</para>
+	<orderedlist>
+		<listitem>
+			<para>
+				 Add the service and assign it a descriptive name to distinguish its functionality from other services that may run on the cluster. 
+			</para>
+			<screen><command>system-config-cluster-cmd --add_service --name=nfs_engineers </command></screen>
+		</listitem>
+		<listitem>
+			<para>
+				 Add a service IP address that will transfer from one member to another in the event of failover: 
+			</para>
+			<screen><command>system-config-cluster-cmd --service=nfs_engineers --add_service_ipaddress &#92; --ipaddress=10.0.0.10 </command></screen>
+		</listitem>
+		<listitem>
+			<para>
+				 Add a device to the service (the disk partition that serves as the NFS export): 
+			</para>
+			<screen><command>system-config-cluster-cmd --service=nfs_engineering --add_device --name=/dev/sdc3 </command></screen>
+		</listitem>
+		<listitem>
+			<para>
+				 Add a mount point for the device (note: the mount point cannot be listed in <filename>/etc/fstab</filename>): 
+			</para>
+			<screen><command>system-config-cluster-cmd --service=nfs_engineering --device=/dev/sdc3 --mount &#92; --mountpoint=/mnt/nfs/engineering/ --fstype=ext3 &#92; --options=rw,nosuid,sync --forceunmount=yes </command></screen>
+		</listitem>
+		<listitem>
+			<para>
+				 Add the mounted directory for NFS exporting: 
+			</para>
+			<screen><command>system-config-cluster-cmd --service=nfs_engineering --device=/dev/sdc3 &#92; --add_nfs_export --name=/mnt/nfs/engineering </command></screen>
+		</listitem>
+		<listitem id="s1-cmdline-rhccc-ex">
+			<para>
+				 Allow Bob to access the clustered NFS export: 
+			</para>
+			<screen><command>system-config-cluster-cmd --service=nfs_engineering --device=/dev/sdc3 &#92; --nfsexport=/mnt/nfs/engineering --add_client --name=bob &#92; --options=rw </command></screen>
+		</listitem>
+		<listitem>
+			<para>
+				 Repeat step <xref linkend="s1-cmdline-rhccc-ex" /> for Jane and Tom. 
+			</para>
+		</listitem>
+	</orderedlist>
+	<para>
+		 For more information and examples of using <command>system-config-cluster-cmd</command>, refer to the man page by typing the following at a shell prompt: 
+	</para>
+	<screen><command>man system-config-cluster-cmd </command></screen>
+</section>
+<section id="s1-cmdline-shutil">
+	<title>Using the <command>shutil</command>Utility</title>
+	<indexterm>
+		
+		<primary>cluster</primary>
+		<secondary>checking the configuration</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>cluster configuration</primary>
+		<secondary>using the shutil utility</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>testing</primary>
+		<secondary>quorum partitions</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>quorum partitions</primary>
+		<secondary>testing</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>utilities</primary>
+		<secondary>shutil</secondary>
+	</indexterm>
+	<para>
+		 Test the quorum partitions and ensure that they are accessible by invoking the <command>shutil</command> utility with the <option>-p</option> option. 
+	</para>
+	<para>
+		 Running <command>/usr/sbin/shutil -p /cluster/header</command> on all active cluster members should give the same output on each machine. For example: 
+	</para>
+	<screen>/cluster/header is 144 bytes longSharedStateHeader {        ss_magic = 0x39119fcd        ss_timestamp = 0x000000003f5d3eea (22:46:02 Sep 08 2003)        ss_updateHost = lab.example.com}</screen><para>
+		 If the output of the <command>shutil</command> utility with the <option>-p</option> option is not the same on all cluster systems, perform the following: 
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				 Examine the <filename>/etc/sysconfig/rawdevices</filename> file on each cluster system and ensure that the raw character devices and block devices for the primary and backup quorum partitions have been accurately specified. If they are not the same, edit the file and correct any mistakes. Then re-run the <application>cluconfig</application> utility. Refer to <xref linkend="s1-software-rawdevices" /> for more information. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 Ensure that you have created the raw devices for the quorum partitions on each cluster system. Refer to <xref linkend="s3-hardware-quorum" /> for more information. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 On each cluster system, examine the system startup messages at the point where the system probes the SCSI subsystem to determine the bus configuration. Verify that both cluster systems identify the same shared storage devices and assign them the same name. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 Verify that a cluster system is not attempting to mount a file system on the quorum partition. For example, make sure that the actual device (for example, <filename>/dev/sdb1</filename>) is not included in an <filename>/etc/fstab</filename> file. 
+			</para>
+		</listitem>
+	</itemizedlist>
+</section>
+<section id="s1-cmdline-clusvcadm">
+	<title>Using the <command>clusvcadm</command>Utility</title>
+	<indexterm>
+		
+		<primary><command>clusvcadm</command></primary>
+		<secondary>using</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>utilities</primary>
+		<secondary>clusvcadm</secondary>
+	</indexterm>
+	<para>
+		 The <command>clusvcadm</command> utility provides a command-line user interface that enables an administrator to monitor and manage the cluster systems and services. Use the <command>clusvcadm</command> utility to perform the following tasks: 
+	</para>
+	<itemizedlist>
+		<listitem>
+			<para>
+				 Disable and enable services 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 Relocate and restart cluster services 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 lock and unlock service state 
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		 The <command>clusvcadm</command> command line options are as follows: 
+	</para>
+	<variablelist>
+		<varlistentry><term><option>-d</option><replaceable>service</replaceable></term><listitem>
+			<para>
+				 Disable a service. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-e</option><replaceable>service</replaceable></term><listitem>
+			<para>
+				 Enable a service. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-e</option><replaceable>service</replaceable>-m <replaceable>member</replaceable></term><listitem>
+			<para>
+				 Enable a service on a specific member. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-l</option></term><listitem>
+			<para>
+				 Lock the service states. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-r</option><replaceable>service</replaceable>-m <replaceable>member</replaceable></term><listitem>
+			<para>
+				 Relocate a service to a specific member. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-q</option></term><listitem>
+			<para>
+				 Operate quietly. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-R</option></term><listitem>
+			<para>
+				 Restart a service. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-s</option></term><listitem>
+			<para>
+				 Stop a service 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-u</option></term><listitem>
+			<para>
+				 Unlock the service states. 
+			</para>
+		</listitem>
+		</varlistentry><varlistentry><term><option>-v</option></term><listitem>
+			<para>
+				 Displays information about the current version of <command>clusvcadm</command>. 
+			</para>
+		</listitem>
+		</varlistentry>
+	</variablelist>
+	<para>
+		 Refer to the <command>clusvcadm</command>(8) man page for more information. 
+	</para>
+</section>
+<section id="s1-cmdline-custonith">
+	<title>Using the <command>clufence</command>Utility</title>
+	<indexterm>
+		
+		<primary>utilities</primary>
+		<secondary>clufence</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>testing</primary>
+		<secondary>power switches</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>power switches</primary>
+		<secondary>testing</secondary>
+	</indexterm>
+	<para>
+		 If power switches are used in the cluster hardware configuration, run the <command>clufence</command> utility on each cluster system to ensure that it can remotely power-cycle the other cluster members. 
+	</para>
+	<para>
+		 If the command succeeds, run the <command>shutil -p</command> command on both cluster systems to display a summary of the header data structure for the quorum partitions. If the output is different on the systems, the quorum partitions do not point to the same devices on both systems. Check to make sure that the raw devices exist and are correctly specified in the <filename>/etc/sysconfig/rawdevices</filename> file. See <xref linkend="s3-hardware-quorum" /> for more information. 
+	</para>
+	<para>
+		 If either network- or serial-attached power switches are employed in the cluster hardware configuration, install the cluster software and invoke the <command>clufence</command> command to test the power switches. Invoke the command on each cluster system to ensure that it can remotely power-cycle the other cluster members. If testing is successful, then the cluster can be started. 
+	</para>
+	<para>
+		 The <command>clufence</command> command can accurately test a power switch. The format of the <command>clufence</command> command is as follows: 
+	</para>
+	<screen><computeroutput>usage: clufence [-d] [-[furs] &lt;member&gt;] -d Turn on debugging -f &lt;member&gt; Fence (power off) &lt;member&gt; -u &lt;member&gt; Unfence (power on) &lt;member&gt; -r &lt;member&gt; Reboot (power cycle) &lt;member&gt; -s &lt;member&gt; Check status of all switches controlling &lt;member&gt; </computeroutput></screen><para>
+		 When testing power switches, the first step is to ensure that each cluster member can successfully communicate with its attached power switch. The following example of the <command>clufence</command> command output shows that the cluster member is able to communicate with its power switch: 
+	</para>
+	<screen><computeroutput>[23750] info: STONITH: baytech at 192.168.1.31, port 1 controls clu2 [23750] info: STONITH: baytech at 192.168.1.31, port 2 controls clu3 [23750] info: STONITH: wti_nps at 192.168.1.29, port clu4 controls clu4 [23750] info: STONITH: wti_nps at 192.168.1.29, port clu5 controls clu5 </computeroutput></screen><para>
+		 Any errors in the output could be indicative of the following types of problems: 
+	</para>
+	<indexterm>
+		
+		<primary>troubleshooting</primary>
+		<secondary>power switch testing</secondary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>power switches</primary>
+		<secondary>troubleshooting</secondary>
+	</indexterm>
+	<itemizedlist>
+		<listitem>
+			<para>
+				 For serial attached power switches: 
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						 Verify that the device special file for the remote power switch connection serial port (for example, <filename>/dev/ttyS0</filename>) is specified correctly in the cluster database, as established via <application>&RHCLUSTERTOOL;</application>. If necessary, use a terminal emulation package such as <application>minicom</application> to test if the cluster system can access the serial port. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 Ensure that a non-cluster program (for example, a <command>getty</command> program) is not using the serial port for the remote power switch connection. You can use the <command>lsof</command> command to perform this task. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 Check that the cable connection to the remote power switch is correct. Verify that the correct type of cable is used (for example, an RPS-10 power switch requires a null modem cable), and that all connections are securely fastened. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 Verify that any physical dip switches or rotary switches on the power switch are set properly. 
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+		<listitem>
+			<para>
+				 For network based power switches: 
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						 Verify that the network connection to network-based switches is operational. Most switches have a link light that indicates connectivity. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 It should be possible to <command>ping</command> the network switch; if not, then the switch may not be properly configured for its network parameters. 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						 Verify that the correct password and login name (depending on switch type) have been specified in the cluster configuration database (as established by running <application>&RHCLUSTERTOOL;</application>). A useful diagnostic approach is to verify Telnet access to the network switch using the same parameters as specified in the cluster configuration. 
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+	</itemizedlist>
+	<para>
+		 After successfully verifying communication with the switch, attempt to power cycle the other cluster member. Prior to doing this, it is recommended to verify that the other cluster member is not actively performing any important functions (such as serving cluster services to active clients). By executing the following command : 
+	</para>
+	<screen><command>clufence -r clu3</command></screen><para>
+		 The following depicts a successful power cycle operation: 
+	</para>
+	<screen>Successfully power cycled host clu3. </screen>
+</section>
+</appendix>

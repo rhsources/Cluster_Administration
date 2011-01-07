@@ -1,0 +1,673 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % RH_ENTITIES SYSTEM "./Common_Config/rh-entities.ent">
+%RH_ENTITIES;
+]>
+
+<chapter id="ch-admin-conga">
+	<title>Cluster Administration With <application>Conga</application></title>
+	<indexterm>
+		
+		<primary>cluster administration</primary>
+	</indexterm>
+	<indexterm>
+		
+		<primary>cluster</primary>
+		<secondary>administration</secondary>
+	</indexterm>
+	<para>
+		 This chapter describes the various administrative tasks for maintaining a cluster after it has been installed and configured. 
+	</para>
+	<section id="s1-admin-overview-conga">
+		<title>Overview of the <application>&RHCLUSTERSTATTOOL;</application></title>
+		<para>
+			 The <application>&RHCLUSTERSTATTOOL;</application> is part of the &RHCS; management GUI, (the <filename>system-config-cluster</filename> package) and is accessed by a tab in the &RHCS; management GUI. The <application>&RHCLUSTERSTATTOOL;</application> displays the status of cluster members and services and provides control of cluster services. 
+		</para>
+		<para>
+			 The members and services displayed in the <application>&RHCLUSTERSTATTOOL;</application> are determined by the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>). The cluster configuration file is maintained via the <application>&RHCLUSTERTOOL;</application> in the cluster management GUI. 
+		</para>
+		<warning><title>Warning</title>
+		<para>
+			 Do not manually edit the contents of the <filename>/etc/cluster/cluster.conf</filename> file without guidance from an authorized &RH; representative or unless you fully understand the consequences of editing the <filename>/etc/cluster/cluster.conf</filename> file manually. 
+		</para>
+		</warning><para>
+			 You can access the <application>&RHCLUSTERSTATTOOL;</application> by clicking the <guimenu>Cluster Management</guimenu> tab at the cluster management GUI to <xref linkend="fig-intro-clustatus" />). 
+		</para>
+		<para>
+			 Use the <application>&RHCLUSTERSTATTOOL;</application> to enable, disable, restart, or relocate a service. To enable a service, select the service in the <guilabel>Services</guilabel> area and click <guilabel>Enable</guilabel>. To disable a service, select the service in the <guilabel>Services</guilabel> area and click <guilabel>Disable</guilabel>. To restart a service, select the service in the <guilabel>Services</guilabel> area and click <guilabel>Restart</guilabel>. To relocate service from one member to another, drag the service to another member and drop the service onto that member. Relocating a member restarts the service on that member. (Relocating a service to its current member &amp;mdash; that is, dragging a service to its current member and dropping the service onto that member &amp;mdash; restarts the service.) 
+		</para>
+		<figure id="fig-intro-clustatus-conga">
+			<title><application>&RHCLUSTERSTATTOOL;</application></title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/clustatus.png" />
+				</imageobject>
+				<textobject><para>
+					 cluster status tool 
+				</para>
+				</textobject>
+			</mediaobject>
+		</figure>
+	</section>
+	<section id="s1-admin-display-conga">
+		<title>Displaying Cluster and Service Status</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>displaying cluster and service status</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>displaying status</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster service</primary>
+			<secondary>displaying status</secondary>
+		</indexterm>
+		<para>
+			 Monitoring cluster and application service status can help identify and resolve problems in the cluster environment. The following tools assist in displaying cluster status information: 
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					 The <application>&RHCLUSTERSTATTOOL;</application>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 The <command>clustat</command> utility 
+				</para>
+			</listitem>
+		</itemizedlist>
+		<important><title>Important</title>
+		<para>
+			 Members that are not running the cluster software cannot determine or report the status of other members of the cluster. 
+		</para>
+		</important>
+		<para>
+			 Cluster and service status includes the following information: 
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					 Cluster member system status 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Service status and which cluster system is running the service or owns the service 
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			 The following tables describe how to analyze the status information shown by the <application>&RHCLUSTERSTATTOOL;</application> and the <command>clustat</command> utility. 
+		</para>
+		<indexterm>
+			
+			<primary>tables</primary>
+			<secondary>member status for <application>&RHCLUSTERSTATTOOL;</application></secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>member status for <application>&RHCLUSTERSTATTOOL;</application>table</primary>
+		</indexterm>
+		<table id="tb-admin-memberstattool-conga">
+			<title>Member Status for the <application>&RHCLUSTERSTATTOOL;</application></title>
+			<tgroup cols="2">
+				<colspec colname="MemberStatus" colnum="1" colwidth="3*"></colspec><colspec colname="Description" colnum="2" colwidth="9*"></colspec><thead>
+					<row>
+						<entry>
+							 Member Status
+						</entry>
+						<entry>
+							 Description
+						</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>
+							<guilabel>Member</guilabel>
+						</entry>
+						<entry>
+							<simplelist>
+								<member>The node is part of the cluster.</member>
+								<member>Note: A node can be a member of a cluster; however, the node may be inactive and incapable of running services. For example, if <command>rgmanager</command>is not running on the node, but all other cluster software components are running in the node, the node appears as a <guilabel>Member</guilabel>in the <application>&RHCLUSTERSTATTOOL;</application>. However, without <command>rgmanager</command>running, the node does not appear in the <command>clustat</command>display. </member>
+							</simplelist>
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<guilabel>Dead</guilabel>
+						</entry>
+						<entry>
+							 The member system is unable to participate as a cluster member. The most basic cluster software is not running on the node. 
+						</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+		<indexterm>
+			
+			<primary>tables</primary>
+			<secondary>member status for<command>clustat</command></secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>member status for<command>clustat</command>table</primary>
+		</indexterm>
+		<table id="tb-admin-memberclustat-conga">
+			<title>Member Status for <command>clustat</command></title>
+			<tgroup cols="2">
+				<colspec colname="MemberStatus" colnum="1" colwidth="3*"></colspec><colspec colname="Description" colnum="2" colwidth="9*"></colspec><thead>
+					<row>
+						<entry>
+							 Member Status 
+						</entry>
+						<entry>
+							 Description
+						</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>
+							<guilabel>Online</guilabel>
+						</entry>
+						<entry>
+							 The node is communicating with other nodes in the cluster.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<guilabel>Inactive</guilabel>
+						</entry>
+						<entry>
+							<simplelist>
+								<member>The node is unable to communicate with the other nodes in the cluster. If the node is inactive, <command>clustat</command>does not display the node. If <command>rgmanager</command>is not running in a node, the node is inactive.</member>
+								<member>Note: Although a node is inactive, it may still appear as a <guilabel>Member</guilabel>in the <application>&RHCLUSTERSTATTOOL;</application>. However, if the node is inactive, it is incapable of running services.</member>
+							</simplelist>
+						</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+		<indexterm>
+			
+			<primary>tables</primary>
+			<secondary>service status</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>service status table</primary>
+		</indexterm>
+		<table id="tb-admin-servicestat-conga">
+			<title>Service Status</title>
+			<tgroup cols="2">
+				<colspec colname="ServiceStatus" colnum="1" colwidth="3*"></colspec><colspec colname="Description" colnum="2" colwidth="9*"></colspec><thead>
+					<row>
+						<entry>
+							 Service Status
+						</entry>
+						<entry>
+							 Description
+						</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>
+							<guilabel>Started</guilabel>
+						</entry>
+						<entry>
+							 The service resources are configured and available on the cluster system that owns the service.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<guilabel>Pending</guilabel>
+						</entry>
+						<entry>
+							 The service has failed on a member and is pending start on another member. 
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<guilabel>Disabled</guilabel>
+						</entry>
+						<entry>
+							 The service has been disabled, and does not have an assigned owner. A disabled service is never restarted automatically by the cluster.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<guilabel>Stopped</guilabel>
+						</entry>
+						<entry>
+							 The service is not running; it is waiting for a member capable of starting the service. A service remains in the stopped state if autostart is disabled.
+						</entry>
+					</row>
+					<row>
+						<entry>
+							<guilabel>Failed</guilabel>
+						</entry>
+						<entry>
+							 The service has failed to start on the cluster and cannot successfully stop the service. A failed service is never restarted automatically by the cluster. 
+						</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+		<para>
+			 The <application>&RHCLUSTERSTATTOOL;</application> displays the current cluster status in the <guilabel>Services </guilabel> area and automatically updates the status every 10 seconds. Additionally, you can display a snapshot of the current cluster status from a shell prompt by invoking the <command>clustat</command> utility. <xref linkend="ex-admin-clustatout" /> shows the output of the <command>clustat</command> utility. 
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<para>
+		</para>
+		<example id="ex-admin-clustatout-conga"><title>Output of <command>clustat</command></title>
+		<screen># 
+		<userinput>clustat</userinput><computeroutput>Member Status: Quorate, Group Member Member Name State ID ------ ---- ----- -- tng3-2 Online 0x0000000000000002 tng3-1 Online 0x0000000000000001 Service Name Owner (Last) State -------- ----- ----- ------ ----- webserver (tng3-1 ) failed email tng3-2 started </computeroutput></screen></example><para>
+			 To monitor the cluster and display status at specific time intervals from a shell prompt, invoke <command>clustat</command> with the <command>-i <replaceable>time</replaceable></command> option, where <replaceable>time</replaceable> specifies the number of seconds between status snapshots. The following example causes the <command>clustat</command> utility to display cluster status every 10 seconds: 
+		</para>
+		<screen>#
+		<userinput>clustat -i 10</userinput></screen>
+	</section>
+	<section id="s1-admin-start-conga">
+		<title>Starting and Stopping the Cluster Software</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>starting and stopping the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster software</primary>
+			<secondary>starting and stopping</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>System V <filename>init</filename></primary>
+		</indexterm>
+		<para>
+			 To start the cluster software on a member, type the following commands in this order: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service ccsd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service lock_gulmd start</command>					or <command>service cman start</command> according to the type of lock manager used 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced start</command>					(DLM clusters only) 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs start</command>					, if you are using &RHGFS; 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service rgmanager start</command>
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			 To stop the cluster software on a member, type the following commands in this order: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service rgmanager stop</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs stop</command>					, if you are using &RHGFS; 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd stop</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced stop</command>					(DLM clusters only) 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service lock_gulmd stop</command>					or <command>service cman stop</command> according to the type of lock manager used 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service ccsd stop</command>
+				</para>
+			</listitem>
+		</orderedlist>
+		<para>
+			 Stopping the cluster services on a member causes its services to fail over to an active member. 
+		</para>
+	</section>
+	<section id="s1-admin-modify-conga">
+		<title>Modifying the Cluster Configuration</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>modifying the cluster configuration</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster configuration</primary>
+			<secondary>modifying</secondary>
+		</indexterm>
+		<para>
+			 To modify the cluster configuration (the cluster configuration file (<filename>/etc/cluster/cluster.conf</filename>), use the <application>&RHCLUSTERTOOL;</application>. For more information about using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="ch-software" />. 
+		</para>
+		<warning><title>Warning</title>
+		<para>
+			 Do not manually edit the contents of the <filename>/etc/cluster/cluster.conf</filename> file without guidance from an authorized &RH; representative or unless you fully understand the consequences of editing the <filename>/etc/cluster/cluster.conf</filename> file manually. 
+		</para>
+		</warning><important><title>Important</title>
+		<para>
+			 Although the <application>&RHCLUSTERTOOL;</application> provides a <guilabel>Quorum Votes</guilabel> parameter in the <guilabel>Properties</guilabel> dialog box of each cluster member, that parameter is intended <emphasis>only</emphasis> for use during initial cluster configuration. Furthermore, it is recommended that you retain the default <guilabel>Quorum Votes</guilabel> value of 
+			<userinput>1</userinput>. For more information about using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="ch-software" />. 
+		</para>
+		</important>
+		<para>
+			 To edit the cluster configuration file, click the <guilabel>Cluster Configuration</guilabel> tab in the cluster configuration GUI. Clicking the <guilabel>Cluster Configuration</guilabel> tab displays a graphical representation of the cluster configuration. Change the configuration file according the the following steps: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 Make changes to cluster elements (for example, create a service). 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Propagate the updated configuration file throughout the cluster by clicking <guibutton>Send to Cluster</guibutton>. 
+				</para>
+				<note>
+					<title>Note</title>
+					<para>
+						 The <application>&RHCLUSTERTOOL;</application> does not display the <guibutton>Send to Cluster</guibutton> button if the cluster is new and has not been started yet, or if the node from which you are running the <application>&RHCLUSTERTOOL;</application> is not a member of the cluster. If the <guibutton>Send to Cluster</guibutton> button is not displayed, you can still use the <application>&RHCLUSTERTOOL;</application>; however, you cannot propagate the configuration. You can still <emphasis>save</emphasis> the configuration file. For information about using the <application>&RHCLUSTERTOOL;</application> for a new cluster configuration, refer to <xref linkend="ch-software" />. 
+					</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>Send to Cluster</guibutton> causes a <guilabel>Warning</guilabel> dialog box to be displayed. Click <guibutton>Yes</guibutton> to save and propagate the configuration. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>Yes</guibutton> causes an <guilabel>Information</guilabel> dialog box to be displayed, confirming that the current configuration has been propagated to the cluster. Click <guibutton>OK</guibutton>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Click the <guilabel>Cluster Management</guilabel> tab and verify that the changes have been propagated to the cluster members. 
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-admin-backup-conga">
+		<title>Backing Up and Restoring the Cluster Database</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>backing up the cluster database</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster database</primary>
+			<secondary>backing up</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>restoring the cluster database</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster database</primary>
+			<secondary>restoring</secondary>
+		</indexterm>
+		<para>
+			 The <application>&RHCLUSTERTOOL;</application> automatically retains backup copies of the three most recently used configuration files (besides the currently used configuration file). Retaining the backup copies is useful if the cluster does not function correctly because of misconfiguration and you need to return to a previous working configuration. 
+		</para>
+		<para>
+			 Each time you save a configuration file, the <application>&RHCLUSTERTOOL;</application> saves backup copies of the three most recently used configuration files as <filename>/etc/cluster/cluster.conf.bak.1</filename>, <filename>/etc/cluster/cluster.conf.bak.2</filename>, and <filename>/etc/cluster/cluster.conf.bak.3</filename>. The backup file <filename>/etc/cluster/cluster.conf.bak.1</filename> is the newest backup, <filename>/etc/cluster/cluster.conf.bak.2</filename> is the second newest backup, and <filename>/etc/cluster/cluster.conf.bak.3</filename> is the third newest backup. 
+		</para>
+		<para>
+			 If a cluster member becomes inoperable because of misconfiguration, restore the configuration file according to the following steps: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					 At the <application>&RHCLUSTERTOOL;</application> tab of the &RHCS; management GUI, click <guimenu>File</guimenu>= &gt; <guimenuitem>Open</guimenuitem>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guilabel>File = &gt; Open</guilabel> causes the <guilabel>system-config-cluster</guilabel> dialog box to be displayed. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 At the the <guilabel>system-config-cluster</guilabel> dialog box, select a backup file (for example, <filename>/etc/cluster/cluster.conf.bak.1</filename>). Verify the file selection in the <guilabel>Selection</guilabel> box and click <guibutton>OK</guibutton>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Increment the configuration version beyond the current working version number as follows: 
+				</para>
+				<orderedlist>
+					<listitem>
+						<para>
+							 Click <guilabel>Cluster</guilabel>= &gt; <guilabel>Edit Cluster Properties</guilabel>. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							 At the <guilabel>Cluster Properties</guilabel> dialog box, change the <guilabel>Config Version</guilabel> value and click <guibutton>OK</guibutton>. 
+						</para>
+					</listitem>
+				</orderedlist>
+			</listitem>
+			<listitem>
+				<para>
+					 Click <guimenu>File</guimenu>= &gt; <guimenuitem>Save As</guimenuitem>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guimenu>File</guimenu>= &gt; <guimenuitem>Save As</guimenuitem> causes the <guilabel>system-config-cluster</guilabel> dialog box to be displayed. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 At the the <guilabel>system-config-cluster</guilabel> dialog box, select <filename>/etc/cluster/cluster.conf</filename> and click <guibutton>OK</guibutton>. (Verify the file selection in the <guilabel>Selection</guilabel> box.) 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>OK</guibutton> causes an <guilabel>Information</guilabel> dialog box to be displayed. At that dialog box, click <guibutton>OK</guibutton>. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Propagate the updated configuration file throughout the cluster by clicking <guibutton>Send to Cluster</guibutton>. 
+				</para>
+				<note>
+					<title>Note</title>
+					<para>
+						 The <application>&RHCLUSTERTOOL;</application> does not display the <guibutton>Send to Cluster</guibutton> button if the cluster is new and has not been started yet, or if the node from which you are running the <application>&RHCLUSTERTOOL;</application> is not a member of the cluster. If the <guibutton>Send to Cluster</guibutton> button is not displayed, you can still use the <application>&RHCLUSTERTOOL;</application>; however, you cannot propagate the configuration. You can still <emphasis>save</emphasis> the configuration file. For information about using the <application>&RHCLUSTERTOOL;</application> for a new cluster configuration, refer to <xref linkend="ch-software" />. 
+					</para>
+				</note>
+			</listitem>
+			<listitem>
+				<para>
+					 Clicking <guibutton>Send to Cluster</guibutton> causes a <guilabel>Warning</guilabel> dialog box to be displayed. Click <guibutton>Yes</guibutton> to propagate the configuration. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 Click the <guilabel>Cluster Management</guilabel> tab and verify that the changes have been propagated to the cluster members. 
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-admin-update-conga">
+		<title>Updating the Cluster Software</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>updating the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster software</primary>
+			<secondary>updating</secondary>
+		</indexterm>
+		<para>
+			 For information about updating the cluster software, contact an authorized Red Hat support representative. 
+		</para>
+	</section>
+	<section id="s1-admin-name-conga">
+		<title>Changing the Cluster Name</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>changing the cluster name</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>name, changing</secondary>
+		</indexterm>
+		<para>
+			 Although the <application>&RHCLUSTERTOOL;</application> provides a <guilabel>Cluster Properties</guilabel> dialog box with a cluster <guilabel>Name</guilabel> parameter, the parameter is intended <emphasis>only</emphasis> for use during initial cluster configuration. The only way to change the name of a &RH; cluster is to create a new cluster with the new name. For more information about using the <application>&RHCLUSTERTOOL;</application>, refer to <xref linkend="ch-software" />. 
+		</para>
+	</section>
+	<section id="s1-admin-disable-conga">
+		<title>Disabling the Cluster Software</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>disabling the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>disabling the cluster software</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster software</primary>
+			<secondary>disabling</secondary>
+		</indexterm>
+		<para>
+			 It may become necessary to temporarily disable the cluster software on a cluster member. For example, if a cluster member experiences a hardware failure, you may want to reboot that member, but prevent it from rejoining the cluster to perform maintenance on the system. 
+		</para>
+		<para>
+			 Use the <command>/sbin/chkconfig</command> command to stop the member from joining the cluster at boot-up as follows: 
+		</para>
+		<screen><command>chkconfig --level 2345 rgmanager off</command><command>chkconfig --level 2345 gfs off</command><command>chkconfig --level 2345 clvmd off</command><command>chkconfig --level 2345 fenced off</command><command>chkconfig --level 2345 lock_gulmd off</command><command>chkconfig --level 2345 cman off</command><command>chkconfig --level 2345 ccsd off</command></screen><para>
+			 Once the problems with the disabled cluster member have been resolved, use the following commands to allow the member to rejoin the cluster: 
+		</para>
+		<screen><command>chkconfig --level 2345 rgmanager on</command><command>chkconfig --level 2345 gfs on</command><command>chkconfig --level 2345 clvmd on</command><command>chkconfig --level 2345 fenced on</command><command>chkconfig --level 2345 lock_gulmd on</command><command>chkconfig --level 2345 cman on</command><command>chkconfig --level 2345 ccsd on</command></screen><para>
+			 You can then reboot the member for the changes to take effect or run the following commands in the order shown to restart cluster software: 
+		</para>
+		<orderedlist>
+			<listitem>
+				<para>
+					<command>service ccsd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service lock_gulmd start</command>					or <command>service cman start</command> according to the type of lock manager used 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service fenced start</command>					(DLM clusters only) 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service clvmd start</command>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service gfs start</command>					, if you are using &RHGFS; 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<command>service rgmanager start</command>
+				</para>
+			</listitem>
+		</orderedlist>
+	</section>
+	<section id="s1-admin-problems-conga">
+		<title>Diagnosing and Correcting Problems in a Cluster</title>
+		<indexterm>
+			
+			<primary>cluster administration</primary>
+			<secondary>diagnosing and correcting problems in a cluster</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>cluster</primary>
+			<secondary>diagnosing and correcting problems</secondary>
+		</indexterm>
+		<indexterm>
+			
+			<primary>troubleshooting</primary>
+			<secondary>diagnosing and correcting problems in a cluster</secondary>
+		</indexterm>
+		<para>
+			 For information about diagnosing and correcting problems in a cluster, contact an authorized Red Hat support representative. 
+		</para>
+	</section>
+</chapter>
+
